@@ -8,11 +8,11 @@
 
 // TODO : mod flags
 // describes client's permission, bitmasking
-#define JUST1RCE_SRCS_CLIENT_MOD_INVISIBLE 0b00`0001
-#define JUST1RCE_SRCS_CLIENT_MOD_WALLOPS 0b00`0010
-#define JUST1RCE_SRCS_CLIENT_MOD_OPERATOR 0b00`0100
-#define JUST1RCE_SRCS_CLIENT_MOD_REGISTERED 0b00`1000
-#define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0B01`0000
+#define JUST1RCE_SRCS_CLIENT_MOD_INVISIBLE 0b000001
+#define JUST1RCE_SRCS_CLIENT_MOD_WALLOPS 0b000010
+#define JUST1RCE_SRCS_CLIENT_MOD_OPERATOR 0b000100
+#define JUST1RCE_SRCS_CLIENT_MOD_REGISTERED 0b001000
+#define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0B010000
 
 #include <string>
 
@@ -69,7 +69,8 @@ class Client {
 
   // mode control
   std::string GetMode() const;
-  void SetMode(uint const flag, bool const do_flag_add);
+  void SetMode(uint const flags);
+  void UnsetMode(uint const flags);
   bool CheckMode(uint const flags) const;
 
   // TODO : receive message, read data from socket
