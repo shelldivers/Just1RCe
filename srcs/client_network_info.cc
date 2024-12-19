@@ -8,6 +8,7 @@ namespace Just1RCe {
 /**
  * @brief get IP address in IPv4 formatted string
  * @return formatted string
+ * @throws none
  */
 std::string Client::GetHostName() const {
   static uint const mask = 0b11111111000000000000000000000000;
@@ -25,6 +26,7 @@ std::string Client::GetHostName() const {
 /**
  * @brief get port number in string
  * @return string
+ * @throws none
  */
 std::string Client::GetPortNum() const {
   std::ostringstream oss;

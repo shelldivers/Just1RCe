@@ -1,6 +1,4 @@
 
-/*
- */
 #ifndef JUST1RCE_SRCS_CLIENT_H
 #define JUST1RCE_SRCS_CLIENT_H
 
@@ -20,6 +18,13 @@
 
 namespace Just1RCe {
 
+/**
+ *
+ * @brief Class that manage resources related to the client
+ * @details This class holds newwork/identification/status information
+ * @author eldeshue
+ * @date 2024-12-19
+ */
 class Client {
  private:
   Client();
