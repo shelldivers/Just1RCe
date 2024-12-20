@@ -19,14 +19,9 @@ jobs:
         run: |
           pip install cpplint
 
-      - name: For globstar  
-        run: |
-          shopt -s globstar
-
       - name: Generate file list
         run: |
           find . -name "*.cc" -o -name "*.h" > file_list.txt
-          
 
       - name: Run cpplint
         run: |

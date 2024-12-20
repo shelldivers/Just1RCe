@@ -13,14 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for C++ files
-        run: |
-          if ls **/*.cpp **/*.hpp > /dev/null 2>&1; then
-            echo "EXIT_WORKFLOW=false" >> $GITHUB_ENV
-          else
-            echo "EXIT_WORKFLOW=true" >> $GITHUB_ENV
-          fi
-
       - name: install cppcheck
         run: |
           sudo apt-get install -y cppcheck
@@ -29,21 +21,22 @@ jobs:
         run: |
           sudo apt-get install -y libxml2-utils
 
-      - name: Check for C++ files
+      - name: Generate file list from only srcs and includes
         run: |
-          FILES=$(find . -name "*.cpp" -o -name "*.hpp")
-          if [ -z "$FILES" ]; then
-            echo "No C++ files found. Skipping linting."
-            exit 0
-          fi
+          find . -name "*.cc" -path "./srcs/**" -o -name "*.h" -path "./includes/**" > file_list.txt
 
       - name: make report.xml by cppcheck
         run: |
-          find . -name "*.cc" -o -name "*.h" | xargs cppcheck --enable=all --suppress=missingIncludeSystem --xml --output-file=report.xml **/*
+          if [ ! -s file_list.txt ]; then
+            echo "No C++ files found."
+            exit 0
+          else
+            xargs cppcheck --language=c++ --enable=all --suppress=missingInclude --xml --output-file=not_filtered_report.xml < file_list.txt
+          fi
 
       - name: remove inforamtion severity from report.xml
         run: |
-          xmllint --xpath '//error[@severity="warning" or @severity="error"]' report.xml > filtered_report.xml
+          xmllint --xpath '//error[@severity="warning" or @severity="error"]' not_filtered_report.xml > report.xml
 
       - uses: Flast/cppcheck-sarif@v2
         with:
