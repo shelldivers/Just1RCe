@@ -7,9 +7,6 @@ if [ ! -s file_list.txt ]; then
 	rm -rf file_list.txt
 	exit 0
 else
-	xargs cppcheck --language=c++ --enable=all --suppress=missingInclude --xml --output-file=not_filtered_report.xml < file_list.txt
+	xargs cppcheck --language=c++ --enable=all --suppress=missingIncludeSystem --xml --output-file=report.xml < file_list.txt
 	rm -rf file_list.txt
-
-	xmllint --xpath '//error[@severity="warning" or @severity="error"]' not_filtered_report.xml > cppcheck_report.xml
-	rm -rf not_filtered_report.xml
 fi
