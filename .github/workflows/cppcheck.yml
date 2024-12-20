@@ -31,12 +31,8 @@ jobs:
             echo "No C++ files found."
             exit 0
           else
-            xargs cppcheck --language=c++ --enable=all --suppress=missingInclude --xml --output-file=not_filtered_report.xml < file_list.txt
+            xargs cppcheck --language=c++ --enable=all --suppress=missingIncludeSystem --xml --output-file=report.xml < file_list.txt
           fi
-
-      - name: remove inforamtion severity from report.xml
-        run: |
-          xmllint --xpath '//error[@severity="warning" or @severity="error"]' not_filtered_report.xml > report.xml
 
       - uses: Flast/cppcheck-sarif@v2
         with:
