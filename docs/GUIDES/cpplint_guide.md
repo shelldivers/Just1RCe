@@ -52,12 +52,13 @@ echo 'alias cpplint="~/goinfre/venv/bin/cpplint"' >> ./.zshrc
 ### COMMAND     
 
 ```bash
-
+find . -name "*.cc" -o -name "*.h" > file_list.txt
+xargs cpplint < file_list.txt
 ```   
 
 ### VSCODE EXTENSION   
 
-This [extension](https://marketplace.visualstudio.com/items?itemName=mine.cpplint) check coding style of cpp and c, when open and save source file   
+This [extension](https://marketplace.visualstudio.com/items?itemName=mine.cpplint) check coding style of cpp and c, when open and save source file .  
 
 
 
