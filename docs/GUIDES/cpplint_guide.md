@@ -51,12 +51,7 @@ echo 'alias cpplint="~/goinfre/venv/bin/cpplint"' >> ./.zshrc
 
 ### COMMAND     
 
-```bash
-find . -name "*.cc" -o -name "*.h" > file_list.txt
-xargs cpplint < file_list.txt
-```   
-
-or USE SCRIPT ./scripts/cpplint.sh
+USE SCRIPT ./scripts/cpplint.sh
 
 ### VSCODE EXTENSION   
 
