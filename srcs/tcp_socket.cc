@@ -9,7 +9,7 @@ extern "C" {
 #include <iostream>
 #include <stdexcept>
 
-#include "tcp_socket.h"
+#include "../includes/tcp_socket.h"
 
 namespace Just1RCe {
 
