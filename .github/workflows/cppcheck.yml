@@ -1,4 +1,4 @@
-name: cppCheck
+name: Cpp Check
 
 on:
   [push, pull_request]
