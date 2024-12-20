@@ -21,7 +21,7 @@ jobs:
 
       - name: Generate file list
         run: |
-          find . -name "*.cc" -o -name "*.h" > file_list.txt
+          find . \( -name "*.cc" -path "./srcs/**" \) -o \( -name "*.h" -path "./includes/**" \) > file_list.txt
 
       - name: Run cpplint
         run: |

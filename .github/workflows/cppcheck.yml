@@ -23,7 +23,7 @@ jobs:
 
       - name: Generate file list from only srcs and includes
         run: |
-          find . -name "*.cc" -path "./srcs/**" -o -name "*.h" -path "./includes/**" > file_list.txt
+          find . \( -name "*.cc" -path "./srcs/**" \) -o \( -name "*.h" -path "./includes/**" \) > file_list.txt
 
       - name: make report.xml by cppcheck
         run: |
