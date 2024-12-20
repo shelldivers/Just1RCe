@@ -56,6 +56,8 @@ find . -name "*.cc" -o -name "*.h" > file_list.txt
 xargs cpplint < file_list.txt
 ```   
 
+or USE SCRIPT ./scripts/cpplint.sh
+
 ### VSCODE EXTENSION   
 
 This [extension](https://marketplace.visualstudio.com/items?itemName=mine.cpplint) check coding style of cpp and c, when open and save source file .  
