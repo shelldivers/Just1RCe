@@ -16,5 +16,3 @@
 ## HOW TO USE
 
 USE SCRIPT ./scripts/cppcheck.sh   
-
-If you don't have xmllib -> `sudo apt-get install -y libxml2-utils`.   
