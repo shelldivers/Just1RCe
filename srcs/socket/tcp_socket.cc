@@ -8,8 +8,9 @@ extern "C" {
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
-#include "tcp_socket.h"
+#include "../../includes/tcp_socket.h"
 
 namespace Just1RCe {
 
@@ -44,7 +45,7 @@ TcpSocket::TcpSocket(std::string const &port_number) try
   const int sock_reuse_opt = 1;
   if (setsockopt(socket_fd_, SOL_SOCKET, SO_REUSEADDR, &sock_reuse_opt,
                  sizeof(sock_reuse_opt)) == -1)
-    throw std::runtime_error(JUST1RCE_SRCS_SOCKET_SET_OPTION_ERROR);
+    throw std::runtime_error(JUST1RCE_SRCS_SOCKET_SET_`OPTION_ERROR);
 
   if (bind(socket_fd_, reinterpret_cast<struct sockaddr *>(&inet_sock_address_),
            kInetSocketAddrLen) == -1)
