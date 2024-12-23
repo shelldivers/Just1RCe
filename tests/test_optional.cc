@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "../includes/ft_optional.h"
 
@@ -42,4 +43,10 @@ int main() {
   std::cout << "Dose test2 has value ? : " << std::boolalpha
             << test1.has_value() << '\n';
   std::cout << "the value is : " << test2.value() << '\n';
+
+  // optional vector string
+  std::cout << "optional + vector + string tests\n";
+  ft::optional<std::vector<std::string> > test3{std::vector<std::string>()};
+  (*test3).push_back("hello\n");
+  std::cout << (*test3)[0];
 }
