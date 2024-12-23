@@ -2,7 +2,8 @@
 
 ## INDEX
 - [CPPLINT](#cpplint)
-	- [INSTALL](#install)
+	- [INSTALL (for Cluster)](#install-for-cluster)
+	- [INSTALL (for Personal Invironment)](#install-for-personal-invironment)
 	- [HOW TO USE](#how-to-use)
 		- [COMMAND](#command)
 		- [VSCODE EXTENSION](#vscode-extension)
@@ -13,39 +14,32 @@
 # CPPLINT
 
 
-
 Cpplint is a command-line tool to check C/C++ files for style issues according to (Google's C++ style guide)[https://google.github.io/styleguide/cppguide.html].   
 
-## INSTALL   
+## INSTALL (for Cluster)   
 
-1. Install brew    
-
-```bash
-cd goinfre
-mkdir brew
-export HOMEBREW_PREFIX=~/goinfre/brew
-export HOMEBREW_REPOSITORY=~/goinfre/brew/Homebrew
-
-
-git clone https://github.com/Homebrew/brew.git ~/goinfre/brew/Homebrew
-echo 'export PATH=~/goinfre/brew/Homebrew/bin:$PATH' >> ~/.bash_profile
-source ~/.bash_profile
-```    
-
-2. Install cpplint by python virtual environmet   
+- Install cpplint by python virtual environmet   
 
 ```bash
+# 1. Install cpplint by python virtual environmet
 cd ~/goinfre
 python3 -m venv ./venv
 . ./venv/bin/activate
 pip3 install cpplint
 deactivate
-./venv/bin/cpplint 
 cd ~
 
-echo $SHELL
+# 1. Add cpplint PATH
 echo 'alias cpplint="~/goinfre/venv/bin/cpplint"' >> ./.zshrc
 ```   
+
+## INSTALL (for Personal Invironment)   
+
+```bash
+# 1. Install cpplint
+pip install cpplint
+cpplint --version
+```
    
 ## HOW TO USE   
 
