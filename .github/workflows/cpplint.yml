@@ -1,7 +1,7 @@
 name: C++ Linting
 
 on:
-  [push, pull_request]
+  pull_request
 
 jobs:
   cpplint:
@@ -19,21 +19,16 @@ jobs:
         run: |
           pip install cpplint
 
-      - name: For globstar  
+      - name: Generate file list
         run: |
-          shopt -s globstar
-
-      - name: Check for C++ files
-        run: |
-          if ls **/*.cpp **/*.hpp > /dev/null 2>&1; then
-            echo "C++ files found. Proceeding with linting."
-          else
-            echo "No C++ files found. Skipping linting."
-            exit 0
-          fi
+          find . \( -name "*.cc" -path "./srcs/**" \) -o \( -name "*.h" -path "./includes/**" \) > file_list.txt
 
       - name: Run cpplint
         run: |
-          find . -name "*.cpp" -o -name "*.hpp" | xargs cpplint
-          # run: git diff --name-only --diff-filter=AM HEAD~1 HEAD -- '*.cpp' '*.hpp' | xargs cpplint
+          if [ ! -s file_list.txt ]; then
+            echo "No C++ files found."
+            exit 0
+          else
+            xargs cpplint < file_list.txt
+          fi
 
