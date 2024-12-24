@@ -2,9 +2,6 @@
 #ifndef UTILITY_42OPTIONAL_H
 #define UTILITY_42OPTIONAL_H
 
-#include <cstring>
-#include <iostream>
-
 namespace ft {
 
 /**
@@ -21,7 +18,7 @@ class optional {
 
  public:
   optional();
-  optional(T const &val);
+  explicit optional(T const &val);
   optional(optional<T> const &other);
   optional<T> &operator=(optional<T> const &rhs);
   ~optional();
