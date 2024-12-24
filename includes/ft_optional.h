@@ -35,7 +35,7 @@ class optional {
  * @return std::no_ops like empty option
  */
 template <typename T>
-optional<T>::optional() : data_(NULL){};
+optional<T>::optional() : data_(NULL) {}
 
 /**
  * @brief constructor with value T
@@ -43,7 +43,7 @@ optional<T>::optional() : data_(NULL){};
  * @return option with value
  */
 template <typename T>
-optional<T>::optional(T const &val) : data_(new T(val)){};
+optional<T>::optional(T const &val) : data_(new T(val)) {}
 
 /**
  * @brief copy constructor
@@ -57,7 +57,7 @@ optional<T>::optional(optional<T> const &other) {
   } else {
     this->data_ = NULL;
   }
-};
+}
 
 /**
  * @brief copy assign operator
@@ -87,7 +87,7 @@ template <typename T>
 optional<T>::~optional() {
   delete this->data_;
   this->data_ = NULL;
-};
+}
 
 /**
  * @brief getter for has_value_
@@ -96,7 +96,7 @@ optional<T>::~optional() {
 template <typename T>
 bool optional<T>::has_value() const {
   return (data_ != NULL);
-};
+}
 
 /**
  * @brief getter for the value_
@@ -106,7 +106,7 @@ bool optional<T>::has_value() const {
 template <typename T>
 T const &optional<T>::value() const {
   return *data_;
-};
+}
 
 /**
  * @brief operator* to have access to the value_
@@ -116,7 +116,7 @@ T const &optional<T>::value() const {
 template <typename T>
 T const &optional<T>::operator*() const {
   return *data_;
-};
+}
 
 /**
  * @brief operator* to have access to the value_
@@ -126,7 +126,7 @@ T const &optional<T>::operator*() const {
 template <typename T>
 T &optional<T>::operator*() {
   return *data_;
-};
+}
 
 }  // namespace ft
 
