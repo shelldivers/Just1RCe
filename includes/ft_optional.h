@@ -17,11 +17,7 @@ namespace ft {
 template <typename T>
 class optional {
  private:
-  bool has_value_;
-  union {
-    char none_;
-    T value_;
-  };
+  T *data_;
 
  public:
   optional();
@@ -42,9 +38,7 @@ class optional {
  * @return std::no_ops like empty option
  */
 template <typename T>
-optional<T>::optional() : has_value_(false), none_(0) {
-  std::memset(&none_, 0, sizeof(T));
-};
+optional<T>::optional() : data_(NULL){};
 
 /**
  * @brief constructor with value T
@@ -52,10 +46,7 @@ optional<T>::optional() : has_value_(false), none_(0) {
  * @return option with value
  */
 template <typename T>
-optional<T>::optional(T const &val) : has_value_(true), none_(1) {
-  std::memset(&none_, 0, sizeof(T));
-  value_ = val;
-};
+optional<T>::optional(T const &val) : data_(new T(val)){};
 
 /**
  * @brief copy constructor
@@ -63,10 +54,12 @@ optional<T>::optional(T const &val) : has_value_(true), none_(1) {
  * @return either empty or not, depends on parameter
  */
 template <typename T>
-optional<T>::optional(optional<T> const &other)
-    : has_value_(other.has_value_), none_(0) {
-  std::memset(&none_, 0, sizeof(T));
-  value_ = other.value_;
+optional<T>::optional(optional<T> const &other) {
+  if (other.data_ != NULL) {
+    this->data_ = new T(*other.data_);
+  } else {
+    this->data_ = NULL;
+  }
 };
 
 /**
@@ -77,11 +70,12 @@ optional<T>::optional(optional<T> const &other)
 template <typename T>
 optional<T> &optional<T>::operator=(optional<T> const &rhs) {
   if (this != &rhs) {
-    has_value_ = rhs.has_value_;
-    if (has_value_) {
-      value_ = rhs.value_;
-    } else {
-      none_ = rhs.none_;
+    if (this->has_value()) {
+      delete this->data_;
+      this->data_ = NULL;
+    }
+    if (rhs.has_value()) {
+      this->data_ = new T(*rhs.data_);
     }
   }
   return *this;
@@ -94,7 +88,8 @@ optional<T> &optional<T>::operator=(optional<T> const &rhs) {
  */
 template <typename T>
 optional<T>::~optional() {
-  if (has_value_) value_.~T();
+  delete this->data_;
+  this->data_ = NULL;
 };
 
 /**
@@ -103,7 +98,7 @@ optional<T>::~optional() {
  */
 template <typename T>
 bool optional<T>::has_value() const {
-  return has_value_;
+  return (data_ != NULL);
 };
 
 /**
@@ -113,7 +108,7 @@ bool optional<T>::has_value() const {
  */
 template <typename T>
 T const &optional<T>::value() const {
-  return value_;
+  return *data_;
 };
 
 /**
@@ -123,7 +118,7 @@ T const &optional<T>::value() const {
  */
 template <typename T>
 T const &optional<T>::operator*() const {
-  return value_;
+  return *data_;
 };
 
 /**
@@ -133,7 +128,7 @@ T const &optional<T>::operator*() const {
  */
 template <typename T>
 T &optional<T>::operator*() {
-  return value_;
+  return *data_;
 };
 
 }  // namespace ft
