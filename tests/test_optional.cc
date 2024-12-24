@@ -46,7 +46,7 @@ int main() {
 
   // optional vector string
   std::cout << "optional + vector + string tests\n";
-  ft::optional<std::vector<std::string> > test3{std::vector<std::string>()};
+  ft::optional<std::vector<std::string> > test3((std::vector<std::string>()));
   (*test3).push_back("hello\n");
   std::cout << (*test3)[0];
 }
