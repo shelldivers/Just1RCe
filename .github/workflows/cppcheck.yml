@@ -1,7 +1,7 @@
-name: cppCheck
+name: Cpp Check
 
 on:
-  [push, pull_request]
+  pull_request
 
 jobs:
   cppcheck:
@@ -13,15 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for C++ files
-        run: |
-          if ls **/*.cpp **/*.hpp > /dev/null 2>&1; then
-            echo "C++ files found. Proceeding with linting."
-          else
-            echo "No C++ files found. Skipping linting."
-            exit 0
-          fi
-
       - name: install cppcheck
         run: |
           sudo apt-get install -y cppcheck
@@ -30,13 +21,18 @@ jobs:
         run: |
           sudo apt-get install -y libxml2-utils
 
+      - name: Generate file list from only srcs and includes
+        run: |
+          find . \( -name "*.cc" -path "./srcs/**" \) -o \( -name "*.h" -path "./includes/**" \) > file_list.txt
+
       - name: make report.xml by cppcheck
         run: |
-          cppcheck --enable=all --xml --output-file=report.xml .
-
-      - name: remove inforamtion severity from report.xml
-        run: |
-          xmllint --xpath '//error[not(@severity="information")]' report.xml > filtered_report.xml
+          if [ ! -s file_list.txt ]; then
+            echo "No C++ files found."
+            exit 0
+          else
+            xargs cppcheck --language=c++ --enable=all --suppress=missingIncludeSystem --xml --output-file=report.xml < file_list.txt
+          fi
 
       - uses: Flast/cppcheck-sarif@v2
         with:
