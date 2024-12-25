@@ -3,6 +3,7 @@
 #define JUST1RCE_SRCS_CLIENT_H
 
 // TODO : predefined error message
+#define JUST1RCE_SRCS_CLIENT_RECV_ERROR "Client : recv failed."
 
 // TODO : mod flags
 // describes client's permission, bitmasking
@@ -12,7 +13,11 @@
 #define JUST1RCE_SRCS_CLIENT_MOD_REGISTERED 0b001000
 #define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0B010000
 
+#define JUST1RCE_SRCS_CLIENT_RECV_MAX 512
+#define JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM "\r\n"
+
 #include <string>
+#include <vector>
 
 #include "tcp_socket.h"
 
@@ -79,7 +84,10 @@ class Client {
   bool CheckMode(uint const flags) const;
 
   // TODO : receive message, read data from socket
+  // ft::optional<std::vector<std::string> > GetMessages();
+  std::vector<std::string> Client::GetMessages();
   // TODO : send message, write data to the socket
+  // void
 };
 
 }  // namespace Just1RCe
