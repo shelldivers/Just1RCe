@@ -45,11 +45,6 @@ optional<T>::optional() : data_(NULL) {}
 template <typename T>
 optional<T>::optional(T const &val) : data_(new T(val)) {}
 
-/**
- * @brief copy constructor
- * @param other source to copy
- * @return either empty or not, depends on parameter
- */
 template <typename T>
 optional<T>::optional(optional<T> const &other) {
   if (other.data_ != NULL) {
@@ -59,11 +54,6 @@ optional<T>::optional(optional<T> const &other) {
   }
 }
 
-/**
- * @brief copy assign operator
- * @param rhs source to copy
- * @return reference of assigned var
- */
 template <typename T>
 optional<T> &optional<T>::operator=(optional<T> const &rhs) {
   if (this != &rhs) {
@@ -78,21 +68,12 @@ optional<T> &optional<T>::operator=(optional<T> const &rhs) {
   return *this;
 }
 
-/**
- * @brief destructor
- * @attention value_ is part of union, destructor of value_ must be called \n
-  explicitly.
- */
 template <typename T>
 optional<T>::~optional() {
   delete this->data_;
   this->data_ = NULL;
 }
 
-/**
- * @brief getter for has_value_
- * @return true if the option has value
- */
 template <typename T>
 bool optional<T>::has_value() const {
   return (data_ != NULL);
