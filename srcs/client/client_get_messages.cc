@@ -36,9 +36,9 @@ std::vector<std::string> Client::GetMessages() {
       std::string msg(start_pos, msg_size);
 
       // combine with the previous left buffer
-      if (!left_buffer_.empty()) {
-        msg = left_buffer_ + msg;
-        left_buffer_.clear();
+      if (!read_buffer_.empty()) {
+        msg = read_buffer_ + msg;
+        read_buffer_.clear();
       }
       // push whole message
       result.push_back(msg);
@@ -49,7 +49,7 @@ std::vector<std::string> Client::GetMessages() {
     }
   }
   // save left over text
-  left_buffer_ = std::string(start_pos, recv_size);
+  read_buffer_ = std::string(start_pos, recv_size);
 
   // return
   return result;

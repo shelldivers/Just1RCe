@@ -53,7 +53,8 @@ class Client {
 
   // per socket IO buffer, saving unsufficient message
   // no getter or setter
-  std::string left_buffer_;
+  std::string read_buffer_;
+  std::string write_buffer_;
 
  public:
   Client(const int listen_fd);
@@ -85,9 +86,9 @@ class Client {
 
   // TODO : receive message, read data from socket
   // ft::optional<std::vector<std::string> > GetMessages();
-  std::vector<std::string> Client::GetMessages();
+  std::vector<std::string> GetMessages();
   // TODO : send message, write data to the socket
-  // void
+  void SendMessage(std::string const &message);
 };
 
 }  // namespace Just1RCe
