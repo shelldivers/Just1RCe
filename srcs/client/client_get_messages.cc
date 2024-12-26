@@ -16,11 +16,11 @@ namespace Just1RCe {
  * @throws runtime error, recv failure
  */
 std::vector<std::string> Client::GetReceivedMessages() {
-  char recv_buffer[JUST1RCE_SRCS_CLIENT_RECV_MAX + 1];
+  char recv_buffer[JUST1RCE_SRCS_CLIENT_MSG_MAX + 1];
 
-  memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_RECV_MAX + 1);
+  memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_MSG_MAX + 1);
   int recv_size =
-      recv(socket_.socket_fd(), recv_buffer, JUST1RCE_SRCS_CLIENT_RECV_MAX, 0);
+      recv(socket_.socket_fd(), recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
   if (recv_size == -1) {
     throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
   }
