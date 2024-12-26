@@ -15,7 +15,7 @@ namespace Just1RCe {
  * @return vector of strings
  * @throws runtime error, recv failure
  */
-std::vector<std::string> Client::GetMessages() {
+std::vector<std::string> Client::GetReceivedMessages() {
   char recv_buffer[JUST1RCE_SRCS_CLIENT_RECV_MAX + 1];
 
   memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_RECV_MAX + 1);

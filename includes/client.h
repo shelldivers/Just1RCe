@@ -86,9 +86,11 @@ class Client {
 
   // TODO : receive message, read data from socket
   // ft::optional<std::vector<std::string> > GetMessages();
-  std::vector<std::string> GetMessages();
+  std::vector<std::string> GetReceivedMessages();
+
   // TODO : send message, write data to the socket
-  void SendMessage(std::string const &message);
+  void setSendMessage(std::string const &message);
+  bool sendMessage();
 };
 
 }  // namespace Just1RCe
