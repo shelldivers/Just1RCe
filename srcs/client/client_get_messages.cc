@@ -1,5 +1,6 @@
 
 extern "C" {
+#include <errno.h>
 #include <sys/socket.h>
 }
 
@@ -22,6 +23,11 @@ std::vector<std::string> Client::GetReceivedMessages() {
   int recv_size =
       recv(socket_.socket_fd(), recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
   if (recv_size == -1) {
+    /* TODO, re-entering receive later
+if (errno == EAGAIN || errno == EWOULDBLOCK) {
+  // return noop
+}
+    */
     throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
   }
 
