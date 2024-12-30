@@ -1,0 +1,14 @@
+# Project name
+PROJECT_NAME = @PROJECT_NAME@
+
+# Output directory for generated documentation
+OUTPUT_DIRECTORY = @CMAKE_BINARY_DIR@/docs
+
+# Input files and directories
+INPUT = @CMAKE_SOURCE_DIR@/includes @CMAKE_SOURCE_DIR@/srcs
+
+# Enable HTML output
+GENERATE_HTML = YES
+
+# Disable LaTeX output
+GENERATE_LATEX = NO
