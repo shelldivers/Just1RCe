@@ -12,20 +12,21 @@ extern "C" {
 namespace Just1RCe {
 
 /**
- * @brief
- * @param
+ * @brief add processed message data to the write buffer
+ * @attention cr-lf will be added here
+ * @param message pure message data without delimeter(cr-lf)
  */
-void Client::setSendMessage(std::string const &message) {
-  write_buffer_ += message;
+void Client::SetSendMessage(std::string const &message) {
+  write_buffer_ += message + JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM;
 }
 
 /**
- * @brief
- * @details
- * @return
+ * @brief send text data to the client
+ * @details will be called after write event triggered
+ * @attention write event will be level triggered
+ * @return if true, write_buffer_ has content to write, register write event
  */
-bool Client::sendMessage() {
-  // send call
+bool Client::SendMessage() {
   int send_size =
       send(socket_.socket_fd(), write_buffer_.c_str(),
            std::min(write_buffer_.size(), JUST1RCE_SRCS_CLIENT_MSG_MAX), 0);
@@ -38,9 +39,11 @@ bool Client::sendMessage() {
     }
   }
 
-  // save substr
+  // save left buffer
+  if (send_size > 0) write_buffer_ = write_buffer_.substr(send_size);
 
-  // return is buffer left
+  // do re-register write event?
+  return !write_buffer_.empty();
 }
 
 }  // namespace Just1RCe

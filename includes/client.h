@@ -85,13 +85,11 @@ class Client {
   void UnsetMode(uint const flags);
   bool CheckMode(uint const flags) const;
 
-  // TODO : receive message, read data from socket
   // ft::optional<std::vector<std::string> > GetMessages();
   std::vector<std::string> GetReceivedMessages();
 
-  // TODO : send message, write data to the socket
-  void setSendMessage(std::string const &message);
-  bool sendMessage();
+  void SetSendMessage(std::string const &message);
+  bool SendMessage();
 };
 
 }  // namespace Just1RCe
