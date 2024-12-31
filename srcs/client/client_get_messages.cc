@@ -16,7 +16,7 @@ namespace Just1RCe {
  * @return vector of strings
  * @throws runtime error, recv failure
  */
-std::vector<std::string> Client::GetReceivedMessages() {
+ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
   char recv_buffer[JUST1RCE_SRCS_CLIENT_MSG_MAX + 1];
 
   memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_MSG_MAX + 1);
@@ -32,7 +32,7 @@ if (errno == EAGAIN || errno == EWOULDBLOCK) {
   }
 
   // get result
-  std::vector<std::string> result;
+  ft::optional<std::vector<std::string> > result;
   size_t start_pos = 0, end_pos = 0;
   if (recv_size > 0) {
     // combine recv_buffer and left over read_buffer_
@@ -41,11 +41,16 @@ if (errno == EAGAIN || errno == EWOULDBLOCK) {
     // split result with delimeter
     while ((end_pos = read_buffer_.find(JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM,
                                         start_pos)) != std::string::npos) {
+      // result is option, use after initialization
+      if (!result.has_value()) {
+        *result = std::vector<std::string>();
+      }
+
       // get whole message from read_buffer
       std::string msg = read_buffer_.substr(start_pos, (end_pos - start_pos));
 
       // push whole message
-      result.push_back(msg);
+      (*result).push_back(msg);
 
       // move search position
       start_pos = end_pos + 2;  // move after cr-lf
@@ -57,7 +62,6 @@ if (errno == EAGAIN || errno == EWOULDBLOCK) {
     read_buffer_ =
         read_buffer_.substr(start_pos, read_buffer_.size() - start_pos);
 
-  // return
   return result;
 }
 

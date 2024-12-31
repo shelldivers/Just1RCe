@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "ft_optional.h"
 #include "tcp_socket.h"
 
 namespace Just1RCe {
@@ -85,8 +86,7 @@ class Client {
   void UnsetMode(uint const flags);
   bool CheckMode(uint const flags) const;
 
-  // ft::optional<std::vector<std::string> > GetMessages();
-  std::vector<std::string> GetReceivedMessages();
+  ft::optional<std::vector<std::string> > GetReceivedMessages();
 
   void SetSendMessage(std::string const &message);
   bool SendMessage();
