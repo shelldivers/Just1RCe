@@ -59,7 +59,7 @@ class Client {
   std::string write_buffer_;
 
  public:
-  Client(const int listen_fd);
+  explicit Client(const int listen_fd);
   ~Client();
 
   // getter
