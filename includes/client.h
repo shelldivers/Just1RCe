@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "ft_optional.h"
-#include "tcp_socket.h"
+#include "../includes/ft_optional.h"
+#include "../includes/tcp_socket.h"
 
 namespace Just1RCe {
 
@@ -39,7 +39,7 @@ class Client {
   Client &operator=(Client const &);
 
   // newwork connection info
-  // TODO : connection time control will be needed
+  // TODO(eldeshue) : connection time control will be needed
   // ex) ping/pong
   TcpSocket socket_;
 
