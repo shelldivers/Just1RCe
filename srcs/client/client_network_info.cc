@@ -1,5 +1,6 @@
 
 #include <sstream>
+#include <string>
 
 #include "../../includes/client.h"
 

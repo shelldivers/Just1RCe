@@ -1,4 +1,6 @@
 
+#include <string>
+
 #include "../../includes/client.h"
 
 namespace Just1RCe {

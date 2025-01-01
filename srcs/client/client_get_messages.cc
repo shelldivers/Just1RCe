@@ -6,6 +6,8 @@ extern "C" {
 
 #include <cstring>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "../../includes/client.h"
 

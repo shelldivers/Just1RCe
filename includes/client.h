@@ -2,11 +2,11 @@
 #ifndef JUST1RCE_SRCS_CLIENT_H
 #define JUST1RCE_SRCS_CLIENT_H
 
-// TODO : predefined error message
+// Predefined error message
 #define JUST1RCE_SRCS_CLIENT_RECV_ERROR "Client : recv failed."
 #define JUST1RCE_SRCS_CLIENT_SEND_ERROR "Client : send failed."
 
-// TODO : mod flags
+// Mod flags
 // describes client's permission, bitmasking
 #define JUST1RCE_SRCS_CLIENT_MOD_INVISIBLE 0b000001
 #define JUST1RCE_SRCS_CLIENT_MOD_WALLOPS 0b000010

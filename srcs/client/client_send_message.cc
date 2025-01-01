@@ -5,7 +5,9 @@ extern "C" {
 #include <sys/socket.h>
 }
 
+#include <algorithm>
 #include <stdexcept>
+#include <string>
 
 #include "../../includes/client.h"
 
