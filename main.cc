@@ -3,8 +3,7 @@
 
 #include <iostream>
 
-int main(int argc, char *argv[]) {
-	int a;
+int main() {
 	Math math(3, 15);
 
 	std::cout << PROJECT_VERSION << std::endl;
