@@ -41,10 +41,10 @@ bool Client::SendMessage() {
     }
   }
 
-  // save left buffer
+  // save partial message, push back to the read_buffer_
   if (send_size > 0) write_buffer_ = write_buffer_.substr(send_size);
 
-  // do re-register write event?
+  // if true, there is content to send, re-register event
   return !write_buffer_.empty();
 }
 
