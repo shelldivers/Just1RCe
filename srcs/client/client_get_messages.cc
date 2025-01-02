@@ -26,13 +26,15 @@ ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
       recv(socket_.socket_fd(), recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
   if (recv_size == -1) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
-      return ft::optional<std::vector<std::string> >();  // empty option, equivalent to std::noops
+      return ft::optional<std::vector<std::string> >();  // empty option,
+                                                         // equivalent to
+                                                         // std::noops
     }
     throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
   }
 
   // get result
-  ft::optional<std::vector<std::string> > result;
+  ft::optional<std::vector<std::string> > buffered_messages;
   size_t start_pos = 0, end_pos = 0;
   if (recv_size > 0) {
     // combine recv_buffer and left over read_buffer_
@@ -42,15 +44,13 @@ ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
     while ((end_pos = read_buffer_.find(JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM,
                                         start_pos)) != std::string::npos) {
       // result is option, use after initialization
-      if (!result.has_value()) {
-        *result = std::vector<std::string>();
+      if (!buffered_messages.has_value()) {
+        *buffered_messages = std::vector<std::string>();
       }
 
-      // get whole message from read_buffer
-      std::string msg = read_buffer_.substr(start_pos, (end_pos - start_pos));
-
-      // push whole message
-      (*result).push_back(msg);
+      // get whole message from read_buffer and push
+      (*buffered_messages)
+          .push_back(read_buffer_.substr(start_pos, (end_pos - start_pos)));
 
       // move search position
       start_pos = end_pos + 2;  // move after cr-lf
@@ -62,7 +62,7 @@ ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
     read_buffer_ =
         read_buffer_.substr(start_pos, read_buffer_.size() - start_pos);
 
-  return result;
+  return buffered_messages;
 }
 
 }  // namespace Just1RCe
