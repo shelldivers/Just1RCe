@@ -12,14 +12,20 @@ namespace Just1RCe {
  * @throws none
  */
 std::string Client::GetHostName() const {
-  static uint const mask = 0b11111111000000000000000000000000;
+  static uint const octet_mask = 0b11111111;  // mask of octet
   uint const ip_address = socket_.GetIPAddress();
   std::ostringstream oss;
 
-  for (int i = 0; i < 4; ++i) {
-    uint const field = (ip_address & (mask >> (i * 8))) >> ((4 - i) * 8);
+  for (int offset = 3; offset >= 0; --offset) {
+    // extracting field's octet : use bit-masking
+    uint const field_octet = ip_address & (octet_mask << (offset * 8));
+
+    // getting field : shift extracted octet to erase trailing zero bits
+    uint const field = field_octet >> ((3 - offset) * 8);
+
+    // append result
     oss << field;
-    if (i != 3) oss << '.';
+    if (offset != 0) oss << '.';  // skip last dot
   }
   return oss.str();
 }
