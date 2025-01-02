@@ -10,7 +10,7 @@ namespace Just1RCe {
  * @return formatted mode of client
  * @throws none
  */
-std::string Client::GetMode() const {
+std::string Client::GetModeAsString() const {
   std::string result("+");
   if (mode_mask_ & JUST1RCE_SRCS_CLIENT_MOD_INVISIBLE) result.push_back('i');
   if (mode_mask_ & JUST1RCE_SRCS_CLIENT_MOD_WALLOPS) result.push_back('w');

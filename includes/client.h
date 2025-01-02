@@ -81,7 +81,7 @@ class Client {
   std::string GetPortNum() const;
 
   // mode control
-  std::string GetMode() const;
+  std::string GetModeAsString() const;
   void SetMode(uint const flags);
   void UnsetMode(uint const flags);
   bool CheckMode(uint const flags) const;
