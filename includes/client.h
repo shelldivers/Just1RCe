@@ -12,7 +12,7 @@
 #define JUST1RCE_SRCS_CLIENT_MOD_WALLOPS 0b000010
 #define JUST1RCE_SRCS_CLIENT_MOD_OPERATOR 0b000100
 #define JUST1RCE_SRCS_CLIENT_MOD_REGISTERED 0b001000
-#define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0B010000
+#define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0b010000
 
 #define JUST1RCE_SRCS_CLIENT_MSG_MAX 512UL
 #define JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM "\r\n"
@@ -76,7 +76,7 @@ class Client {
   void set_server_name(std::string const &name);
   void set_away_msg(std::string const &msg);
 
-  // newwork info
+  // network info
   std::string GetHostName() const;
   std::string GetPortNum() const;
 
