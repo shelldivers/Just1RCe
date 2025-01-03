@@ -38,6 +38,7 @@ endif()
 # Add executable files
 add_executable(Just1RCe
     #executable files
+    main.cc
 )
 
 set(CMAKE_SH "bash")
