@@ -18,7 +18,7 @@ jobs:
           python-version: '3.x'
 
       - name: Set up CMake
-        uses: lukka/get-cmake@v3
+        run: pip install cmake
 
       - name: Configure CMake
         run: cmake -S . -B build
