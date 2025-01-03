@@ -21,7 +21,7 @@ jobs:
         run: pip install cmake
 
       - name: Configure CMake
-        run: cmake -S . -B build
+        run: cmake --preset=default -S . -B build
 
       - name: Build
         run: cmake --build build
