@@ -129,11 +129,21 @@ gtest_discover_tests(
     googleUnitTest   
 )
 
-add_custom_target(
-    RunGoogleTest
-    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-    COMMENT "Running GoogleTest with CTest"
-)
+# Check if the test directory is empty or doesn't exist
+file(GLOB TEST_FILES "${TEST_DIR}/*")
+if (NOT TEST_FILES)
+    add_custom_target(
+        RunGoogleTest ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Test directory is empty. No tests to run."
+        COMMENT "Test directory is empty"
+    )
+else()
+    add_custom_target(
+        RunGoogleTest ALL
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        COMMENT "Running GoogleTest with CTest"
+    )
+endif()
 
 #=============== Set cppcheck ===============
 # Set cppcheck path
