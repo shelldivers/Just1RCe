@@ -113,6 +113,7 @@ enable_testing()
 add_executable(
     googleUnitTest
     # test files
+    ${TEST_DIR}/test_optional.cc
 )
 
 # Link GoogleTest
