@@ -1,20 +1,10 @@
 #!/bin/bash
 
-source ~/goinfre/venv/bin/activate
+# Initialize cpplint report
+echo ' ' > "$1"
 
-echo '' > cpplint_report.txt
-
-find . \( -name "*.cc" -path "./srcs/**" \) -o \( -name "*.h" -path "./includes/**" \) > file_list.txt
-
-if [ ! -s file_list.txt ]; then
-	echo "No C++ files found."
-	rm -rf file_list.txt
-	exit 0
-else
-	while IFS= read -r file; do
-    	cpplint "$file" >> cpplint_report.txt 2>&1
-		echo "" >> cpplint_report.txt
-	done < file_list.txt
-
-	rm -rf file_list.txt
-fi
+# Read file_list.txt and run cpplint
+while IFS= read -r file; do
+    "$2" "$file" >> "$1" 2>&1
+    echo "" >> "$1"
+done < "$3"
