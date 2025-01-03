@@ -170,7 +170,7 @@ add_custom_target(
 
 # Step 3: Add target to run cppcheck-htmlreport
 add_custom_target(
-    RunCppcheck
+    RunCppcheck ALL
     COMMAND ${VENV_PATH}/bin/python ${CPPCHECK_HTMLREPORT} --file=${CPPCHECK_REPORT_XML} --report-dir=${CPPCHECK_HTML_DIR}
     DEPENDS RunCppcheckXmlReport
     COMMENT "Generating cppcheck HTML report using virtual environment"
@@ -191,7 +191,7 @@ add_custom_target(
 
 # Step 2: Run cpplint
 add_custom_target(
-    RunCpplint
+    RunCpplint ALL
     COMMAND ${CPPLINT_SCRIPT} ${CPPLINT_REPORT} ${CPPLINT} ${FILE_LIST}
     DEPENDS InstallCpplint GenerateFileList
     COMMENT "Running cpplint and saving results to cpplint_report.txt"
