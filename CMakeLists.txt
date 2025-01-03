@@ -1,4 +1,28 @@
 # ONLY UNIX & MAC!!
+#
+# Just1RCe - CMake Configuration
+#
+# Features:
+# - Builds the Just1RCe project (main executable)
+# - Python virtual environment is used for code quality tools
+#   - cppcheck: Static code analysis with HTML and XML reports
+#   - cpplint: Style checking with report generation
+# - Includes configurable presets for CI/CD or local development
+#
+#
+# To build and run tools:
+# 1. Default build (includes all targets): 
+#    cmake --preset=default -S . -B build
+#    cmake --build build
+#
+# 2. Run cpplint only:
+#    cmake --build build --target RunCpplint
+#
+# 3. Run cppcheck only:
+#    cmake --build build --target RunCppcheck
+#
+# 4. Run google test only:
+#    cmake --build build --target RunGoogleTest
 
 # CMake required minimum version
 cmake_minimum_required(VERSION 3.30)
@@ -13,16 +37,13 @@ endif()
 
 # Add executable files
 add_executable(Just1RCe
-  main.cc 
-  srcs/math.cc 
-  includes/math.h
+    #executable files
 )
 
 set(CMAKE_SH "bash")
 
 # Set project configuration options
-set(ENABLE_FEATURE_X ON)
-set(AUTHOR_NAME "jiwojung")
+set(AUTHOR_NAME "SHELLDIVERS")
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -37,12 +58,13 @@ file(MAKE_DIRECTORY ${REPORTS_DIR})
 configure_file(config.h.in ${CMAKE_SOURCE_DIR}/includes/config.h)
 
 # Include directories
-target_include_directories(Just1RCe PUBLIC
-${CMAKE_BINARY_DIR}/includes
-${CMAKE_SOURCE_DIR}/includes
+target_include_directories(
+    Just1RCe PUBLIC
+    ${CMAKE_BINARY_DIR}/includes
+    ${CMAKE_SOURCE_DIR}/includes
 )
 
-#=============== Set external programs =============== 
+#=============== Set Python Virtual Environment ===============
 # Find Python Interpreter
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -69,8 +91,8 @@ add_custom_target(
 
 add_custom_target(
     GenerateFileList 
-    COMMAND find ../srcs -type f -name "*.cc" > ${FILE_LIST}
-    COMMAND find ../includes -type f -name "*.h" >> ${FILE_LIST}
+    COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" > ${FILE_LIST}
+    COMMAND find ${CMAKE_SOURCE_DIR}/includes -type f -name "*.h" >> ${FILE_LIST}
     COMMENT "Generating file list"
 )
 
@@ -81,7 +103,8 @@ set(TEST_DIR "${CMAKE_SOURCE_DIR}/tests")
 include(FetchContent)
 FetchContent_Declare(
     googletest
-    URL https://github.com/google/googletest/archive/refs/heads/main.zip
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG f8d7d77 # v1.14.0
 )
 FetchContent_MakeAvailable(googletest)
 
@@ -89,8 +112,7 @@ enable_testing()
 
 add_executable(
     googleUnitTest
-    ${TEST_DIR}/test_gtest.cc
-    ${TEST_DIR}/test_gtest_copy.cc
+    # test files
 )
 
 # Link GoogleTest
@@ -105,18 +127,10 @@ gtest_discover_tests(
 )
 
 add_custom_target(
-    RunGoogleTest ALL
-    COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process --output-on-failure --output-junit ${REPORTS_DIR}/gtest_report.xml || true
-    COMMENT "Running GoogleTest with CTest, ignoring failures"
+    RunGoogleTest
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+    COMMENT "Running GoogleTest with CTest"
 )
-
-add_custom_target(
-    XmlToHtml ALL
-    COMMAND xsltproc ${SCRIPTS_PATH}/gtest-to-html.xsl ${REPORTS_DIR}/gtest_report.xml > ${REPORTS_DIR}/gtest_report.html
-    DEPENDS RunGoogleTest
-)
-
-#=============== End google test ===============
 
 #=============== Set cppcheck ===============
 # Set cppcheck path
@@ -148,8 +162,6 @@ add_custom_target(
     COMMENT "Generating cppcheck HTML report using virtual environment"
 )
 
-#|=============== End cppcheck ===============|
-
 #=============== Set cpplint ===============
 # Set cpplint path
 set(CPPLINT "${VENV_PATH}/bin/cpplint")
@@ -170,34 +182,4 @@ add_custom_target(
     DEPENDS InstallCpplint GenerateFileList
     COMMENT "Running cpplint and saving results to cpplint_report.txt"
 )
-
-#|=============== End cpplint ===============|
-
-#|=============== End set external programs ===============|
-
-
-# Just1RCe - CMake Configuration
-#
-# Features:
-# - Builds the Just1RCe project (main executable)
-# - Python virtual environment is used for code quality tools
-#   - cppcheck: Static code analysis with HTML and XML reports
-#   - cpplint: Style checking with report generation
-# - Includes configurable presets for CI/CD or local development
-#
-#
-# To build and run tools:
-# 1. Default build (includes all targets): 
-#    cmake --preset=default -S . -B build
-#    cmake --build build
-#
-# 2. Run cpplint only:
-#    cmake --build build --target RunCpplint
-#
-# 3. Run cppcheck only:
-#    cmake --build build --target RunCppcheck
-#
-# 4. Run google test only:
-#    cmake --build build --target RunGoogleTest
-
 
