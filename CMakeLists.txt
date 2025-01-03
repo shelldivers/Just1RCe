@@ -118,7 +118,9 @@ add_executable(
 # Link GoogleTest
 target_link_libraries(
     googleUnitTest
-    GTest::gtest_main
+    # must write main function at test file
+    GTest::gtest 
+    GTest::gmock
 )
 
 include(GoogleTest)
