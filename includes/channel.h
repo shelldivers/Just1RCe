@@ -9,7 +9,9 @@
 #define JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY 0b0001000  // t
 #define JUST1RCE_SRCS_CHANNEL_MOD_KEY_SET 0b0010000          // k
 #define JUST1RCE_SRCS_CHANNEL_MOD_USER_LIMIT 0b0100000       // l
-#define JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT 0b0001100          // nt
+#define JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT 0b0001100          // default setting
+#define JUST1RCE_SRCS_CHANNEL_MOD_ALL 0b01111111             // all mode setting
+#define JUST1RCE_SRCS_CHANNEL_MOD_NONE 0b0                   // no mode setting
 
 // error
 #define JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR "Channel : wrong channel name."
@@ -81,9 +83,9 @@ class Channel {
   // mod handler, authority check needed
   ChannelModeMask GetMode() const;
   std::string GetModeAsString() const;
-  void SetMode(ChannelModeMask mask);
-  void UnsetMode(ChannelModeMask mask);
-  bool CheckMode(ChannelModeMask mask) const;
+  void SetMode(ChannelModeMask const flags);
+  void UnsetMode(ChannelModeMask const flags);
+  bool CheckMode(ChannelModeMask const flags) const;
 
   // user control
   void AddUser(std::string const &target_user_name);
