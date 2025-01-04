@@ -91,7 +91,6 @@ class Channel {
   void AddUser(std::string const &target_user_name);
   void DeleteUser(std::string const &target_user_name);
   bool CheckUser(std::string const &target_user_name) const;
-  void SetUserAuth(std::string const &, char const auth);
 };
 }  // namespace Just1RCe
 
