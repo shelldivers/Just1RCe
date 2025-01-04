@@ -11,8 +11,10 @@
 #
 #
 # To build and run tools:
-# 1. Default build (includes all targets): 
+# 0. Configure CMake build
 #    cmake --preset=default -S . -B build
+#
+# 1. Default build (includes all targets): 
 #    cmake --build build
 #
 # 2. Run cpplint only:
@@ -114,6 +116,7 @@ enable_testing()
 add_executable(
     googleUnitTest
     # test files
+    ${TEST_DIR}/test_main.cc
     ${TEST_DIR}/test_optional.cc
 )
 
