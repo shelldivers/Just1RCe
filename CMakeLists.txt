@@ -139,12 +139,14 @@ if (NOT TEST_FILES)
     add_custom_target(
         RunGoogleTest ALL
         COMMAND ${CMAKE_COMMAND} -E echo "Test directory is empty. No tests to run."
+        DEPENDS googleUnitTest
         COMMENT "Test directory is empty"
     )
 else()
     add_custom_target(
         RunGoogleTest ALL
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        DEPENDS googleUnitTest
         COMMENT "Running GoogleTest with CTest"
     )
 endif()
