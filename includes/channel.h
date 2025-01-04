@@ -3,8 +3,22 @@
 #define JUST1RCE_SRCS_CHANNEL_H
 
 // channel mode flags
+#define JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY 0b0000001      // i
+#define JUST1RCE_SRCS_CHANNEL_MOD_MSG_OPRT_ONLY 0b0000010    // m
+#define JUST1RCE_SRCS_CHANNEL_MOD_MSG_IN_ONLY 0b0000100      // n
+#define JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY 0b0001000  // t
+#define JUST1RCE_SRCS_CHANNEL_MOD_KEY_SET 0b0010000          // k
+#define JUST1RCE_SRCS_CHANNEL_MOD_USER_LIMIT 0b0100000       // l
+#define JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT 0b0001100          // nt
 
 // error
+#define JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR "Channel : wrong channel name."
+
+// macro function
+#define IS_CHANNEL_GLOBAL (this->name_[0] == '#')
+#define IS_CHANNEL_LOCAL (this->name_[0] == '&')
+#define IS_CHANNEL_MOELESS (this->name_[0] == '+')
+#define IS_CHANNEL_SAFE (this->name_[0] == '!')
 
 #include <set>
 #include <string>
@@ -37,7 +51,6 @@ class Channel {
 
   // user info
   size_t max_user_num_;
-  size_t user_num_;
   std::set<std::string> user_nicknames_;
 
   // TODO(eldeshue) : time information
@@ -47,7 +60,7 @@ class Channel {
 
  public:
   // constructor
-  Channel(std::string const &name, std::string const &user_name,
+  Channel(std::string const &name, std::string const &oprt_name,
           std::string const key = "");
   ~Channel();
 
@@ -63,12 +76,9 @@ class Channel {
   // auth check needed
   void set_topic(std::string const &new_topic);
   void set_key(std::string const &new_key);
-
   size_t set_max_user_num(size_t const new_max_user_num);
-  size_t set_user_num(size_t const new_user_num);
 
-  // mod handler, authority check
-  // get mode, set mode, get mode as string, is set?
+  // mod handler, authority check needed
   ChannelModeMask GetMode() const;
   std::string GetModeAsString() const;
   void SetMode(ChannelModeMask mask);
