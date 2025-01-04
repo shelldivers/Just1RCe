@@ -28,7 +28,7 @@ jobs:
       - name: check pwd
         run: pwd
       - name: check ls
-        run: ls
+        run: cd ../ | ls
       - name: cmake build
         run: cmake --preset=default -S . -B build
 
