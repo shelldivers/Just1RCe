@@ -14,8 +14,7 @@ void Channel::AddUser(std::string const &target_user_name) {
 }
 
 void Channel::DeleteUser(std::string const &target_user_name) {
-  if (user_nicknames_.find(target_user_name) != user_nicknames_.end())
-    user_nicknames_.erase(target_user_name);
+  user_nicknames_.erase(target_user_name);
 }
 
 bool Channel::CheckUser(std::string const &target_user_name) const {
