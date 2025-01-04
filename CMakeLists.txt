@@ -94,7 +94,8 @@ add_custom_target(
 
 add_custom_target(
     GenerateFileList 
-    COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" > ${FILE_LIST}
+    COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "main.cc" > ${FILE_LIST} 
+    COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" >> ${FILE_LIST}
     COMMAND find ${CMAKE_SOURCE_DIR}/includes -type f -name "*.h" >> ${FILE_LIST}
     COMMENT "Generating file list"
 )
@@ -146,7 +147,6 @@ else()
     add_custom_target(
         RunGoogleTest ALL
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-        DEPENDS googleUnitTest
         COMMENT "Running GoogleTest with CTest"
     )
 endif()
@@ -171,12 +171,13 @@ add_custom_target(
     COMMAND xargs ${CPPCHECK} --language=c++ --enable=all --suppress=missingIncludeSystem --xml --output-file=${CPPCHECK_REPORT_XML} < ${FILE_LIST}
     DEPENDS GenerateFileList InstallCppcheckAndPygments
     COMMENT "Running cppcheck and generating XML report"
-)
-
-# Step 3: Add target to run cppcheck-htmlreport
-add_custom_target(
-    RunCppcheck ALL
+    )
+    
+    # Step 3: Add target to run cppcheck-htmlreport
+    add_custom_target(
+        RunCppcheck ALL
     COMMAND ${VENV_PATH}/bin/python ${CPPCHECK_HTMLREPORT} --file=${CPPCHECK_REPORT_XML} --report-dir=${CPPCHECK_HTML_DIR}
+    COMMAND xargs ${CPPCHECK} --language=c++ --enable=all --error-exitcode=1 < ${FILE_LIST} 2>/dev/null
     DEPENDS RunCppcheckXmlReport
     COMMENT "Generating cppcheck HTML report using virtual environment"
 )
@@ -198,6 +199,7 @@ add_custom_target(
 add_custom_target(
     RunCpplint ALL
     COMMAND ${CPPLINT_SCRIPT} ${CPPLINT_REPORT} ${CPPLINT} ${FILE_LIST}
+    COMMAND xargs ${CPPLINT} < ${FILE_LIST} 2>/dev/null
     DEPENDS InstallCpplint GenerateFileList
     COMMENT "Running cpplint and saving results to cpplint_report.txt"
 )
