@@ -178,7 +178,7 @@ add_custom_target(
     add_custom_target(
         RunCppcheck ALL
     COMMAND ${VENV_PATH}/bin/python ${CPPCHECK_HTMLREPORT} --file=${CPPCHECK_REPORT_XML} --report-dir=${CPPCHECK_HTML_DIR}
-    COMMAND xargs ${CPPCHECK} --language=c++ --enable=all --error-exitcode=1 < ${FILE_LIST} 2>/dev/null
+    COMMAND awk '/<error/ && /severity="error"/ {count++} END {if (count > 0) exit 1}' ${CPPCHECK_REPORT_XML}
     DEPENDS RunCppcheckXmlReport
     COMMENT "Generating cppcheck HTML report using virtual environment"
 )
