@@ -7,6 +7,15 @@
 
 namespace Just1RCe {
 
+/**
+ * @brief constructor of the channel object.
+ * @param name name of the channel. First character of the name indicates the
+ * type of channel. Empty name must be considered as parsing error.
+ * @param oprt_name name of the first user who JOIN the channel. Client wth this
+ * name must be masked as operator.
+ * @param key password for the channel. if pw is not setted, key must be impty.
+ * @throw if 'name' is not formatted properly, throw runtime_exception
+ */
 Channel::Channel(std::string const &name, std::string const &oprt_name,
                  std::string const key = "")
     : name_(name),
