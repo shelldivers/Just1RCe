@@ -27,21 +27,21 @@ jobs:
 
   Run_Cppcheck:
     runs-on: ubuntu-latest
-    needs: [Set_Environment]
+    needs: [Set_Environment, Configure_CMake]
     steps:
       - name: CMake build and run cppcheck
         run: cmake --build build --target RunCppcheck
 
   Run_Cpplint:
     runs-on: ubuntu-latest
-    needs: [Set_Environment]
+    needs: [Set_Environment, Configure_CMake]
     steps:
       - name: CMake build and run cpplint
         run: cmake --build build --target RunCpplint
 
   Run_Google_Test:
     runs-on: ubuntu-latest
-    needs: [Set_Environment]
+    needs: [Set_Environment, Configure_CMake]
     steps:
       - name: CMake build and run google test
         run: cmake --build build --target RunGoogleTest
