@@ -147,6 +147,7 @@ else()
     add_custom_target(
         RunGoogleTest ALL
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        DEPENDS googleUnitTest
         COMMENT "Running GoogleTest with CTest"
     )
 endif()
