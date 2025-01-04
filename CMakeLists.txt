@@ -11,8 +11,10 @@
 #
 #
 # To build and run tools:
-# 1. Default build (includes all targets): 
+# 0. Configure CMake build
 #    cmake --preset=default -S . -B build
+#
+# 1. Default build (includes all targets): 
 #    cmake --build build
 #
 # 2. Run cpplint only:
@@ -38,6 +40,7 @@ endif()
 # Add executable files
 add_executable(Just1RCe
     #executable files
+    main.cc
 )
 
 set(CMAKE_SH "bash")
@@ -91,7 +94,8 @@ add_custom_target(
 
 add_custom_target(
     GenerateFileList 
-    COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" > ${FILE_LIST}
+    COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "main.cc" > ${FILE_LIST} 
+    COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" >> ${FILE_LIST}
     COMMAND find ${CMAKE_SOURCE_DIR}/includes -type f -name "*.h" >> ${FILE_LIST}
     COMMENT "Generating file list"
 )
@@ -113,6 +117,8 @@ enable_testing()
 add_executable(
     googleUnitTest
     # test files
+    ${TEST_DIR}/test_main.cc
+    ${TEST_DIR}/test_optional.cc
 )
 
 # Link GoogleTest
@@ -128,11 +134,23 @@ gtest_discover_tests(
     googleUnitTest   
 )
 
-add_custom_target(
-    RunGoogleTest
-    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-    COMMENT "Running GoogleTest with CTest"
-)
+# Check if the test directory is empty or doesn't exist
+file(GLOB TEST_FILES "${TEST_DIR}/*")
+if (NOT TEST_FILES)
+    add_custom_target(
+        RunGoogleTest ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Test directory is empty. No tests to run."
+        DEPENDS googleUnitTest
+        COMMENT "Test directory is empty"
+    )
+else()
+    add_custom_target(
+        RunGoogleTest ALL
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        DEPENDS googleUnitTest
+        COMMENT "Running GoogleTest with CTest"
+    )
+endif()
 
 #=============== Set cppcheck ===============
 # Set cppcheck path
@@ -154,12 +172,13 @@ add_custom_target(
     COMMAND xargs ${CPPCHECK} --language=c++ --enable=all --suppress=missingIncludeSystem --xml --output-file=${CPPCHECK_REPORT_XML} < ${FILE_LIST}
     DEPENDS GenerateFileList InstallCppcheckAndPygments
     COMMENT "Running cppcheck and generating XML report"
-)
-
-# Step 3: Add target to run cppcheck-htmlreport
-add_custom_target(
-    RunCppcheck
+    )
+    
+    # Step 3: Add target to run cppcheck-htmlreport
+    add_custom_target(
+        RunCppcheck ALL
     COMMAND ${VENV_PATH}/bin/python ${CPPCHECK_HTMLREPORT} --file=${CPPCHECK_REPORT_XML} --report-dir=${CPPCHECK_HTML_DIR}
+    COMMAND awk '/<error/ && /severity="error"/ {count++} END {if (count > 0) exit 1}' ${CPPCHECK_REPORT_XML}
     DEPENDS RunCppcheckXmlReport
     COMMENT "Generating cppcheck HTML report using virtual environment"
 )
@@ -179,8 +198,9 @@ add_custom_target(
 
 # Step 2: Run cpplint
 add_custom_target(
-    RunCpplint
+    RunCpplint ALL
     COMMAND ${CPPLINT_SCRIPT} ${CPPLINT_REPORT} ${CPPLINT} ${FILE_LIST}
+    COMMAND xargs ${CPPLINT} < ${FILE_LIST} 2>/dev/null
     DEPENDS InstallCpplint GenerateFileList
     COMMENT "Running cpplint and saving results to cpplint_report.txt"
 )
