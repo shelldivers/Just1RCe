@@ -25,7 +25,7 @@ std::string Channel::GetModeAsString() const {
 }
 
 void Channel::SetMode(ChannelModeMask const flags) { mod_ |= flags; }
-void Channel::UnsetMode(ChannelModeMask const flags) { mod_ &= ~flags; };
+void Channel::UnsetMode(ChannelModeMask const flags) { mod_ &= ~flags; }
 
 /**
  * @brief compare a mask
@@ -34,5 +34,5 @@ void Channel::UnsetMode(ChannelModeMask const flags) { mod_ &= ~flags; };
  */
 bool Channel::CheckMode(ChannelModeMask const flags) const {
   return (mod_ & flags);
-};
+}
 }  // namespace Just1RCe

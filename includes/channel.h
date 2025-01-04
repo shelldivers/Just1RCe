@@ -24,6 +24,7 @@
 
 #include <set>
 #include <string>
+#include <utility>
 
 typedef unsigned int ChannelModeMask;
 typedef std::set<std::string>::iterator ChannelUserIter;
