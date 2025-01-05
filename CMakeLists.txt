@@ -94,7 +94,6 @@ add_custom_target(
 
 add_custom_target(
     GenerateFileList 
-    COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "main.cc" > ${FILE_LIST} 
     COMMAND find ${CMAKE_SOURCE_DIR}/srcs -type f -name "*.cc" >> ${FILE_LIST}
     COMMAND find ${CMAKE_SOURCE_DIR}/includes -type f -name "*.h" >> ${FILE_LIST}
     COMMENT "Generating file list"
@@ -124,7 +123,6 @@ add_executable(
 # Link GoogleTest
 target_link_libraries(
     googleUnitTest
-    # must write main function at test file
     GTest::gtest 
     GTest::gmock
 )
