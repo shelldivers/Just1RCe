@@ -40,7 +40,7 @@ endif()
 # Add executable files
 add_executable(Just1RCe
     #executable files
-    main.cc
+    ${CMAKE_SOURCE_DIR}/main.cc
 )
 
 set(CMAKE_SH "bash")
