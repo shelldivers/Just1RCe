@@ -17,7 +17,7 @@ namespace Just1RCe {
  * @throw if 'name' is not formatted properly, throw runtime_exception
  */
 Channel::Channel(std::string const &name, std::string const &oprt_name,
-                 std::string const key = "")
+                 std::string const &key = "")
     : name_(name),
       topic_(""),
       key_(key),
