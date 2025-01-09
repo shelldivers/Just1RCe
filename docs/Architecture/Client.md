@@ -1,16 +1,6 @@
 # Description
-IRC 클라이언트와 관련된 데이터를 관리하는 객체.
-
-client라 하면, 서버와 연결된 노드 중에서 서버를 제외한 모든 대상을 뜻한다. 네트워크에서 말단(leaf)를 이루며, 실질적인 통신의 대상이다. 서버는 이들 클라이언트의 요청을 수행하고, 클라이언트의 메시지를 대신 전달하는 매개자에 불과하다.
-
-본래의 IRC 클라이언트에서는 두 개 이상의 서버를 경유하는 통신도 가능하지만, 현재 구현에서는 한 개의 서버를 경유하는 통신만 가능하다.
-
 # Lifetime & Ownership
-heap allocation된 후, name(string)을 key로 하는 std::map인  client_manager에서 pointer로 관리됨.
-
-``` C++
-std::map<std::string, Client *> client_manager;
-```
+heap allocation된 후, DBContext에서 pointer로 관리됨.
 
 connection이 해제될 때(quit 혹은 비정상 종료) 명시적으로 제거됨.
 
@@ -84,9 +74,10 @@ service routine의 read event가 trigger된 경우 호출.
 실행 과정은 다음과 같음
 1. TcpSockt의 fd에서 receive_buffer로 read(recv)
 2. 기존의 read_buffer_에 recv_buffer의 내용을 append
-3. read_buffer_에서 CR-LF로 끝나는, message를 vector에 저장
-4. CR-LF로 구분되지 않는, 불완전한 메시지를 read_buffer_에 저장
-5. message를 저장한 vector를 optional에 담아서 return
+3. recv_buffer로 읽어올 내용이 없을 때 까지 1, 2를 반복함.
+4. read_buffer_에서 CR-LF로 끝나는, message를 vector에 저장
+5. CR-LF로 구분되지 않는, 불완전한 메시지를 read_buffer_에 저장
+6. message를 저장한 vector를 optional에 담아서 return
 
 read size를 512byte로 설정. 이는 프로토콜에서 규정하는 메시지 최대 크기로, 이 보다 큰 메시지는 규약 위반임.
 
@@ -107,4 +98,13 @@ client를 향해 텍스트 데이터를 보내고, 남은 데이터를 저장한
 
 service routine의 write event가 trigger된 경우 호출한다.
 
-return 값으로 write_buffer_의 데이터 유무를 bool값으로 반환하는데, 컨텐츠가 있는 경우, 해당 소켓에 대한 write event를 다시 등록한다. 이러한 이벤트 관리 방식을 **level-trigger**하다고 표현한다.
+return 값으로 write_buffer_의 데이터 유무를 bool값으로 반환하는데, 컨텐츠가 있는 경우, 해당 소켓에 대한 write event를 다시 등록한다. 이는 해당 소켓에 대한 이벤트가 EPOLLET + EPOLLONESHOT으로 관리될 예정이기 때문이다.
+# Client와 epoll
+
+현재 클라이언트 관련 IO는 epoll에 의한 event-driven 방식으로 처리될 예정이며, 이 event는 효율성을 위해서 edge-trigger하게 관리된다.
+
+edge-trigger하지 않은 소켓이 write가능한 상태라면, wirte event는 계속해서 발생한다. 즉 쓸 내용이 없음에도 불구하고 쓰기 가능함을 notify하는, 불필요한 이벤트가 다수 발생한다. 이를 막기 위해서 EPOLLET를 설정하여 이벤트를 edge-trigger하여 해당 소켓에 쓸 수 있게 되는 그 순간에만 event가 발생하도록 처리하여 불필요한 처리가 없도록 한다.
+
+또한 write는 write_buffer_에 컨텐츠가 있을 때에만 trigger하면 되므로, 이를 위해서 EPOLLONESHOT을 조합한다. 이 플래그는 한 번 이벤트가 발동하면 해당 fd를 비활성화 하는데, 이는 후속 상황에 따라서 명시적으로 재등록(epoll_ctl, EPOLL_MOD_CTL)할 수 있도록 구현하기 위함이다.
+
+**다만, 한 소켓에 대하여 read와 write는 모두 같은 flag에 영향을 받기 때문에 이벤트의 재등록을 주의 깊게 처리해야 한다. 즉 read 처리 후에 oneshot에 의해 해당 fd는 비활성화 될 수 있다.**
