@@ -2,10 +2,9 @@
 # Description
 서버가 관리해야 하는 채널과 관련된 데이터를 표현하는 class.
 # Lifetime & Ownership
-heap allocation되며, channel_manager가 pointer의 형태로 관리함
-``` C++
-std::map<std::string, Channel *> channel_manager;
-```
+heap allocation되며,  DBContext에서 pointer의 형태로 관리함
+
+현재 해당 채널에 소속된 사용자 관련 정보 또한 DBContext에서 관리될 예정임.
 # Inheritance
 NONE
 
@@ -32,11 +31,6 @@ NONE
 해당 채널이 유지 가능한 최대 사용자 수를 의미하는 값.
 
 채널 모드 +l이 설정되었고, user_nicknames_의 크기가 max_user_num_ 이상이라면 AddUser는 바로 return하게 됨.
-### nickname_to_username_
-현재 채널에 소속된 사용자의 별칭(nick name, std::string)과 그에 해당하는 사용자의 이름(user name, std::string)을 저장하는 맵(std::map<std::string, std::string>).
-
-현재 해당 채널에 소속된 사용자의 수는 nickname_to_nicknames_.size()를 통해서 획득.
-
 ## Member Functions
 **setter를 비롯한 일부 member function들은 호출하기 전에 채널의 권한과 그 대상이 되는 client의 권한을 비교 및 확인을 할 필요가 있음.**
 ### constructor
@@ -61,15 +55,3 @@ NONE
 인자로 전달된 mask에 세팅된 모드와 현재 채널에 세팅된 모드를 비교하여 공통으로 설정된 mod가 있는지 확인하고, 이를 bool값으로 반환함.
 
 인자의 모드가 일부만 일치해도 true를 반환함.
-### AddUser
-채널에 사용자를 추가함.
-
-만약 max_user_num_가 user_nicknames_의 size이상이라면 동작은 무시됨.
-
-채널에서 별칭(nick name)은 고유하므로, 중복된 별칭이 존재하는 경우, 해당 사용자는 입장이 거부됨.
-### DeleteUser
-채널에 사용자를 제거함.
-
-해당 채널의 사용자가 아니라면 무시됨.
-### CheckUser
-채널에 인자로 전달된 이름(nick name)이 있는지 확인하여 있다면 true를 반환함.
