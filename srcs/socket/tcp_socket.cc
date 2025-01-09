@@ -29,7 +29,7 @@ socklen_t const Just1RCe::TcpSocket::kInetSocketAddrLen =
  * @throws std::runtime_error with error message
  *
  */
-TcpSocket::TcpSocket(std::string const &port_number) try
+TcpSocket::TcpSocket(std::string const &port_number)
     : cur_inet_sock_addr_len_(kInetSocketAddrLen),
       socket_fd_(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
       is_listen_only_(true) {
@@ -59,10 +59,6 @@ TcpSocket::TcpSocket(std::string const &port_number) try
   if (flag == -1) throw std::runtime_error(JUST1RCE_SRCS_FCNTL_GETFL_ERROR);
   if (fcntl(socket_fd_, F_SETFL, flag | O_NONBLOCK) == -1)
     throw std::runtime_error(JUST1RCE_SRCS_FCNTL_SETFL_ERROR);
-
-} catch (const std::exception &e) {
-  std::cerr << e.what() << '\n';
-  throw;
 }
 
 /**
@@ -76,7 +72,7 @@ TcpSocket::TcpSocket(std::string const &port_number) try
  * @throws std::runtime_error with error message
  *
  */
-TcpSocket::TcpSocket(int const listen_sock_fd) try
+TcpSocket::TcpSocket(int const listen_sock_fd)
     : cur_inet_sock_addr_len_(kInetSocketAddrLen),
       socket_fd_(
           accept(listen_sock_fd,
@@ -99,10 +95,6 @@ TcpSocket::TcpSocket(int const listen_sock_fd) try
   if (flag == -1) throw std::runtime_error(JUST1RCE_SRCS_FCNTL_GETFL_ERROR);
   if (fcntl(socket_fd_, F_SETFL, flag | O_NONBLOCK) == -1)
     throw std::runtime_error(JUST1RCE_SRCS_FCNTL_SETFL_ERROR);
-
-} catch (const std::exception &e) {
-  std::cerr << e.what() << '\n';
-  throw;
 }
 
 /**
