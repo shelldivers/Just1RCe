@@ -16,7 +16,7 @@ namespace Just1RCe {
  * @param key password for the channel. if pw is not setted, key must be impty.
  * @throw if 'name' is not formatted properly, throw runtime_exception
  */
-Channel::Channel(std::string const &name, std::string const &key = "")
+explicit Channel::Channel(std::string const &name, std::string const &key = "")
     : name_(name),
       topic_(""),
       key_(key),

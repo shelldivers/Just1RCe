@@ -60,7 +60,7 @@ class Channel {
 
  public:
   // constructor
-  Channel(std::string const &name, std::string const &key = "");
+  explicit Channel(std::string const &name, std::string const &key = "");
   ~Channel();
 
   // getter
