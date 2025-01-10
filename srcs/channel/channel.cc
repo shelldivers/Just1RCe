@@ -16,8 +16,7 @@ namespace Just1RCe {
  * @param key password for the channel. if pw is not setted, key must be impty.
  * @throw if 'name' is not formatted properly, throw runtime_exception
  */
-Channel::Channel(std::string const &name, std::string const &oprt_name,
-                 std::string const &key = "")
+Channel::Channel(std::string const &name, std::string const &key = "")
     : name_(name),
       topic_(""),
       key_(key),
@@ -27,7 +26,6 @@ Channel::Channel(std::string const &name, std::string const &oprt_name,
   if (!IS_CHANNEL_GLOBAL && !IS_CHANNEL_LOCAL && !IS_CHANNEL_MOELESS &&
       !IS_CHANNEL_SAFE)
     throw std::runtime_error(JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR);
-  user_nicknames_.insert(oprt_name);
 
   if (!key_.empty()) {
     mod_ |= JUST1RCE_SRCS_CHANNEL_MOD_KEY_SET;
@@ -41,7 +39,6 @@ std::string Channel::name() const { return name_; }
 std::string Channel::topic() const { return topic_; }
 std::string Channel::key() const { return key_; }
 size_t Channel::max_user_num() const { return max_user_num_; }
-size_t Channel::user_num() const { return user_nicknames_.size(); }
 
 // setter
 void Channel::set_topic(std::string const &new_topic) { topic_ = new_topic; }

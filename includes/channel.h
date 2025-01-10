@@ -27,8 +27,6 @@
 #include <utility>
 
 typedef unsigned int ChannelModeMask;
-typedef std::set<std::string>::iterator ChannelUserIter;
-typedef std::pair<ChannelUserIter, ChannelUserIter> ChannelUserRange;
 
 namespace Just1RCe {
 
@@ -54,7 +52,6 @@ class Channel {
 
   // user info
   size_t max_user_num_;
-  std::set<std::string> user_nicknames_;
 
   // TODO(eldeshue) : time information
   /// TODO(eldeshue) : invite_list_, ban_list_
@@ -63,8 +60,7 @@ class Channel {
 
  public:
   // constructor
-  Channel(std::string const &name, std::string const &oprt_name,
-          std::string const &key = "");
+  Channel(std::string const &name, std::string const &key = "");
   ~Channel();
 
   // getter
@@ -73,7 +69,6 @@ class Channel {
   std::string key() const;
 
   size_t max_user_num() const;
-  size_t user_num() const;
 
   // setter
   // auth check needed
@@ -87,11 +82,6 @@ class Channel {
   void SetMode(ChannelModeMask const flags);
   void UnsetMode(ChannelModeMask const flags);
   bool CheckMode(ChannelModeMask const flags) const;
-
-  // user control
-  void AddUser(std::string const &target_user_name);
-  void DeleteUser(std::string const &target_user_name);
-  bool CheckUser(std::string const &target_user_name) const;
 };
 }  // namespace Just1RCe
 
