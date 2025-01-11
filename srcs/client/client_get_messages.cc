@@ -20,26 +20,30 @@ namespace Just1RCe {
  */
 ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
   char recv_buffer[JUST1RCE_SRCS_CLIENT_MSG_MAX + 1];
-
   memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_MSG_MAX + 1);
-  ssize_t recv_size =
-      recv(socket_.socket_fd(), recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
-  if (recv_size == -1) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK) {
-      return ft::optional<std::vector<std::string> >();  // empty option,
-                                                         // equivalent to
-                                                         // std::noops
+
+  // recv text data from socket till the socket's buffer is empty
+  ssize_t total_recv_size = 0, recv_size = 0;
+  while (recv_size = recv(socket_.socket_fd(), recv_buffer,
+                          JUST1RCE_SRCS_CLIENT_MSG_MAX, 0)) {
+    // recv failed
+    if (recv_size == -1) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        return ft::optional<std::vector<std::string> >();  // empty option,
+                                                           // equivalent to
+                                                           // std::noops
+      }
+      throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
     }
-    throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
+    // recv succed, append read_buffer_ with the received text
+    read_buffer_.append(recv_buffer, recv_size);
+    total_recv_size += recv_size;
   }
 
   // get result
   ft::optional<std::vector<std::string> > buffered_messages;
   size_t start_pos = 0, end_pos = 0;
-  if (recv_size > 0) {
-    // combine recv_buffer and left over read_buffer_
-    read_buffer_.append(recv_buffer, recv_size);
-
+  if (total_recv_size > 0) {
     // split result with delimeter
     while ((end_pos = read_buffer_.find(JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM,
                                         start_pos)) != std::string::npos) {
