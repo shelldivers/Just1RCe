@@ -23,8 +23,7 @@ explicit Channel::Channel(std::string const &name, std::string const &key = "")
       mod_(JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT),
       max_user_num_(std::numeric_limits<size_t>::max()) {
   // wrong channel name format error
-  if (!IS_CHANNEL_GLOBAL && !IS_CHANNEL_LOCAL && !IS_CHANNEL_MOELESS &&
-      !IS_CHANNEL_SAFE)
+  if (!is_channel_global() && !is_channel_global())
     throw std::runtime_error(JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR);
 
   if (!key_.empty()) {
@@ -45,5 +44,19 @@ void Channel::set_topic(std::string const &new_topic) { topic_ = new_topic; }
 void Channel::set_key(std::string const &new_key) { key_ = new_key; }
 size_t Channel::set_max_user_num(size_t const new_max_user_num) {
   max_user_num_ = new_max_user_num;
+}
+
+/**
+ * @brief check channel name's prefix and return true if it is global
+ */
+inline bool Channel::is_channel_global() const {
+  return (this->name_[0] == '#');
+}
+
+/**
+ * @brief check channel name's prefix and return true if it is local
+ */
+inline bool Channel::is_channel_local() const {
+  return (this->name_[0] == '&');
 }
 }  // namespace Just1RCe

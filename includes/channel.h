@@ -16,12 +16,6 @@
 // error
 #define JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR "Channel : wrong channel name."
 
-// macro function
-#define IS_CHANNEL_GLOBAL (this->name_[0] == '#')
-#define IS_CHANNEL_LOCAL (this->name_[0] == '&')
-#define IS_CHANNEL_MOELESS (this->name_[0] == '+')
-#define IS_CHANNEL_SAFE (this->name_[0] == '!')
-
 #include <set>
 #include <string>
 #include <utility>
@@ -52,6 +46,10 @@ class Channel {
 
   // user info
   size_t max_user_num_;
+
+  // channel type information
+  inline bool is_channel_global() const;
+  inline bool is_channel_local() const;
 
   // TODO(eldeshue) : time information
   /// TODO(eldeshue) : invite_list_, ban_list_
