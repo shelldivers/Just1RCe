@@ -15,8 +15,12 @@ namespace Just1RCe {
 
 /**
  * @brief recv text from socket's fd and append text to the buffer
- * @param fd fd of the socket
- * @param buffer buffer to save received text
+ * @details append pbuffer with the text from fd's socket till the system buffer
+ * is empty.
+ * @throw Throw runtime exception if the recv calls failed.
+ * @param fd fd of the socket to recv
+ * @param pbuffer pointer to the buffer to save received text
+ * @return if the recv succeed, return true.
  */
 static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
   char recv_buffer[JUST1RCE_SRCS_CLIENT_MSG_MAX + 1];
@@ -40,7 +44,11 @@ static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
 }
 
 /**
- * @brief split result with CR-LF
+ * @brief split string with CR-LF
+ * @details Split string with "\r\n" and save them to the vector of string.
+ * Splitted strings does not contain "\r\n".
+ * @param pstr pointer to the string to split
+ * @return vector of splitted string
  */
 static std::vector<std::string> split_string_with_crlf(std::string *pstr) {
   std::vector<std::string> buffered_messages;
@@ -61,8 +69,8 @@ static std::vector<std::string> split_string_with_crlf(std::string *pstr) {
 }
 
 /**
- * @brief receive raw text from socket and turn it to propeer messages
- * @return vector of strings
+ * @brief receive all the text from socket and turn it to propeer messages
+ * @return optional vector of messages(strings)
  * @throws runtime error, recv failure
  */
 ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
