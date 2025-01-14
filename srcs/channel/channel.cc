@@ -23,7 +23,7 @@ explicit Channel::Channel(std::string const &name, std::string const &key = "")
       mod_(JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT),
       max_user_num_(std::numeric_limits<size_t>::max()) {
   // wrong channel name format error
-  if (!is_channel_global() && !is_channel_global())
+  if (!is_channel_global() && !is_channel_local())
     throw std::runtime_error(JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR);
 
   if (!key_.empty()) {
