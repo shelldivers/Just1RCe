@@ -18,7 +18,7 @@ namespace Just1RCe {
  * @param fd fd of the socket
  * @param buffer buffer to save received text
  */
-static bool recv_and_append_buffer(int const fd, std::string &buffer) {
+static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
   char recv_buffer[JUST1RCE_SRCS_CLIENT_MSG_MAX + 1];
   ssize_t recv_size = 0;
 
@@ -34,7 +34,7 @@ static bool recv_and_append_buffer(int const fd, std::string &buffer) {
       throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
     }
     // recv succed, append buffer with the received text
-    buffer.append(recv_buffer, recv_size);
+    pbuffer->append(recv_buffer, recv_size);
   }
   return true;
 }
@@ -42,21 +42,21 @@ static bool recv_and_append_buffer(int const fd, std::string &buffer) {
 /**
  * @brief split result with CR-LF
  */
-static std::vector<std::string> split_string_with_crlf(std::string &str) {
+static std::vector<std::string> split_string_with_crlf(std::string *pstr) {
   std::vector<std::string> buffered_messages;
   size_t start_pos = 0, end_pos = 0;
 
-  while ((end_pos = str.find(JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM, start_pos)) !=
-         std::string::npos) {
+  while ((end_pos = pstr->find(JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM,
+                               start_pos)) != std::string::npos) {
     // get whole message from str
-    buffered_messages.push_back(str.substr(start_pos, (end_pos - start_pos)));
+    buffered_messages.push_back(pstr->substr(start_pos, (end_pos - start_pos)));
 
     // move start position to search next delimeter delimeter
     start_pos = end_pos + 2;  // move after cr-lf
   }
   // save left over text
   // erase used messages
-  if (start_pos != 0) str = str.substr(start_pos, str.size() - start_pos);
+  if (start_pos != 0) *pstr = pstr->substr(start_pos, pstr->size() - start_pos);
   return buffered_messages;
 }
 
@@ -66,11 +66,11 @@ static std::vector<std::string> split_string_with_crlf(std::string &str) {
  * @throws runtime error, recv failure
  */
 ft::optional<std::vector<std::string> > Client::GetReceivedMessages() {
-  if (!recv_and_append_buffer(this->socket_.socket_fd(), this->read_buffer_))
+  if (!recv_and_append_buffer(this->socket_.socket_fd(), &(this->read_buffer_)))
     return ft::optional<std::vector<std::string> >();
 
   return ft::optional<std::vector<std::string> >(
-      split_string_with_crlf(this->read_buffer_));
+      split_string_with_crlf(&(this->read_buffer_)));
 }
 
 }  // namespace Just1RCe
