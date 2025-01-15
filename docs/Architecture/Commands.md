@@ -23,6 +23,11 @@
   - [  CHANNEL MESSAGES  ](#--channel-messages--)
     - [JOIN](#join)
       - [FORMAT](#format-5)
+    - [USER](#user-2)
+    - [PING / PONG](#ping--pong)
+    - [QUIT](#quit-1)
+  - [Channel Operations](#channel-operations)
+    - [JOIN](#join-1)
       - [Numerics](#numerics-3)
     - [PART](#part)
       - [FORMAT](#format-6)
@@ -50,6 +55,17 @@
     - [PRIVMSG](#privmsg)
       - [FORMAT](#format-13)
       - [NUMERICS](#numerics-11)
+    - [TOPIC](#topic-1)
+    - [LIST](#list-1)
+    - [NAMES](#names-1)
+    - [INVITE](#invite-1)
+    - [KICK](#kick-1)
+  - [Server Queries and Commands](#server-queries-and-commands)
+    - [MODE](#mode-1)
+  - [Sending Messages](#sending-messages-1)
+    - [PRIVMSG](#privmsg-1)
+- [Command Object](#command-object)
+- [Command-to-Function Mapping](#command-to-function-mapping)
 
 ---
 
@@ -206,6 +222,7 @@ irssi는 위의 명령어를 통해 서버에 연결시 다음 네가지 명령�
   Parameters: <nickname>
 ```
 
+<<<<<<< HEAD
 - Message Transaction   
 ```
 CLIENT: 
@@ -480,10 +497,47 @@ irssi는 QUIT명령어 사용시 기본 메시지로 *leaving*을 남긴다
 **채널에 접속하기 위한 명령어**
 #### FORMAT
 - FORMAT   
+=======
+`NICK <nickname>`
+
+- 사용중인 별명인지 확인 필요   
+- 숫자, 영문, [], {}, \, | 허용   
+- 첫 번째 문자 숫자 금지   
+- 다른 클라이언트에게 별명 변경을 알려야함   
+    NICK b -> :a NICK b
+- 매개변수가 없을 경우 무시   
+
+### USER
+
+### PING / PONG
+
+### QUIT
+format:   
+```bnf
+    Command: QUIT
+ Parameters: [<reason>]
+```   
+
+`/quit :<reason>`
+
+- 클라이언트와 서버와의 연결을 종료할 때 사용   
+    서버는 이를 인지하고 클라이언트와의 연결을 종료해야함   
+- 같은 채널에 있는 사용자들에게만 `<nickname> :QUIT: <reason>` 양식으로 메시지를 출력   
+- 종료 이유가 없는 경우 기본 메시지 제공 (irssi의 경우 "leaving" 이라는 기본 이유를 제공해줌)   
+- 타임아웃이나 기타 이유료 강제 종료된 경우, 그에 해당하는 이유를 적어줌     
+
+
+
+## Channel Operations
+
+### JOIN
+format:   
+>>>>>>> docs: add commands list
 ```bnf
      Command: JOIN
   Parameters: <channel>{,<channel>} [<key>{,<key>}]
   Alt Params: 0
+<<<<<<< HEAD
 ```
 
 - Message Transaction   
@@ -1321,3 +1375,76 @@ Server:
   :{SERVER_NAME} 412 nick_ken :No text to send
 ```     
 
+=======
+```   
+
+join을 하면 클라이언트는 각 채널마다 고유의 메시지들을 저장하는 공간이 있음
+각 채널마다 나
+
+### PART
+format:   
+```bnf
+     Command: JOIN
+  Parameters: <channel>{,<channel>} [<key>{,<key>}]
+  Alt Params: 0
+```   
+
+### TOPIC
+format:   
+```bnf
+     Command: TOPIC
+  Parameters: <channel> [<topic>]
+```    
+
+`/topic <channel>`
+
+### LIST
+
+### NAMES
+
+### INVITE
+format:   
+```bnf
+     Command: INVITE
+  Parameters: <nickname> <channel>
+```   
+
+`INVITE`
+
+### KICK
+format:   
+```bnf
+      Command: KICK
+   Parameters: <channel> <user> *( "," <user> ) [<comment>]
+```   
+
+`KICK`
+
+## Server Queries and Commands
+
+### MODE
+format:   
+```bnf
+     Command: MODE
+  Parameters: <target> [<modestring> [<mode arguments>...]]
+```   
+
+`MODE`
+
+## Sending Messages
+
+### PRIVMSG
+format:   
+```bnf
+     Command: PRIVMSG
+  Parameters: <target>{,<target>} <text to be sent>
+```   
+
+
+# Command Object
+
+
+
+
+# Command-to-Function Mapping
+>>>>>>> docs: add commands list
