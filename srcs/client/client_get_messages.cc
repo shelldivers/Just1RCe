@@ -27,14 +27,18 @@ static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
   ssize_t recv_size = 0;
 
   memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_MSG_MAX + 1);
-  while (recv_size = recv(fd, recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0)) {
-    // recv failed
+  while (true) {
+    recv_size = recv(fd, recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
+    // connection destructed, EPOLLHUP
+    if (recv_size == 0) {
+      return false;
+    }
+    // no more data to receive
+    if (recv_size == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      break;
+    }
+    // recv error
     if (recv_size == -1) {
-      if (errno == EAGAIN || errno == EWOULDBLOCK) {
-        return false;  // empty option,
-                       // equivalent to
-                       // std::noops
-      }
       throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
     }
     // recv succed, append buffer with the received text
