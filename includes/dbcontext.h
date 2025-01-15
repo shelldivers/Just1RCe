@@ -18,9 +18,9 @@ class Client;
  * @date 2025-01-10
  *
  */
-class DBContext {
+class DbContext {
  public:
-  virtual ~DBContext();
+  virtual ~DbContext();
 
   // Client index table
   virtual bool AddClient(Client *user) = 0;
@@ -39,7 +39,7 @@ class DBContext {
   virtual Channel *GetChannelByName(std::string const &channel_name) = 0;
   virtual size_t GetUserNumOfChannelByName(std::string const &channel_name) = 0;
 
-  // ClientChannel middle table
+  // mapping table between channel and client
   virtual bool JoinClientToChannelByNames(std::string const &client_nick_name,
                                           std::string const &channel_name) = 0;
   virtual std::vector<Channel *> GetChannelsByClientNickName(
