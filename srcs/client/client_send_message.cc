@@ -15,7 +15,7 @@ namespace Just1RCe {
 
 /**
  * @brief add processed message data to the write buffer
- * @attention cr-lf will be added here
+ * @attention register write event with EPOLLET | EPOLLONESHOT
  * @param message pure message data without delimeter(cr-lf)
  */
 void Client::SetSendMessage(std::string const &message) {
@@ -25,13 +25,12 @@ void Client::SetSendMessage(std::string const &message) {
 /**
  * @brief send text data to the client
  * @details will be called after write event triggered
- * @attention write event will be level triggered
- * @return if true, write_buffer_ has content to write, register write event
+ * @attention write event will be marked as EPOLLET | EPOLLONESHOT
+ * @return if true, write_buffer_ has content to send, re-register write event
  */
 bool Client::SendMessage() {
-  int send_size =
-      send(socket_.socket_fd(), write_buffer_.c_str(),
-           std::min(write_buffer_.size(), JUST1RCE_SRCS_CLIENT_MSG_MAX), 0);
+  ssize_t send_size =
+      send(socket_.socket_fd(), write_buffer_.c_str(), write_buffer_.size(), 0);
   if (send_size == -1) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       return true;  // re-register the write event
@@ -42,6 +41,8 @@ bool Client::SendMessage() {
   }
 
   // save partial message, push back to the read_buffer_
+  // send_size == 0 means no change, no need to call substr
+  // substr takess first position of original string to copy
   if (send_size > 0) write_buffer_ = write_buffer_.substr(send_size);
 
   // if true, there is content to send, re-register event
