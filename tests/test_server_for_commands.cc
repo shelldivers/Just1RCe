@@ -86,9 +86,7 @@ int main(int argc, char *argv[])
         printf("Client connected\n");
 
         // Send welcome message
-        const char *welcome = "001 ken Welcome to the networkname Network, ken!jiwojung@jhostname \r\n";
-        // const char *welcome1 = ":Just1RCe 002 :Your host is Just1RCe, running version 1.0\r\n";
-        // write(connfd, welcome, strlen(welcome1));
+        const char *welcome = ":irc.losslessone.com 001 nick_kenn :Welcome to the Rizon Internet Relay Chat Network nick_kenn\r\n:irc.losslessone.com 002 nick_kenn :Your host is irc.losslessone.com, running version plexus-4(hybrid-8.1.20)\r\n:irc.losslessone.com 003 nick_kenn :This server was created Mar 19 2022 at 21:25:18\r\n:irc.losslessone.com 004 nick_kenn irc.losslessone.com plexus-4(hybrid-8.1.20) CDGNRSUWagilopqrswxyz BCIMNORSabcehiklmnopqstvz Iabehkloqv\r\n:irc.losslessone.com 005 nick_kenn CALLERID CASEMAPPING=rfc1459 DEAF=D KICKLEN=180 MODES=4 PREFIX=(qaohv)~&@%+ STATUSMSG=~&@%+ EXCEPTS=e INVEX=I NICKLEN=30 NETWORK=Rizon MAXLIST=beI:250 MAXTARGETS=4 :are supported by this server\r\n:irc.losslessone.com 005 nick_kenn CHANTYPES=# CHANLIMIT=#:250 CHANNELLEN=50 TOPICLEN=390 CHANMODES=beI,k,l,BCMNORScimnpstz NAMESX UHNAMES KNOCK WATCH=60 AWAYLEN=180 ELIST=CMNTU SAFELIST :are supported by this server\r\n";
 
         // Handle client commands
         while ((nread = read(connfd, buf, sizeof(buf) - 1)) > 0)
