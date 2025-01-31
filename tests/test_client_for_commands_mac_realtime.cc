@@ -95,8 +95,21 @@ private:
 
 int main() {
     try {
-        std::string ip = "52.193.79.145";
-        int port = 6667;  // 일반 IRC 포트
+        int option;
+        std::cout << "Enter 1 to connect to the default server, or any other number to enter a custom server: ";
+        std::cin >> option;
+        std::cin.ignore();  // 개행 문자 제거
+
+        std::string ip;
+        int port;
+
+        if (option == 1) {
+            ip = "52.193.79.145";  // 기본 서버 IP
+            port = 6667;            // 기본 포트
+        } else {
+            ip = "127.0.0.1";  // localhost (변경됨)
+            port = 6667;       // 기본 포트
+        }
 
         IRCClient client(ip, port);
         client.connectToServer();
