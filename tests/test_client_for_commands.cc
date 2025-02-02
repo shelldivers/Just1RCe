@@ -4,38 +4,20 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+#include <thread>
 
 class IRCClient {
 public:
-    IRCClient(const std::string& ip, int port, const std::string& nickname)
-        : ip_(ip), port_(port), nickname_(nickname), sockfd_(-1), ssl_ctx_(nullptr), ssl_(nullptr) {}
+    IRCClient(const std::string& ip, int port)
+        : ip_(ip), port_(port), sockfd_(-1) {}
 
     ~IRCClient() {
-        if (ssl_) {
-            SSL_shutdown(ssl_);
-            SSL_free(ssl_);
-        }
-        if (ssl_ctx_) {
-            SSL_CTX_free(ssl_ctx_);
-        }
         if (sockfd_ != -1) {
             close(sockfd_);
         }
     }
 
     void connectToServer() {
-        // Initialize OpenSSL
-        SSL_library_init();
-        OpenSSL_add_all_algorithms();
-        SSL_load_error_strings();
-
-        ssl_ctx_ = SSL_CTX_new(TLS_client_method());
-        if (!ssl_ctx_) {
-            throw std::runtime_error("Failed to create SSL context");
-        }
-
         sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
         if (sockfd_ < 0) {
             throw std::runtime_error("Error creating socket");
@@ -54,77 +36,96 @@ public:
             throw std::runtime_error("Connection failed");
         }
 
-        ssl_ = SSL_new(ssl_ctx_);
-        if (!ssl_) {
-            throw std::runtime_error("Failed to create SSL object");
-        }
+        std::cout << "Connected to " << ip_ << ":" << port_ << std::endl;
 
-        SSL_set_fd(ssl_, sockfd_);
-        if (SSL_connect(ssl_) <= 0) {
-            throw std::runtime_error("SSL/TLS handshake failed: " + getSSLError());
-        }
+        std::thread receive_thread([this]() { this->receiveMessages(); });
+        receive_thread.detach();
 
-        std::cout << "Connected securely to " << ip_ << ":" << port_ << std::endl;
-        sendCommand("NICK " + nickname_);
-        sendCommand("USER " + nickname_ + " 0 * :" + nickname_);
-
-        run();
+        inputLoop();
     }
 
 private:
     void sendCommand(const std::string& command) {
         std::string formatted_command = command + "\r\n";
-        if (SSL_write(ssl_, formatted_command.c_str(), formatted_command.size()) <= 0) {
+        if (send(sockfd_, formatted_command.c_str(), formatted_command.size(), 0) < 0) {
             throw std::runtime_error("Failed to send command: " + command);
         }
     }
 
-    void run() {
+    void receiveMessages() {
         char buffer[4096];
+        std::string nickname;
 
         while (true) {
             std::memset(buffer, 0, sizeof(buffer));
-            int bytes_received = SSL_read(ssl_, buffer, sizeof(buffer) - 1);
+            int bytes_received = recv(sockfd_, buffer, sizeof(buffer) - 1, 0);
             if (bytes_received <= 0) {
                 std::cout << "Disconnected from server." << std::endl;
                 break;
             }
-            std::cout << "[RECEIVED] " << buffer;
+            std::string message(buffer);
+            std::cout << "[RECEIVED]: " << message;
 
-            // PING 처리
-            if (std::strncmp(buffer, "PING", 4) == 0) {
-                std::string pong_response = std::string(buffer).replace(0, 4, "PONG");
+            if (message.find("PING") == 0) {
+                std::string pong_response = message;
+                pong_response.replace(0, 4, "PONG");
                 std::cout << "[DEBUG] Responding to PING with: " << pong_response << std::endl;
                 sendCommand(pong_response);
+            }
+            else if (message.find("PRIVMSG ") != std::string::npos && message.find(" :VERSION") != std::string::npos) {
+                std::size_t start = message.find(":") + 1;
+                std::size_t end = message.find("!");
+                if (start != std::string::npos && end != std::string::npos) {
+                    nickname = message.substr(start, end - start);
+                }
+                sendCommand("NOTICE " + nickname + " :\001VERSION IRCClient 1.0\001");
+            }
+            else if (message.find("NOTICE * :*** No Ident response") != std::string::npos) {
+                if (!nickname.empty()) {
+                    sendCommand("USER " + nickname + " " + nickname + " irc.rizon.net :" + nickname);
+                }
             }
         }
     }
 
-    std::string getSSLError() {
-        char error_buffer[256];
-        ERR_error_string_n(ERR_get_error(), error_buffer, sizeof(error_buffer));
-        return std::string(error_buffer);
+    void inputLoop() {
+        std::string input;
+        while (true) {
+            std::getline(std::cin, input);
+            if (input.empty()) continue;
+
+            sendCommand(input);
+
+            if (input == "QUIT") {
+                break;
+            }
+        }
     }
 
     std::string ip_;
     int port_;
-    std::string nickname_;
     int sockfd_;
-    SSL_CTX* ssl_ctx_;
-    SSL* ssl_;
 };
 
 int main() {
     try {
-        std::string ip = "52.193.79.145";
-        int port = 6697;
-        std::string nickname;
-
-        std::cout << "Enter nickname: ";
-        std::cin >> nickname;
+        int option;
+        std::cout << "Enter 1 to connect to the default server, or any other number to enter a custom server: ";
+        std::cin >> option;
         std::cin.ignore();
 
-        IRCClient client(ip, port, nickname);
+        std::string ip;
+        int port;
+
+        if (option == 1) {
+            ip = "52.193.79.145";
+            port = 6667;
+        } else {
+            ip = "127.0.0.1";
+            port = 6667;
+        }
+
+        IRCClient client(ip, port);
         client.connectToServer();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
