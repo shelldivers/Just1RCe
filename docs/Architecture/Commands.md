@@ -791,7 +791,8 @@ Server:
 #### FORMAT
 - FORMAT   
 ```bnf
-
+     Command: INVITE
+  Parameters: <nickname> <channel>
 ```
 
 - Message Transaction   
