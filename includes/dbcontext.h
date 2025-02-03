@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "client_mode.h"
+
 namespace Just1RCe {
 
 class Channel;
@@ -38,6 +40,19 @@ class DbContext {
 
   virtual Channel *GetChannelByName(std::string const &channel_name) = 0;
   virtual size_t GetUserNumOfChannelByName(std::string const &channel_name) = 0;
+
+  // client mode table
+  virtual void SetClientMode(std::string const &channel_name,
+                             std::string const &client_name,
+                             ClientModeMask mask) = 0;
+  virtual ClientModeMask GetClientMode(std::string const &channel_name,
+                                       std::string const &client_name) = 0;
+  virtual void DeleteClientMode(std::string const &channel_name,
+                                std::string const &client_name) = 0;
+  virtual void DeleteClientModesByClientName(
+      std::string const &client_name) = 0;
+  virtual void DeleteClientModesByChannelName(
+      std::string const &channel_name) = 0;
 
   // mapping table between channel and client
   virtual bool JoinClientToChannelByNames(std::string const &client_nick_name,
