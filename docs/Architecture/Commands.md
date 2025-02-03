@@ -1,5 +1,6 @@
 ## INDEX
 - [COMMANDS](#commands)
+  - [COMMAND FORMAT](#command-format)
   - [INFO](#info)
     - [USER](#user)
     - [SERVER](#server)
@@ -53,6 +54,75 @@
 ---
 
 # COMMANDS   
+
+## COMMAND FORMAT
+
+서버는 클라이언트로부터 오는 메시지를 parsing할 뿐만아니라 client에게 보내는 메시지 또한 parsing 하여 보내야 한다   
+
+아래에는 IRC 프로토콜의 메시지 형식을 ABNF로 표현한 것이다   
+
+```ABNF
+  message         ::= [':' <source> SPACE] <command> <parameters> <crlf>
+  SPACE           ::=  %x20 *( %x20 )   ; space character(s)
+  crlf            ::=  %x0D %x0A        ; "carriage return" "linefeed"
+
+  source          ::=  <servername> / ( <nickname> [ "!" <user> ] [ "@" <host> ] )
+  nick            ::=  <any characters except NUL, CR, LF, chantype character, and SPACE> <possibly empty sequence of any characters except NUL, CR, LF, and SPACE>
+  user            ::=  <sequence of any characters except NUL, CR, LF, and SPACE>
+
+  command         ::=  letter* / 3digit
+
+  parameters      ::=  *( SPACE middle ) [ SPACE ":" trailing ]
+  nospcrlfcl      ::=  <sequence of any characters except NUL, CR, LF, colon (`:`) and SPACE>
+  middle          ::=  nospcrlfcl *( ":" / nospcrlfcl )
+  trailing        ::=  *( ":" / " " / nospcrlfcl )
+```
+
+IRC 메시지는 크게 3개로 나뉜다   
+
+`source`, `command`, `parameters`    
+
+**source**   
+`0 ~ 1` 개가 존재할 수 있다   
+
+server가 client에게 보내는 메시지에 사용된다   
+`:`으로 시작해 `SPACE` 로 끝이 나며, 서버 이름 혹은 nickname (nickname!username@host) 형식으로 이루어진다   
+
+```c++
+#define SOURCE_PREFIX = ":";
+#define SOURCE_SUFFIX = " ";
+
+std::string& server_name;
+std::string& nick_name;
+std::string& full_name;
+```
+
+**command**   
+반드시 `1` 개가 존재해야 한다   
+일반적으로 전부 대문자로 이루어져 있다    
+(대소문자 구분은 자율적이다)   
+
+```c++
+std::string& command;
+```
+
+**parameters**   
+`0 ~ 15` 개가 존재할 수 있다   
+
+```c++
+vector<std::string>& parameters(15, "");
+```
+
+PARSE를 위해 들어오는 명령어에는 source가 들어오지 않는다    
+대부분의 양식이 
+
+```abnf
+<command> <parameters> <crlf>
+```
+
+으로 들어오게되며 이 둘만 가지고 분석을 수행하며 source의 주체는 command의 종류와 결과값에 따라 나뉜다   
+
+---
 
 ## INFO
 
@@ -414,7 +484,6 @@ SERVER:
     :{SERVER_NAME} 366 nick_ken #nick_ken :End of /NAMES list.
   ```   
 
-
 - 클라이언트가 JOIN 명령을 성공적으로 실행하면, 서버는 다음 순서로 응답을 보내야 한다   
   ```
   CLIENT:
@@ -448,6 +517,15 @@ SERVER:
 - 각 <channel> 과 <key>는 순서에 맞게 적용된다 (첫 번째 채널에 첫 번째 키, 두 번째 채널에 두 번째 키)   
 
 - 인자로 대신 0을 전달하면 현재 참여중인 모든 채널에서 나가게 된다 (각 채널에서 PART하는 효과를 가짐)   
+  ```
+  Client:
+    JOIN 0
+  
+  SERVER:
+    :nick_ken!~user_ken@{MASKED_IP}.IP PART #ccc
+    :nick_ken!~user_ken@{MASKED_IP}.IP PART #bbb
+    :nick_ken!~user_ken@{MASKED_IP}.IP PART #aaa
+  ```
 
 #### Numerics
 
