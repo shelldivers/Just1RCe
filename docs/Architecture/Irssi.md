@@ -7,34 +7,47 @@
     - [RULES](#rules)
   - [  CONNECTION MESSAGES ](#--connection-messages-)
     - [NICK](#nick)
+      - [FORMAT](#format)
       - [Numerics](#numerics)
     - [USER](#user-1)
-      - [FORMAT](#format)
+      - [FORMAT](#format-1)
       - [Numerics](#numerics-1)
     - [PING](#ping)
+      - [FORMAT](#format-2)
       - [Numerics](#numerics-2)
     - [PONG](#pong)
+      - [FORMAT](#format-3)
     - [QUIT](#quit)
+      - [FORMAT](#format-4)
   - [  CHANNEL MESSAGES  ](#--channel-messages--)
     - [JOIN](#join)
+      - [FORMAT](#format-5)
       - [Numerics](#numerics-3)
     - [PART](#part)
+      - [FORMAT](#format-6)
       - [Numerics](#numerics-4)
     - [TOPIC](#topic)
+      - [FORMAT](#format-7)
       - [Numerics](#numerics-5)
     - [NAMES](#names)
+      - [FORMAT](#format-8)
       - [Numerics](#numerics-6)
     - [LIST](#list)
+      - [FORMAT](#format-9)
       - [Numerics](#numerics-7)
     - [INVITE](#invite)
+      - [FORMAT](#format-10)
       - [Numerics](#numerics-8)
     - [KICK](#kick)
+      - [FORMAT](#format-11)
       - [Numerics](#numerics-9)
   - [SERVER QUERY](#server-query)
     - [MODE](#mode)
+      - [FORMAT](#format-12)
       - [Numerics](#numerics-10)
   - [SENDING MESSAGES](#sending-messages)
     - [PRIVMSG](#privmsg)
+      - [FORMAT](#format-13)
       - [NUMERICS](#numerics-11)
 
 ---
@@ -91,6 +104,8 @@ irssi는 위의 명령어를 통해 서버에 연결시 다음 네가지 명령�
 ### NICK   
 
 **사용자의 NICK_NAME을 설정하는 명령어**   
+
+#### FORMAT
 
 - FORMAT   
 ```bnf
@@ -160,6 +175,7 @@ SERVER:
 #### Numerics
 
 **ERR_NEEDMOREPARAMS (461) 인자가 제대로 들어오지 않은 경우 무시한다**   
+
 ```
 CLIENT: 
   USER    
@@ -242,7 +258,7 @@ PING :3340719355
 
 **서버와 연결 여부를 확인하기 위해 사용하는 명령어**    
 
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: PING
@@ -285,7 +301,7 @@ SERVER:
 ### PONG
 
 **PING 명령어에 응답하는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: PONG
@@ -306,7 +322,7 @@ CLIENT:
 ### QUIT    
 
 **서버에서 나가는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: QUIT
@@ -364,7 +380,7 @@ irssi는 QUIT명령어 사용시 기본 메시지로 *leaving*을 남긴다
 ### JOIN
 
 **채널에 접속하기 위한 명령어**
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: JOIN
@@ -488,7 +504,7 @@ Server:
 ### PART
 
 **채널에서 나가는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: PART
@@ -522,7 +538,7 @@ SERVER:
 ### TOPIC
 
 **채널의 주제를 불러오거나 설정하는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: TOPIC
@@ -634,7 +650,7 @@ Server:
 ### NAMES
 
 **특정 채널에 참여한 사용자의 닉네임과 채널 내 권한 접두사를 조회하는  명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: NAMES
@@ -694,7 +710,7 @@ Server:
 ### LIST
 
 **채널 목록과 각 채널에 대한 정보를 가져오는 명렁어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: LIST
@@ -767,7 +783,7 @@ Server:
 ### INVITE
 
 **사용자를 채널로 초대하는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
 
@@ -870,7 +886,7 @@ Server:
 ### KICK
 
 **특정 사용자를 강제로 채널에서 제거하는 명령어**    
-
+#### FORMAT
 - FORMAT   
 ```bnf
       Command: KICK
@@ -951,7 +967,7 @@ Server:
 ## SERVER QUERY
 
 ### MODE   
-
+#### FORMAT
 **특정 대상의 옵션(또는 모드)을 설정하거나 제거하는 명령어**   
 
 - FORMAT   
@@ -1118,7 +1134,7 @@ SERVER:
 ### PRIVMSG
 
 **사용자 간 개인 메시지를 전송하거나, 채널에 메시지를 보내는 명령어**   
-
+#### FORMAT
 - FORMAT   
 ```bnf
      Command: PRIVMSG
