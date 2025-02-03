@@ -66,7 +66,7 @@
   SPACE           ::=  %x20 *( %x20 )   ; space character(s)
   crlf            ::=  %x0D %x0A        ; "carriage return" "linefeed"
 
-  source          ::=  <servername> / ( <nickname> [ "!" <user> ] [ "@" <host> ] )
+  source          ::=  <servername> / <nickname> 
   nick            ::=  <any characters except NUL, CR, LF, chantype character, and SPACE> <possibly empty sequence of any characters except NUL, CR, LF, and SPACE>
   user            ::=  <sequence of any characters except NUL, CR, LF, and SPACE>
 
@@ -86,15 +86,15 @@ IRC 메시지는 크게 3개로 나뉜다
 `0 ~ 1` 개가 존재할 수 있다   
 
 server가 client에게 보내는 메시지에 사용된다   
-`:`으로 시작해 `SPACE` 로 끝이 나며, 서버 이름 혹은 nickname (nickname!username@host) 형식으로 이루어진다   
+`:`으로 시작해 `SPACE` 로 끝이 나며, 서버 이름 혹은 닉네임으로 이루어진다   
 
 ```c++
 #define SOURCE_PREFIX = ":";
 #define SOURCE_SUFFIX = " ";
 
-std::string& server_name;
-std::string& nick_name;
-std::string& full_name;
+std::string& server_name("");
+std::string& nick_name("");
+std::string& full_name("");
 ```
 
 **command**   
@@ -103,14 +103,32 @@ std::string& full_name;
 (대소문자 구분은 자율적이다)   
 
 ```c++
-std::string& command;
+std::string& command("");
 ```
 
 **parameters**   
-`0 ~ 15` 개가 존재할 수 있다   
+- `0 ~ 15` 개가 존재할 수 있다   
+- 공백(`SPACE`)으로 나뉘며, `:`(콜론)를 기준으로 좌측은 `middle`, 우측은 `trailing`으로 구분된다   
+
+**middle**   
+- `middle`은 최대 14개까지 존재할 수 있다   
+- `middle`은 공백을 포함할 수 없다    
+- `middle`은 쉼표(`,`)를 사용해 내부적으로 여러 개의 값을 가질 수 있다     
+  (e.g.: `JOIN #channel1,#channel2 111,111`)  
+  → 여기서 `#channel1,#channel2`, `111,111` 두 개의 `middle`이 된다    
+
+**trailing**   
+- `trailing`은 오직 **1개만 존재 가능**하다    
+- `trailing`은 `:`(콜론)으로 시작해야 한다    
+- `trailing`은 **공백을 포함할 수 있다.**   
+- `:` 이후에 오는 `trailing`은 하나의 파라미터로 묶이며, 더 이상 공백으로 나뉘지 않는다     
+  (e.g.: `PRIVMSG #channel :Hello, how are you?`)     
+  → 여기서 `"Hello, how are you?"`는 하나의 `trailing` 파라미터가 된다    
+
 
 ```c++
-vector<std::string>& parameters(15, "");
+vector<std::string>& middle(14);
+std::string& trailing("");
 ```
 
 PARSE를 위해 들어오는 명령어에는 source가 들어오지 않는다    
@@ -155,6 +173,11 @@ CLINET_VERSION: 1.45
 
 - 서버에서 보내는 모든 메시지들은 임의로 수정하여도 된다   
   이는 그저 상용서버에서 어떻게 보내는지 알리기 위해 적었으며 그대로 작성해도 된다   
+
+- {NICK_NAME}!{USER_NAME}@{HOST or MAKSED_IP} 와 같은 source 양식은 그냥 {NICK_NAME} 만 표기하여도 된다    
+  e.g.: :dan-!d@localhost QUIT :Quit: Bye for now! --> :dan-!d QUIT :Quit: Bye for now!    
+        :nick_ken!~user_ken@{MASKED_IP}.IP JOIN :#{CHANNEL_NAME} --> nick_ken JOIN :#{CHANNEL_NAME}    
+
 
 ---
 
@@ -266,7 +289,7 @@ SERVER:
 ---
 
 위의 NICK 명령어와 USER 명령어를 서버가 받아 들이게 되면 서버는 적절한 Welcome Message를 포함한 메시지들을 반환한다   
-이 Welcome Message들은 `001` 까지만 필수이며 그 외에는 아무런 필요가 없다   
+이 Welcome Message들은 irssi 클라이언트에서서 `001, 002` 까지만 필수이며 그 외에는 작성하지 않아도 된다    
 
 rizon 서버는 다음과 같이 응답한다
 
@@ -277,9 +300,9 @@ PING :3340719355
 :{SERVER_NAME} NOTICE nick_ken :*** Your host is masked ({Masked_IP}.IP)
 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓(this is welcom message from server to client)
 :{SERVER_NAME} 001 nick_ken :Welcome to the Rizon Internet Relay Chat Network nick_ken
-:{SERVER_NAME} 002 nick_ken :Your host is {SERVER_NAME}, running version SERVER_VERSION
+:{SERVER_NAME} 002 nick_ken :Your host is {SERVER_NAME}, running version {SERVER_VERSION}
 :{SERVER_NAME} 003 nick_ken :This server was created Mar 19 2022 at 21:25:18
-:{SERVER_NAME} 004 nick_ken {SERVER_NAME} SERVER_VERSION CDGNRSUWagilopqrswxyz BCIMNORSabcehiklmnopqstvz Iabehkloqv
+:{SERVER_NAME} 004 nick_ken {SERVER_NAME} {SERVER_VERSION} CDGNRSUWagilopqrswxyz BCIMNORSabcehiklmnopqstvz Iabehkloqv
 :{SERVER_NAME} 005 nick_ken CALLERID CASEMAPPING=rfc1459 DEAF=D KICKLEN=180 MODES=4 PREFIX=(qaohv)~&@%+ STATUSMSG=~&@%+ EXCEPTS=e INVEX=I NICKLEN=30 NETWORK=Rizon MAXLIST=beI:250 MAXTARGETS=4 :are supported by this server
 :{SERVER_NAME} 005 nick_ken CHANTYPES=# CHANLIMIT=#:250 CHANNELLEN=50 TOPICLEN=390 CHANMODES=beI,k,l,BCMNORScimnpstz NAMESX UHNAMES KNOCK WATCH=60 AWAYLEN=180 ELIST=CMNTU SAFELIST :are supported by this server
 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
