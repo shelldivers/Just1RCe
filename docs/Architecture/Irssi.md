@@ -5,7 +5,6 @@
     - [SERVER](#server)
     - [CLINET](#clinet)
     - [RULES](#rules)
-    - [CONNECT](#connect)
   - [  CONNECTION MESSAGES ](#--connection-messages-)
     - [NICK](#nick)
       - [Numerics](#numerics)
@@ -63,7 +62,7 @@ CLINET_VERSION: 1.45
   *_ken2: 이후에 들어온 채널 사용자   
   *_ken3: 마지막에 들어온 채널 사용자     
 
-- 테스트한 서버에서는 user_ken 앞에오는 `~`는 검증되지 않은 사용자를 나타낸다     
+- user_ken 앞에오는 `~`는 검증되지 않은 사용자를 나타낸다     
 
 - 일반적으로 `:`로 시작하는 문자열은 서버가 전송해주는 문자열이다      
   `":string "` 의 형태로 문자열이 감싸져 있게 된다면 해당 문자열은 다른 클라이언트들에게도 보여지는 것이다      
@@ -76,30 +75,6 @@ CLINET_VERSION: 1.45
 
 ---
 
-### CONNECT
-
-/connect -nocap servername port
-
-NICK nick_ken   
-USER user_ken user_ken irc.rizon.net :real_ken   
-
-NICK nick_ken2   
-USER user_ken2 user_ken2 irc.rizon.net :real_ken2   
-
-NICK nick_ken3   
-USER user_ken3 user_ken3 irc.rizon.net :real_ken3
-
-NOTICE py-ctcp :\x01VERSION CustomIRC 1.0 (Ubuntu)\x01
-
-PING {SERVER_NAME}
-
-```
-CLIENT: 
-  NICK nick_ken    
-
-SERVER:
-
-```   
 
 irssi는 위의 명령어를 통해 서버에 연결시 다음 네가지 명령어를 전송한다   
 - NICK nick_ken   
@@ -134,32 +109,32 @@ SERVER:
 
 #### Numerics
 
-- 인자로 아무것도 들어오지 않은 경우 무시한다   
-  ```
-  Client:
-    NICK
-  
-  SERVER:
-    :{SERVER_NAME} 431 nick_ken3 :No nickname given
-  ```
+**ERR_NONICKNAMEGIVEN (431) 인자로 아무것도 들어오지 않은 경우 무시한다**    
+```
+Client:
+  NICK
 
-- 이미 사용중인 이름인 경우 무시한다      
-  ```
-  Client:
-    NICK nick_ken
-  
-  SERVER:
-    :{SERVER_NAME} 433 nick_ken3 nick_ken :Nickname is already in use.
-  ```
+SERVER:
+  :{SERVER_NAME} 431 nick_ken3 :No nickname given
+```
 
-- 잘못된 형식의 이름인 경우 무시한다   
-  ```
-  Client:
-    !@#%#@$%^
-  
-  SERVER:
-    :{SERVER_NAME} 432 nick_ken3 !@#%#@$%^ :Erroneous Nickname
-  ```
+**ERR_NICKNAMEINUSE (433) 이미 사용중인 이름인 경우 무시한다**       
+```
+Client:
+  NICK nick_ken
+
+SERVER:
+  :{SERVER_NAME} 433 nick_ken3 nick_ken :Nickname is already in use.
+```
+
+**ERR_ERRONEUSNICKNAME (432) 잘못된 형식의 이름인 경우 무시한다**   
+```
+Client:
+  !@#%#@$%^
+
+SERVER:
+  :{SERVER_NAME} 432 nick_ken3 !@#%#@$%^ :Erroneous Nickname
+```
 
 ### USER   
 
@@ -184,23 +159,23 @@ SERVER:
 
 #### Numerics
 
-- 인자가 제대로 들어오지 않은 경우 무시한다   
-  ```
-  CLIENT: 
-    USER    
+**ERR_NEEDMOREPARAMS (461) 인자가 제대로 들어오지 않은 경우 무시한다**   
+```
+CLIENT: 
+  USER    
 
-  SERVER:
-    :{SERVER_NAME} 461 nick_ken3 USER :Not enough parameters
-  ```   
+SERVER:
+  :{SERVER_NAME} 461 nick_ken3 USER :Not enough parameters
+```   
 
-- 이미 등록된 사용자인 경우 무시한다
-  ```
-  CLIENT: 
-    USER user_ken user_ken irc.rizon.net :real_ken    
+**ERR_ALREADYREGISTERED (462) 이미 등록된 사용자인 경우 무시한다**
+```
+CLIENT: 
+  USER user_ken user_ken irc.rizon.net :real_ken    
 
-  SERVER:
-    :{SERVER_NAME} 462 nick_ken3 :You may not reregister
-  ```   
+SERVER:
+  :{SERVER_NAME} 462 nick_ken3 :You may not reregister
+```   
 
 rizon 서버는 다음과 같이 응답한다
 
@@ -284,25 +259,26 @@ SERVER:
 ```   
  
 
-- <token> 은 어떤 문자열이든 올 수 있다   
+- <token> 은 어떤 문자열이든 올 수 있다 
+  (비어있지만 않으면 된다)   
 
 
 #### Numerics
 
-- 클라이언트는 연결 등록 과정 중에 PING을 보내지 않아야 한다   
-  ```
-  SERVER:
-    :{SERVER_NAME} 451 * :You have not registered (닉네임 등록이 안된 경우)
-    :{SERVER_NAME} 451 nick_ken3 :You have not registered (닉네임 등록이 되어 있는 경우)
-  ```
+**- 클라이언트는 연결 등록 과정 중에 PING을 보내지 않아야 한다**   
+```
+SERVER:
+  :{SERVER_NAME} 451 * :You have not registered (닉네임 등록이 안된 경우)
+  :{SERVER_NAME} 451 nick_ken3 :You have not registered (닉네임 등록이 되어 있는 경우)
+```
 
-- 인자가 없는 경우   
-  ```
-  Client:
-    PING
-  SERVER: 
-    :{SERVER_NAME} 409 nick_ken3 :No origin specified
-  ```
+**ERR_NOORIGIN (409) 인자가 없는 경우**   
+```
+Client:
+  PING
+SERVER: 
+  :{SERVER_NAME} 409 nick_ken3 :No origin specified
+```
 
 - 
 
@@ -324,8 +300,6 @@ SERVER:
 CLIENT:
   PONG :{SERVER_NAME}
 ``` 
-
-
 
 - PONG 명령어는 반드시 PING에서 받은 <token> 값을 그대로 포함해야 한다
 
@@ -456,59 +430,59 @@ SERVER:
 
 #### Numerics
 
-- 채널에 참여할 수 있는 클라이언트 제한을 넘은 경우    
-  ```
-  :{SERVER_NAME} 471 nick_ken3 #limited_channel :Cannot join channel (+l)
-  ```   
+**ERR_CHANNELISFULL (471) 채널에 참여할 수 있는 클라이언트 제한을 넘은 경우**    
+```
+:{SERVER_NAME} 471 nick_ken3 #limited_channel :Cannot join channel (+l)
+```   
 
-- 비밀번호를 잘못 입력한 경우   
-  ```
-  :{SERVER_NAME} 475 nick_ken3 #pass_channel :Cannot join channel (+k)
-  ```     
+**ERR_BADCHANNELKEY (475) 비밀번호를 잘못 입력한 경우**     
+```
+:{SERVER_NAME} 475 nick_ken3 #pass_channel :Cannot join channel (+k)
+```     
 
-- 채널이 초대 전용으로 이루어진 경우   
-  ```
-  :{SERVER_NAME} 473 nick_ken3 #invite_only :Cannot join channel (+i)
-  ``` 
+**ERR_INVITEONLYCHAN (473) 채널이 초대 전용으로 이루어진 경우**   
+```
+:{SERVER_NAME} 473 nick_ken3 #invite_only :Cannot join channel (+i)
+``` 
 
-- 인자가 없는 경우
-  ```
-  CLIENT: 
-    JOIN
+**ERR_NEEDMOREPARAMS (461) 인자가 없는 경우**
+```
+CLIENT: 
+  JOIN
 
-  SERVER:
-    :{SERVER_NAME} 461 nick_ken3 JOIN :Not enough parameters
-  ```   
+SERVER:
+  :{SERVER_NAME} 461 nick_ken3 JOIN :Not enough parameters
+```   
 
-- 존재하지 않는 채널에 JOIN을 시도했으나 채널이 자동 생성되지 않은 경우
-  ```
-  Client:
-    JOIN #nonexistent_channel
+**ERR_NOSUCHCHANNEL (403) 존재하지 않는 채널에 JOIN을 시도했으나 채널이 자동 생성되지 않은 경우**
+```
+Client:
+  JOIN #nonexistent_channel
 
-  Server:
-    :{SERVER_NAME} 403 nick_kenn3 #nonexistent_channel :No such channel
+Server:
+  :{SERVER_NAME} 403 nick_kenn3 #nonexistent_channel :No such channel
 
-  ```   
+```   
 
-- 채널 참가 한도가 초과된 경우
-  ```
-  Client:
-    JOIN #channel5
+**ERR_TOOMANYCHANNELS (405) 채널 참가 한도가 초과된 경우**
+```
+Client:
+  JOIN #channel5
 
-  Server:
-    :{SERVER_NAME} 405 nick_kenn3 #channel5 :You have joined too many channels
-  ```   
+Server:
+  :{SERVER_NAME} 405 nick_kenn3 #channel5 :You have joined too many channels
+```   
 
-- 잘못된 채널 이름인 경우
-  ```
-  Client:
-    JOIN !#$%!
+**ERR_BADCHANMASK (476) 잘못된 채널 이름인 경우**
+```
+Client:
+  JOIN !#$%!
 
-  Server:
-    :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask (IRC 문서)
-                                  or
-    :{SERVER_NAME} 479 nick_ken3 !#$%! :Illegal channel name (현재 상용 서버)
-  ```   
+Server:
+  :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask (IRC 문서)
+                                or
+  :{SERVER_NAME} 479 nick_ken3 !#$%! :Illegal channel name (현재 상용 서버)
+```   
 
 
 ### PART
@@ -535,12 +509,12 @@ SERVER:
 
 #### Numerics
 
-- 채널이 존재하지만 사용자가 해당 채널에 참가하고 있지 않는다면 요청을 무시한다   
+**ERR_NOTONCHANNEL (442) 채널이 존재하지만 사용자가 해당 채널에 참가하고 있지 않는다면 요청을 무시한다**   
   ```
   :{SERVER_NAME} 442 nick_ken3 #test :You're not on that channel
   ```
 
-- 지정된 채널이 존재하지 않는다면 요청을 무시한다    
+**ERR_NOSUCHCHANNEL (403) 지정된 채널이 존재하지 않는다면 요청을 무시한다**    
   ```
   :{SERVER_NAME} 403 nick_ken3 #test :No such channel
   ```
@@ -587,67 +561,75 @@ SERVER:
 
 #### Numerics
 
-- **ERR_NEEDMOREPARAMS (461)	필요한 매개변수가 부족함**    
-  <topic> 매개변수가 제공되지 않으면, 현재 채널의 주제를 나타내는 `RPL_TOPIC` 또는 주제가 없음을 나타내는 `RPL_NOTOPIC`이 반환된다   
- ```
-  Client:
-    TOPIC
+**ERR_NEEDMOREPARAMS (461)	필요한 매개변수가 부족함**    
 
-  Server:
-    :{SERVER_NAME} 461 nick_ken TOPIC :Not enough parameters
-  ```   
+<topic> 매개변수가 제공되지 않으면, 현재 채널의 주제를 나타내는 `RPL_TOPIC` 또는 주제가 없음을 나타내는 `RPL_NOTOPIC`이 반환된다   
 
-- **ERR_NOSUCHCHANNEL (403)	존재하지 않는 채널**   
-  ```
-  Client:
-    TOPIC #notexistchannel
+```
+Client:
+  TOPIC
 
-  Server:
-    :{SERVER_NAME} 403 nick_ken #notexistchannel :No such channel
-  ```   
+Server:
+  :{SERVER_NAME} 461 nick_ken TOPIC :Not enough parameters
+```   
 
-- **ERR_NOTONCHANNEL (442)	채널에 참여하지 않은 상태에서 주제 조회 시도**   
-  명령을 보낸 클라이언트가 해당 채널에 참여하지 않은 상태에서 주제를 조회하려고 하면, 서버는 `ERR_NOTONCHANNEL (442)` 응답을 반환할 수도 있으며, 명령이 실패할 수 있다   
-  ```
-  Client:
-    TOPIC #notjoinedchannel
+**ERR_NOSUCHCHANNEL (403)	존재하지 않는 채널**   
+```
+Client:
+  TOPIC #notexistchannel
 
-  Server:
-    :{SERVER_NAME} 442 nick_ken #notjoinedchannel :You're not on that channel
-  ```   
+Server:
+  :{SERVER_NAME} 403 nick_ken #notexistchannel :No such channel
+```   
 
-- **ERR_CHANOPRIVSNEEDED (482)	주제를 변경할 권한이 없음**   
-  채널에 보호된 주제 모드가 설정되어 있다면, 클라이언트는 채널 주제를 변경할 적절한 권한을 가져야 한다   
-  클라이언트가 적절한 채널 권한 없이 주제를 변경하려 하면, `ERR_CHANOPRIVSNEEDED (482)` 응답이 반환되며 명령이 실패한다   
-  ```
-  Client:
-    TOPIC #test 11
+**ERR_NOTONCHANNEL (442)	채널에 참여하지 않은 상태에서 주제 조회 시도**   
 
-  Server:
-    :{SERVER_NAME} 482 nick_ken2 #test :You're not channel operator
-  ```   
+명령을 보낸 클라이언트가 해당 채널에 참여하지 않은 상태에서 주제를 조회하려고 하면, 서버는 `ERR_NOTONCHANNEL (442)` 응답을 반환할 수도 있으며, 명령이 실패할 수 있다   
 
-- **RPL_NOTOPIC (331)	채널에 설정된 주제가 없음**   
+```
+Client:
+  TOPIC #notjoinedchannel
 
-  ```
-  Client:
-    TOPIC #test
+Server:
+  :{SERVER_NAME} 442 nick_ken #notjoinedchannel :You're not on that channel
+```   
 
-  Server:
-    :{SERVER_NAME} 331 nick_ken #test :No topic is set.
-  ```   
+**ERR_CHANOPRIVSNEEDED (482)	주제를 변경할 권한이 없음**   
 
-- ** RPL_TOPIC (332)	채널의 현재 주제**   
-  **RPL_TOPICWHOTIME (333)	주제 변경을 수행한 사용자 및 변경 시간**    
-  `RPL_TOPIC` 응답이 클라이언트에게 반환되면, `RPL_TOPICWHOTIME` 응답도 함께 보내야 한다   
-  ```
-  Client:
-    TOPIC #test
+채널에 보호된 주제 모드가 설정되어 있다면, 클라이언트는 채널 주제를 변경할 적절한 권한을 가져야 한다   
+클라이언트가 적절한 채널 권한 없이 주제를 변경하려 하면, `ERR_CHANOPRIVSNEEDED (482)` 응답이 반환되며 명령이 실패한다   
 
-  Server:
-    :{SERVER_NAME} 332 nick_ken #test :Now topic
-    :{SERVER_NAME} 333 nick_ken #test nick_ken!~user_ken@{MASKED_IP}.IP {TIME_STAMP}
-  ```   
+```
+Client:
+  TOPIC #test 11
+
+Server:
+  :{SERVER_NAME} 482 nick_ken2 #test :You're not channel operator
+```   
+
+**RPL_NOTOPIC (331)	채널에 설정된 주제가 없음**   
+
+```
+Client:
+  TOPIC #test
+
+Server:
+  :{SERVER_NAME} 331 nick_ken #test :No topic is set.
+```     
+
+**RPL_TOPIC (332)	채널의 현재 주제**   
+**RPL_TOPICWHOTIME (333)	주제 변경을 수행한 사용자 및 변경 시간**    
+
+`RPL_TOPIC` 응답이 클라이언트에게 반환되면, `RPL_TOPICWHOTIME` 응답도 함께 보내야  한다   
+
+```
+Client:
+  TOPIC #test
+
+Server:
+  :{SERVER_NAME} 332 nick_ken #test :Now topic
+  :{SERVER_NAME} 333 nick_ken #test nick_ken!~user_ken@{MASKED_IP}.IP {TIME_STAMP}
+```   
 
 ### NAMES
 
@@ -668,10 +650,10 @@ CLIENT:
                               (그러나 대부분의 서버는 이 요청을 제한하거나 부분적으로 응답할 가능성이 높다)
 
 SERVER:
-  :irc.losslessone.com 366 nick_ken * :End of /NAMES list.
+  :{SERVER_NAME} 366 nick_ken * :End of /NAMES list.
 
-  :irc.losslessone.com 353 nick_ken2 = #twilight_zone :nick_ken3 nick_ken2 @nick_ken
-  :irc.losslessone.com 366 nick_ken2 #twilight_zone :End of /NAMES list.
+  :{SERVER_NAME} 353 nick_ken2 = #twilight_zone :nick_ken3 nick_ken2 @nick_ken
+  :{SERVER_NAME} 366 nick_ken2 #twilight_zone :End of /NAMES list.
 ```
 
 - 사용자가 `invisible`(보이지 않는) 모드를 설정한 경우, 요청한 클라이언트가 해당 채널에 참여하지 않았다면 해당 사용자는 응답에 포함되지 않는다   
@@ -692,21 +674,22 @@ SERVER:
     NAMES #noexistchannel
 
   Server:
-    :irc.losslessone.com 366 nick_ken #noexistchannel :End of /NAMES list.
+    :{SERVER_NAME} 366 nick_ken #noexistchannel :End of /NAMES list.
   ```     
 
 #### Numerics   
 
-- **RPL_NAMREPLY (353)	채널에 있는 사용자 목록 반환**   
-  **RPL_ENDOFNAMES (366)	사용자 목록 전송 완료 또는 채널 없음**   
-  ```
-  Client:
-    NAMES #aaa
+**RPL_NAMREPLY (353)	채널에 있는 사용자 목록 반환**   
+**RPL_ENDOFNAMES (366)	사용자 목록 전송 완료 또는 채널 없음**   
 
-  Server:
-    :irc.losslessone.com 353 nick_ken2 = #aaa :nick_ken3 nick_ken2 @nick_ken
-    :irc.losslessone.com 366 nick_ken2 #aaa :End of /NAMES list.
-  ```     
+```
+Client:
+  NAMES #{CHANNEL_NAME}
+
+Server:
+  :{SERVER_NAME} 353 nick_ken2 = #{CHANNEL_NAME} :nick_ken3 nick_ken2 @nick_ken
+  :{SERVER_NAME} 366 nick_ken2 #{CHANNEL_NAME} :End of /NAMES list.
+```     
   
 ### LIST
 
@@ -726,14 +709,14 @@ CLIENT:
   LIST #twilight_zone,#42         ; #twilight_zone과 #42 채널의 정보를 조회
 
 SERVER:
-  :irc.losslessone.com 321 nick_ken Channel :Users  Name
-  :irc.losslessone.com 322 nick_ken #ccc {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
-  :irc.losslessone.com 322 nick_ken #bbb {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
-  :irc.losslessone.com 322 nick_ken #aaa {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
-  :irc.losslessone.com 323 nick_ken :End of /LIST
+  :{SERVER_NAME} 321 nick_ken Channel :Users  Name
+  :{SERVER_NAME} 322 nick_ken #ccc {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 322 nick_ken #bbb {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 322 nick_ken #{CHANNEL_NAME} {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 323 nick_ken :End of /LIST
 
-  :irc.losslessone.com 321 nick_ken Channel :Users  Name
-  :irc.losslessone.com 323 nick_ken :End of /LIST
+  :{SERVER_NAME} 321 nick_ken Channel :Users  Name
+  :{SERVER_NAME} 323 nick_ken :End of /LIST
 ```
 
 - 다중 채널 조회 기능을 지원하지 않아도 된다     
@@ -750,35 +733,35 @@ SERVER:
   위의 IRC 문서에 적혀있는 내용을 보아 반드시 다중채널을 지원할 필요는 없다고 여겨지며,    
   이를 상용서버에서의 동작 안함과 IRC 문서 내에서 반드시 처리하라는 내용이 없으므로 이를 근거로 다중 채널 명령은 구현하지 않는다   
 
-- :irc.losslessone.com 322 nick_ken #aaa {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE} 
+- :{SERVER_NAME} 322 nick_ken #{CHANNEL_NAME} {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE} 
 
 
 #### Numerics
-- **RPL_LISTSTART (321)	채널 목록 시작 (선택적 응답)**     
-  **RPL_LIST (322)	채널 정보 응답**     
-  **RPL_LISTEND (323)	채널 목록 끝**     
-  ```  
-  Client:
-    LIST
-    
-  Server:
-    :irc.losslessone.com 321 nick_ken Channel :Users  Name   
-    :irc.losslessone.com 322 nick_ken #ccc {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
-    :irc.losslessone.com 322 nick_ken #bbb {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
-    :irc.losslessone.com 322 nick_ken #aaa {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
-    :irc.losslessone.com 323 nick_ken :End of /LIST
-  ```     
+**RPL_LISTSTART (321)	채널 목록 시작 (선택적 응답)**     
+**RPL_LIST (322)	채널 정보 응답**     
+**RPL_LISTEND (323)	채널 목록 끝**     
 
-  ```
-  Client:
-    LIST #aaa
-    
-  Server:
-    :irc.losslessone.com 321 nick_ken Channel :Users  Name
-    :irc.losslessone.com 322 nick_ken #aaa {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
-    :irc.losslessone.com 323 nick_ken :End of /LIST
-  ```     
+```  
+Client:
+  LIST
+  
+Server:
+  :{SERVER_NAME} 321 nick_ken Channel :Users  Name   
+  :{SERVER_NAME} 322 nick_ken #ccc {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 322 nick_ken #bbb {USER_NUMBER} :[+nt] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 322 nick_ken #{CHANNEL_NAME} {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 323 nick_ken :End of /LIST
+```     
 
+```
+Client:
+  LIST #{CHANNEL_NAME}
+  
+Server:
+  :{SERVER_NAME} 321 nick_ken Channel :Users  Name
+  :{SERVER_NAME} 322 nick_ken #{CHANNEL_NAME} {USER_NUMBER} :[+ntk] {TOPIC_MESSAGE}
+  :{SERVER_NAME} 323 nick_ken :End of /LIST
+```     
 
 
 ### INVITE
@@ -813,67 +796,75 @@ SERVER:
 
 #### Numerics
 
-- **RPL_INVITING (341)  초대가 성공했음을 나타내는 응답**   
-  초대가 성공하면, 서버는 명령을 보낸 사용자에게 `RPL_INVITING` 응답을 보내야 하며, 초대 메시지를 `<source>`(초대한 사용자)와 함께 초대 대상 사용자에게 전송해야 한다   
+**RPL_INVITING (341)  초대가 성공했음을 나타내는 응답**   
 
-  ```
-  Client:
-    INVITE nick_ken2 #aaa
-
-  Server:
-    :irc.losslessone.com 341 nick_ken nick_ken2 #aaa
-
-  INVITED CLIENT:
-    :nick_ken!~user_ken@MASKED_IP.IP INVITE nick_ken2 :#aaa
-  ```     
-
-- **ERR_NEEDMOREPARAMS (461) 필요한 매개변수가 부족할 때 반환되는 오류 응답**   
-  ```
-  Client:
-    INVITE
-
-  Server:
-    :irc.losslessone.com 461 nick_ken INVITE :Not enough parameters
-  ```     
-
-- **ERR_NOSUCHNICK (401) 초대하려는 사용자가 없을때 나타내는 응답**
-  ```
-  Client:
-    INVITE noexistuser #test
-    
-  Server:
-    :irc.losslessone.com 401 nick_ken noexistuser :No such nick/channel
-  ```     
-
-- **ERR_NOSUCHCHANNEL (403)  존재하지 않는 채널을 대상으로 초대하려 할 때 반환되는 오류 응답**   
-  대상 채널은 존재해야 하며(적어도 한 명 이상의 사용자가 있어야 함), 그렇지 않으면 서버는 `ERR_NOSUCHCHANNEL(403)` 응답과 함께 명령을 거부해야 한   
-  ```
-  Client:
-    INVITE nick_ken2 #noexistchannel
-    
-  Server:
-    :irc.losslessone.com 403 nick_ken noexistchannel :No such channel
-  ```     
+초대가 성공하면, 서버는 명령을 보낸 사용자에게 `RPL_INVITING` 응답을 보내야 하며, 초대 메시지를 `<source>`(초대한 사용자)와 함께 초대 대상 사용자에게 전송해야 한다   
 
 
-- **ERR_NOTONCHANNEL (442)  초대한 사용자가 해당 채널에 참여하고 있지 않을 때 반환되는 오류 응답**   
-  채널에 참여한 사용자만 다른 사용자를 초대할 수 있으며, 그렇지 않으면 서버는 `ERR_NOTONCHANNEL(442)` 응답과 함께 명령을 반드시 거부해야 한다   
-  ```
-  Client:
-    INVITE nick_ken2 #notjoinedchannel
-  Server:
-    :irc.losslessone.com 442 nick_ken #notjoinedchannel :You're not on that channel
-  ```     
+```
+Client:
+  INVITE nick_ken2 #{CHANNEL_NAME}
+
+Server:
+  :{SERVER_NAME} 341 nick_ken nick_ken2 #{CHANNEL_NAME}
+
+INVITED CLIENT:
+  :nick_ken!~user_ken@MASKED_IP.IP INVITE nick_ken2 :#{CHANNEL_NAME}
+```     
+
+**ERR_NEEDMOREPARAMS (461) 필요한 매개변수가 부족할 때**    
+
+```
+Client:
+  INVITE
+
+Server:
+  :{SERVER_NAME} 461 nick_ken INVITE :Not enough parameters
+```     
+
+**ERR_NOSUCHNICK (401) 초대하려는 사용자가 없을때 나타내는 응답**   
+
+```
+Client:
+  INVITE noexistuser #test
+  
+Server:
+  :{SERVER_NAME} 401 nick_ken noexistuser :No such nick/channel
+```     
+
+**ERR_NOSUCHCHANNEL (403)  존재하지 않는 채널을 대상으로 초대하려 할 때**    
+
+대상 채널은 존재해야 하며(적어도 한 명 이상의 사용자가 있어야 함), 그렇지 않으면 서버는 `ERR_NOSUCHCHANNEL(403)` 응답과 함께 명령을 거부해야 한   
+```
+Client:
+  INVITE nick_ken2 #noexistchannel
+  
+Server:
+  :{SERVER_NAME} 403 nick_ken noexistchannel :No such channel
+```     
 
 
-- **ERR_USERONCHANNEL (443)  초대하려는 사용자가 이미 채널에 있을 때 반환되는 오류 응답**   
-  초대하려는 사용자가 이미 대상 채널에 참여해 있다면, 서버는 `ERR_USERONCHANNEL` 응답과 함께 명령을 반드시 거부해야 한다   
-  ```
-  Client:
-    INVITE alreadyjoineduser #aaa
-  Server:
-    :irc.losslessone.com 443 nick_ken alreadyjoineduser #aaa :is already on channel
-  ```     
+**ERR_NOTONCHANNEL (442)  초대한 사용자가 해당 채널에 참여하고 있지 않을 때**   
+
+채널에 참여한 사용자만 다른 사용자를 초대할 수 있으며, 그렇지 않으면 서버는 `ERR_NOTONCHANNEL(442)` 응답과 함께 명령을 반드시 거부해야 한다   
+
+```
+Client:
+  INVITE nick_ken2 #notjoinedchannel
+Server:
+  :{SERVER_NAME} 442 nick_ken #notjoinedchannel :You're not on that channel
+```     
+
+
+**ERR_USERONCHANNEL (443)  초대하려는 사용자가 이미 채널에 있을 때**   
+
+초대하려는 사용자가 이미 대상 채널에 참여해 있다면, 서버는 `ERR_USERONCHANNEL` 응답과 함께 명령을 반드시 거부해야 한다   
+```
+Client:
+  INVITE alreadyjoineduser #{CHANNEL_NAME}
+Server:
+  :{SERVER_NAME} 443 nick_ken alreadyjoineduser #{CHANNEL_NAME} :is already on channel
+```     
 
 
 ### KICK
@@ -907,79 +898,219 @@ SERVER:
 
 #### Numerics
 
-**ERR_NEEDMOREPARAMS (461) 필요한 매개변수가 부족할 때 반환됨**     
-  ```
-  Client:
-    KICK
+**ERR_NEEDMOREPARAMS (461) 필요한 매개변수가 부족할 때**     
+```
+Client:
+  KICK
 
-  Server:
-    :irc.losslessone.com 461 nick_ken KICK :Not enough parameters
-  ```     
-
-
-**ERR_NOSUCHCHANNEL (403) 존재하지 않는 채널에서 사용자를 강퇴하려 할 때 반환됨**     
-  ```
-  Client:
-    KICK #noexistchannel nick_ken2
-    
-  Server:
-    :irc.losslessone.com 403 nick_ken #noexistchannel :No such channel
-  ```     
+Server:
+  :{SERVER_NAME} 461 nick_ken KICK :Not enough parameters
+```     
 
 
-**ERR_CHANOPRIVSNEEDED (482) 강퇴할 권한이 없는 경우 반환**     
-  ```
-  Client:
-    KICK #aaa nick_ken
-  Server:
-    :irc.losslessone.com 482 nick_ken2 #aaa :You're not channel operator
-  ```     
+**ERR_NOSUCHCHANNEL (403) 존재하지 않는 채널에서 사용자를 강퇴하려 할 때**     
+```
+Client:
+  KICK #noexistchannel nick_ken2
+  
+Server:
+  :{SERVER_NAME} 403 nick_ken #noexistchannel :No such channel
+```     
 
 
-**ERR_USERNOTINCHANNEL (441) 강퇴하려는 사용자가 해당 채널에 없을 때 반환**     
-  ```
-  Client:
-    KICK #aaa noexistuser
-    
-  Server:
-    :irc.losslessone.com 401 nick_ken noexistuser :No such nick/channel
-  ```     
+**ERR_CHANOPRIVSNEEDED (482) 강퇴할 권한이 없는 경우**     
+```
+Client:
+  KICK #{CHANNEL_NAME} nick_ken
+Server:
+  :{SERVER_NAME} 482 nick_ken2 #{CHANNEL_NAME} :You're not channel operator
+```     
 
 
-**ERR_NOTONCHANNEL (442) KICK 요청자가 해당 채널에 속해 있지 않을 때 반환됨**      
-  ```
-  Client:
-    KICK #aaa nick_ken2
-  Server:
-    :irc.losslessone.com 442 nick_ken3 #aaa :You're not on that channel
-  ```     
+**ERR_USERNOTINCHANNEL (441) 강퇴하려는 사용자가 해당 채널에 없을 때**     
+```
+Client:
+  KICK #{CHANNEL_NAME} noexistuser
+  
+Server:
+  :{SERVER_NAME} 401 nick_ken noexistuser :No such nick/channel
+```     
 
+
+**ERR_NOTONCHANNEL (442) KICK 요청자가 해당 채널에 속해 있지 않을 때**      
+```
+Client:
+  KICK #{CHANNEL_NAME} nick_ken2
+Server:
+  :{SERVER_NAME} 442 nick_ken3 #{CHANNEL_NAME} :You're not on that channel
+```     
 
 
 </details>
 
-
-
-
 ## SERVER QUERY
 
 ### MODE   
+
+**특정 대상의 옵션(또는 모드)을 설정하거나 제거하는 명령어**   
+
 - FORMAT   
 ```bnf
      Command: MODE
   Parameters: <target> [<modestring> [<mode arguments>...]]
 ```
 
+- 모드 문자열(<modestring>) 형식      
+  + → 이후에 나오는 모드를 추가   
+  - → 이후에 나오는 모드를 제거   
+  a-z, A-Z → 설정 또는 제거할 모드 문자   
+
+- 구현할 MODE 종류   
+  - o: 채널 운영자 권한 부여   
+  - i: 초대 전용 채널   
+  - m: 조용한 채널    
+  - n: 외부 메시지 차단   
+  - t: 주제 제한   
+  - k: 비밀번호 보호   
+  - l: 최대 사용자 수 제한   
+
 - Message Transaction   
 ```
 CLIENT: 
-  MODE nick_ken +i    
+  MODE #{CHANNEL_NAME} +i                        ; 채널에 초대 전용 채널 모드를 설정   
+  MODE #{CHANNEL_NAME} +k {PASSWORD}  ; 채널에 비밀번호 설정
 
 SERVER:
-  MODE #{CHANNEL_NAME} +k 11111
-  :nick_ken!~user_ken@{MASKED_IP}.IP MODE #{CHANNEL_NAME} +k 11111
+  :nick_ken!~user_ken@{MASKED_IP}.IP MODE #{CHANNEL_NAME} +i
+  :nick_ken!~user_ken@{MASKED_IP}.IP MODE #{CHANNEL_NAME} +k {PASSWORD}
 ```
+
+- 모드에는 여러 유형으로 나뉜다   
+  Type A: 리스트를 관리하는 모드 (+b 밴 목록, +e 예외 목록 등)   
+    mode arguments에서 순차적으로 처리      
+    인자가 없이 명령이 실행되면, 서버는 해당 목록의 내용을 사용자에게 반환해야 한다   
+    (단, 해당 목록이 민감한 정보를 포함하고 있고, 사용자가 이를 볼 권한이 없다면 제외될 수 있음)   
+
+  Type B: 항상 인자가 필요한 모드 (예: +k 채널 키 설정)   
+    mode arguments에서 순차적으로 처리   
+    필요한 인자가 제공되지 않으면, 서버는 해당 모드를 무시   
+  Type C: 설정 시에만 인자가 필요하고, 해제할 때는 인자가 필요하지 않은 모드 (+l 사용자 제한)   
+    mode arguments에서 순차적으로 처리   
+    필요한 인자가 제공되지 않으면, 서버는 해당 모드를 무시
+  Type D: 인자가 필요하지 않은 모드 (+m 모더레이션 모드, +t 주제 변경 제한 등)   
+
+- Type A 
+  - o   
+    ```
+    CLIENT: 
+      MODE #aaa +o nick_ken2
+
+      MODE #aaa -o nick_ken2
+
+    SERVER:
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa +o nick_ken2
+
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa -o nick_ken2
+    ```   
+
+
+- Type B 
+  - k   
+    ```
+    CLIENT: 
+      MODE #aaa +k 111
+
+      MODE #aaa -k
+
+    SERVER:
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa +k 111
+    
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa -k *
+    ```   
+
+- Type C 
+  - l   
+    ```
+    CLIENT: 
+      MODE #aaa +l 3
+
+      MODE #aaa -l 3
+
+    SERVER:
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa +l 3
+
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa -l
+    ```   
+
+- Type D   
+  - i   
+    ```
+    CLIENT: 
+      MODE #aaa +i
+
+    SERVER:
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa +i
+
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa -i
+    ```   
+
+  - t   
+    ```
+    CLIENT: 
+      MODE #aaa +t
+
+      MODE #aaa - t
+
+    SERVER:
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa +t
+
+      **All received**
+      :nick_ken!~user_ken@{MASKED_IP}.IP MODE #aaa -t
+    ```   
+
+- 서버가 모드 변경을 처리한 후, 변경된 모드 정보를 포함하는 MODE 메시지를 채널의 모든 사용자에게 전송해야 한다   
+- 서버는 모드 변경 시 민감한 정보를 숨길 수도 있다   
+
 #### Numerics
+
+**ERR_NOSUCHCHANNEL (403) 네트워크에 존재하지 않는 채널**   
+```
+CLIENT: 
+  MODE #noexistchannel
+
+SERVER:
+  :{SERVER_NAME} 403 nick_ken #noexistchannel :No such channel
+```   
+
+
+**RPL_CHANNELMODEIS (324) modestring이 제공되지 않았을 때**   
+```
+CLIENT: 
+  MODE #aaa
+
+SERVER:
+  :{SERVER_NAME} 324 nick_ken #aaa +cmn
+  :{SERVER_NAME} 329 nick_ken #aaa {TIME_STAMP}
+```   
+
+
+**ERR_CHANOPRIVSNEEDED (482) 사용자가 적절한 권한 없이 채널 모드를 변경하려 할 때**   
+```
+CLIENT: 
+  MODE #aaa +i
+
+SERVER:
+  :{SERVER_NAME} 482 nick_ken3 #aaa :You're not channel operator
+```   
 
 
 ## SENDING MESSAGES
@@ -997,14 +1128,14 @@ SERVER:
 - Message Transaction   
 ```bash
 CLIENT:
-  PRIVMSG #aaa :hello
+  PRIVMSG #{CHANNEL_NAME} :hello
 
   PRIVMSG nick_ken3 :Hello!
                                   ; nick_ken3에게 "yes I'm receiving it!" 메시지를 전송
 
 SERVER:
   **All received**
-  :nick_ken!~user_ken@MASKED_IP.IP PRIVMSG #aaa :hello
+  :nick_ken!~user_ken@MASKED_IP.IP PRIVMSG #{CHANNEL_NAME} :hello
 
   :nick_ken!~user_ken@MASKED_IP.IP PRIVMSG nick_ken3 :Hello!
 
@@ -1023,69 +1154,42 @@ SERVER:
 
 #### NUMERICS
 
-**ERR_NOSUCHNICK (401) 존재하지 않는 사용자에게 메시지를 보내려 할 때 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
+**ERR_NOSUCHNICK (401) 존재하지 않는 사용자에게 메시지를 보내려 할 때**   
+```
+Client:
+  PRIVMSG noexistuser :hello
 
-  Server:
-    :irc.losslessone.com 401 nick_ken asdfa :No such nick/channel
-  ```     
+Server:
+  :{SERVER_NAME} 401 nick_ken noexistuser :No such nick/channel
+```     
 
-**ERR_NOSUCHSERVER (402) 존재하지 않는 서버를 대상으로 메시지를 보내려 할 때 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
+**ERR_CANNOTSENDTOCHAN (404) 채널로 메시지를 보낼 수 없을 때 (예: 사용자가 차단되었거나, 채널이 +m 모드일 때)**   
+```
+Client:
+  PRIVMSG # :hello
+  PRIVMSG #{CHANNEL_NAME} :hello (channel is now +m mode)
 
-  Server:
-    
-  ```     
+Server:
+  :{SERVER_NAME} 404 nick_ken # :Cannot send to channel
+```     
 
-**ERR_CANNOTSENDTOCHAN (404) 채널로 메시지를 보낼 수 없을 때 반환됨 (예: 사용자가 차단되었거나, 채널이 +m 모드일 때)**   
-  ```
-  Client:
-    PRIVMSG 
+**ERR_NORECIPIENT (411) 메시지의 대상이 지정되지 않았을 때**   
+```
+Client:
+  "PRIVMSG   "
 
-  Server:
-    
-  ```     
+Server:
+  :{SERVER_NAME} 411 nick_ken :No recipient given (PRIVMSG)
+```     
 
-**ERR_TOOMANYTARGETS (407) 메시지를 한 번에 너무 많은 대상에게 보내려고 할 때 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
+  rizon 상용 서버에서는 `PRIVMSG   :hello` 를 전송시 ERR_NOTEXTTOSEND(412) 에러를 반환함 이는 구현에 따라 다른 것으로 보임   
 
-  Server:
-    
-  ```     
+**ERR_NOTEXTTOSEND (412) 보낼 메시지 내용이 없는 경우**   
+```
+Client:
+  PRIVMSG #{CHANNEL_NAME} :
 
-**ERR_NORECIPIENT (411) 메시지의 대상이 지정되지 않았을 때 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
-
-  Server:
-    
-  ```     
-
-**ERR_NOTEXTTOSEND (412) 보낼 메시지 내용이 없는 경우 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
-
-  Server:
-    
-  ```     
-
-**ERR_NOTOPLEVEL (413) 잘못된 형식의 서버 주소를 대상으로 메시지를 보내려 할 때 반환됨**   
-  ```
-  Client:
-    PRIVMSG 
-
-  Server:
-    
-  ```     
-
-
-
+Server:
+  :{SERVER_NAME} 412 nick_ken :No text to send
+```     
 
