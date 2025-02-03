@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "client_mode.h"
+#include "../includes/client_mode.h"
 
 namespace Just1RCe {
 

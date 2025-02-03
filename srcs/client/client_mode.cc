@@ -29,8 +29,8 @@ std::string ConvertModeToString(ClientModeMask const target) {
  * @return none
  * @throws none
  */
-inline void AddFlagsToMode(ClientModeMask &target, ClientModeMask const flags) {
-  target |= flags;
+inline void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags) {
+  *target |= flags;
 }
 
 /**
@@ -40,9 +40,9 @@ inline void AddFlagsToMode(ClientModeMask &target, ClientModeMask const flags) {
  * @return none
  * @throws none
  */
-inline void SubFlagsFromMode(ClientModeMask &target,
+inline void SubFlagsFromMode(ClientModeMask *target,
                              ClientModeMask const flags) {
-  target &= ~flags;
+  *target &= ~flags;
 }
 
 /**
