@@ -5,7 +5,7 @@
 
 namespace Just1RCe {
 
-ContextHolder::ContextHolder(DbContext *ptr) : db_(ptr) {}
+explicit ContextHolder::ContextHolder(DbContext *ptr) : db_(ptr) {}
 
 ContextHolder::~ContextHolder() { delete db_; }
 
