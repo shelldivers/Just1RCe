@@ -985,7 +985,7 @@ SERVER:
   :nick_ken!~user_ken@{MASKED_IP}.IP MODE #{CHANNEL_NAME} +k {PASSWORD}
 ```
 
-- 모드에는 여러 유형으로 나뉜다   
+- 모드에는 여러 유형으로 나뉘며, 동작이 다르다   
   Type A: 리스트를 관리하는 모드 (+b 밴 목록, +e 예외 목록 등)   
     mode arguments에서 순차적으로 처리      
     인자가 없이 명령이 실행되면, 서버는 해당 목록의 내용을 사용자에게 반환해야 한다   
