@@ -191,7 +191,12 @@ CLIENT:
 
 SERVER:
   :{SERVER_NAME} 462 nick_ken3 :You may not reregister
-```   
+```
+
+---
+
+위의 NICK 명령어와 USER 명령어를 서버가 받아 들이게 되면 서버는 적절한 Welcome Message를 포함한 메시지들을 반환한다   
+이 Welcome Message들은 `001` 까지만 필수이며 그 외에는 아무런 필요가 없다   
 
 rizon 서버는 다음과 같이 응답한다
 
@@ -199,7 +204,7 @@ rizon 서버는 다음과 같이 응답한다
 PING :3340719355
 [DEBUG] Responding to PING with: PONG :3340719355
 
-:{SERVER_NAME} NOTICE nick_ken :*** Your host is masked (Masked-IP.IP)
+:{SERVER_NAME} NOTICE nick_ken :*** Your host is masked ({Masked_IP}.IP)
 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓(this is welcom message from server to client)
 :{SERVER_NAME} 001 nick_ken :Welcome to the Rizon Internet Relay Chat Network nick_ken
 :{SERVER_NAME} 002 nick_ken :Your host is {SERVER_NAME}, running version SERVER_VERSION
@@ -903,7 +908,7 @@ CLIENT:
 SERVER:
   :WiZ!jto@tolsun.oulu.fi KICK #Finnish Matthew ; WiZ 사용자가 #Finnish 채널에서 Matthew를 강제 퇴장시켰다는 메시지
 
-  :{NICK_NAME}!{USER_NAME}@MASKED_IP.IP KICK #Finnish John :Speaking English
+  :{NICK_NAME}!{USER_NAME}@{MASKED_IP}.IP KICK #Finnish John :Speaking English
 ```
 
 - 자기자신을 KICK 할 수 있다     
@@ -1151,9 +1156,9 @@ CLIENT:
 
 SERVER:
   **All received**
-  :nick_ken!~user_ken@MASKED_IP.IP PRIVMSG #{CHANNEL_NAME} :hello
+  :nick_ken!~user_ken@{MASKED_IP}.IP PRIVMSG #{CHANNEL_NAME} :hello
 
-  :nick_ken!~user_ken@MASKED_IP.IP PRIVMSG nick_ken3 :Hello!
+  :nick_ken!~user_ken@{MASKED_IP}.IP PRIVMSG nick_ken3 :Hello!
 
   :Angel PRIVMSG Wiz :Hello are you receiving this message ?
                                   ; Angel이 Wiz에게 "Hello are you receiving this message?" 메시지를 전송
