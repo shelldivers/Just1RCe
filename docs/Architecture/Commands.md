@@ -514,23 +514,22 @@ SERVER:
   ```
 
   1. JOIN message (채널에 참여하고 있는 모든 클라이언트들에게) 
-  ```
-  SERVER:
-    **All received**
-    :nick_ken3!~user_ken3@{MASKED_IP}.IP JOIN :#{CHANNEL_NAME}
-  ```
-  1. TOPIC message (TOPIC 설정이 없다면 생략 가능)   
-  ```
-  SERVER:
-    :{SERVER_NAME} 332 nick_ken3 #{CHANNEL_NAME} :hello
-    :{SERVER_NAME} 333 nick_ken3 #{CHANNEL_NAME} nick_ken!~user_ken@{MASKED_IP}.IP {TIME_STAMP}
-  ```
-  1. 현재 채널에 있는 사용자 목록   
-  ```
-  SERVER:
-    :{SERVER_NAME} 353 nick_ken3 = #{CHANNEL_NAME} :nick_ken3 nick_ken2 @nick_ken
-    :{SERVER_NAME} 366 nick_ken3 #{CHANNEL_NAME} :End of /NAMES list.
-  ```
+    ```
+    SERVER:
+      **All received**
+      :nick_ken3!~user_ken3@{MASKED_IP}.IP JOIN :#{CHANNEL_NAME}
+    ```
+  2. TOPIC message (TOPIC 설정이 없다면 생략 가능)   
+    ```
+    SERVER:
+      :{SERVER_NAME} 332 nick_ken3 #{CHANNEL_NAME} :hello
+    ```
+  3. 현재 채널에 있는 사용자 목록   
+    ```
+    SERVER:
+      :{SERVER_NAME} 353 nick_ken3 = #{CHANNEL_NAME} :nick_ken3 nick_ken2 @nick_ken
+      :{SERVER_NAME} 366 nick_ken3 #{CHANNEL_NAME} :End of /NAMES list.
+    ```
 
 - 클라이언트가 특정 채널(들)에 참여하려고 한다는 것을 나타내며, 필요한 경우 비밀번호(key)를 사용한다    
 
@@ -551,6 +550,12 @@ SERVER:
   ```
 
 #### Numerics
+
+**RPL_TOPIC (332) 성공적인 JOIN 명령어 실행**      
+```
+SERVER:
+  :{SERVER_NAME} 332 nick_ken3 #{CHANNEL_NAME} :hello
+```
 
 **ERR_CHANNELISFULL (471) 채널에 참여할 수 있는 클라이언트 제한을 넘은 경우**    
 ```
