@@ -1,23 +1,24 @@
-#include "../includes/parser.h"
+#include "../includes/parse.h"
 #include <iostream>
 
-void printParsed(Just1RCe::Parser& parser) {
-    std::cout << "command :" << parser.command_ << std::endl << std::endl;
+void PrintTokenStream(std::vector<std::string> TokenStream) {
+    std::cout << "command :";
+    std::cout << TokenStream[0] << std::endl;
 
-    for (int i = 0; i < parser.middle_size_; ++i) {
-        std::cout << "middle :" << parser.middle_[i] << std::endl;
+    std::cout << "params :" << std::endl;
+    for (int i = 1; i < TokenStream.size(); ++i) {
+        std::cout << TokenStream[i] << std::endl;
     }
-    std::cout << std::endl;
-
-    std::cout << "trailing :" << parser.trailing_ << std::endl;
 }
 
 int main() {
-    Just1RCe::Parser parser;
-    parser.parse("JOIN #a,#b,#c 111,222,333");
-    printParsed(parser);
+    std::vector<std::string> TokenStream = Just1RCe::CreateTokenStream("JOIN #a,#b,#c 111,222,333");
+    PrintTokenStream(TokenStream);
 
-    parser.parse("NICK :new_nickname");
-    printParsed(parser);
+    std::vector<std::string> TokenStream2 = Just1RCe::CreateTokenStream("NICK :new_nickname");
+    PrintTokenStream(TokenStream2);
+
+    std::vector<std::string> TokenStream3 = Just1RCe::CreateTokenStream("NICK aaa aa a a a a a a a a a a a a a a a a a a a a a :b");
+    PrintTokenStream(TokenStream3);
     return 0;
 }
