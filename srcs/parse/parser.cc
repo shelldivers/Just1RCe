@@ -12,9 +12,9 @@ void Parser::parse(const std::string& message) {
 	int before_index = 0;
 
 	for (int current_index = 0; current_index < message.size(); ++current_index) {
-		if (message[current_index] == JUST1RCE_SPACE) {
-			if (middle_size_) {
-				middle_[middle_size_++] = message.substr(before_index + 1, current_index);
+		if (message[current_index] == JUST1RCE_SPACE || current_index == message.size() - 1) {
+			if (before_index) {
+				middle_[middle_size_++] = message.substr(before_index + 1, current_index - before_index - 1);
 				before_index = current_index;
 			} else {
 				command_ = message.substr(0, current_index);
@@ -23,7 +23,7 @@ void Parser::parse(const std::string& message) {
 		}
 		else if (message[current_index] == JUST1RCE_COLON) {
 			is_trailing_ = true;
-			trailing_ = message.substr(current_index + 1, message.size() - current_index);
+			trailing_ = message.substr(current_index + 1);
 			break;
 		}
 	}
