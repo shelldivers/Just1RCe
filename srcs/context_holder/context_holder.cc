@@ -5,14 +5,26 @@
 
 namespace Just1RCe {
 
-explicit ContextHolder::ContextHolder(DbContext *ptr) : db_(ptr) {}
+ContextHolder *ContextHolder::g_instance_ptr = NULL;
+
+explicit ContextHolder::ContextHolder() : db_(NULL) {}
 
 ContextHolder::~ContextHolder() { delete db_; }
 
-ContextHolder *ContextHolder::GetInstance(DbContext *ptr) {
-  if (g_instance_ptr == NULL) g_instance_ptr = new ContextHolder(ptr);
+/**
+ * @brief pointer to the object, only access way to signelton object
+ * @warning do not allocate it's return value.
+ */
+ContextHolder *ContextHolder::GetInstance() {
+  if (g_instance_ptr == NULL) g_instance_ptr = new ContextHolder();
   return g_instance_ptr;
 }
+
+/**
+ * @param db pointer to the DbContext, DbContext is interface, polymorphic
+ * @warning mulst be called once
+ */
+void ContextHolder::InitDbContext(DbContext *db) { db_ = db; }
 
 DbContext *ContextHolder::db() { return db_; }
 

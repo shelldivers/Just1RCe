@@ -19,13 +19,13 @@ class ContextHolder {
 
   ContextHolder &operator=(ContextHolder const &);
 
-  explicit ContextHolder(DbContext *ptr);
-  DbContext *const db_;
-
   static ContextHolder *g_instance_ptr;
+  DbContext *db_;
 
  public:
-  static ContextHolder *GetInstance(DbContext *ptr);
+  static ContextHolder *GetInstance();
+
+  void InitDbContext(DbContext *db);
   DbContext *db();
 };
 
