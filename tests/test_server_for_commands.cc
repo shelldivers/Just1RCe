@@ -94,8 +94,12 @@ int main(int argc, char *argv[])
         printf("Client connected\n");
 
         // Send welcome message
-        const char *welcome = ":irc.losslessone.com 001 nick_ken3 :Welcome to the Rizon Internet Relay Chat Network nick_ken3\r\n:irc.losslessone.com 002 nick_ken3 :Your host is irc.losslessone.com, running version plexus-4(hybrid-8.1.20)\r\n";
-
+        const char *welcome = ":irc.shelldivers.net 001 nickname :Welcome to the Internet Relay Network nickname!~username@172.30.0.1\r\n\
+                               :irc.shelldivers.net 002 nickname :Your host is irc.shelldivers.net, running version ngircd-27 (x86_64/alpine/linux-musl)\r\n\
+                               :irc.shelldivers.net 003 nickname :This server has been started Wed Feb 05 2025 at 17:05:47 (KST)\r\n\
+                               :irc.shelldivers.net 004 nickname irc.shelldivers.net ngircd-27 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz\r\n\
+                               :irc.shelldivers.net 005 nickname RFC2812 IRCD=ngIRCd CHARSET=UTF-8 CASEMAPPING=ascii PREFIX=(qaohv)~&@%+ CHANTYPES=#&+ CHANMODES=beI,k,l,imMnOPQRstVz CHANLIMIT=#&+:50 :are supported on this server\r\n\
+                               :irc.shelldivers.net 005 nickname CHANNELLEN=50 NICKLEN=9 TOPICLEN=490 AWAYLEN=127 KICKLEN=400 MODES=5 MAXLIST=beI:50 EXCEPTS=e INVEX=I PENALTY FNC :are supported on this server\r\n";
         // Handle client commands
         while ((nread = read(connfd, buf, sizeof(buf) - 1)) > 0)
         {
