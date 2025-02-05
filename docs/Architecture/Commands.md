@@ -57,7 +57,7 @@
 
 ## COMMAND FORMAT
 
-서버는 클라이언트로부터 오는 메시지를 parsing할 뿐만아니라 client에게 보내는 메시지 또한 parsing 하여 보내야 한다   
+서버는 클라이언트로부터 오는 메시지를 parsing할 뿐만아니라 client에게 보내는 메시지 또한 올바른 형식으로 조합 하여 보내야 한다   
 
 아래에는 IRC 프로토콜의 메시지 형식을 ABNF로 표현한 것이다   
 
@@ -89,12 +89,12 @@ server가 client에게 보내는 메시지에 사용된다
 `:`으로 시작해 `SPACE` 로 끝이 나며, 서버 이름 혹은 닉네임으로 이루어진다   
 
 ```c++
-#define SOURCE_PREFIX = ":";
-#define SOURCE_SUFFIX = " ";
+#define SOURCE_PREFIX ':'
+#define SOURCE_SUFFIX ' '
 
-std::string& server_name("");
-std::string& nick_name("");
-std::string& full_name("");
+std::string server_name;
+std::string nick_name;
+std::string full_name;
 ```
 
 **command**   
@@ -103,7 +103,7 @@ std::string& full_name("");
 (대소문자 구분은 자율적이다)   
 
 ```c++
-std::string& command("");
+std::string command;
 ```
 
 **parameters**   
@@ -127,8 +127,8 @@ std::string& command("");
 
 
 ```c++
-vector<std::string>& middle(14);
-std::string& trailing("");
+vector<std::string> middle;
+std::string trailing;
 ```
 
 PARSE를 위해 들어오는 명령어에는 source가 들어오지 않는다    
