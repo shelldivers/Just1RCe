@@ -1,5 +1,5 @@
 
-// 3글자 형식으로 출력하기 위해서 std::setw(3) 사용을 권장
+// It is recommended to use std::setw(3) to ensure a three-character-wide output format.
 // std::cout << std::setw(3) << std::setfill('0') << WELCOME << std::endl; 
 #define	CMD_SUCCESS 0
 #define	RPL_WELCOME 1
