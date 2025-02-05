@@ -1,9 +1,10 @@
 
 
 #include "../../includes/context_holder.h"
-#include "../../includes/in_memory_db_context.h"
 
 #include <cstdlib>
+
+#include "../../includes/in_memory_db_context.h"
 
 namespace Just1RCe {
 
