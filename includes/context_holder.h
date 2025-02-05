@@ -25,7 +25,6 @@ class ContextHolder {
  public:
   static ContextHolder *GetInstance();
 
-  void InitDbContext(DbContext *db);
   DbContext *db();
 };
 
