@@ -6,14 +6,6 @@
 #define JUST1RCE_SRCS_CLIENT_RECV_ERROR "Client : recv failed."
 #define JUST1RCE_SRCS_CLIENT_SEND_ERROR "Client : send failed."
 
-// Mod flags
-// describes client's permission, bitmasking
-#define JUST1RCE_SRCS_CLIENT_MOD_INVISIBLE 0b000001
-#define JUST1RCE_SRCS_CLIENT_MOD_WALLOPS 0b000010
-#define JUST1RCE_SRCS_CLIENT_MOD_OPERATOR 0b000100
-#define JUST1RCE_SRCS_CLIENT_MOD_REGISTERED 0b001000
-#define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0b010000
-
 #define JUST1RCE_SRCS_CLIENT_MSG_MAX 512UL
 #define JUST1RCE_SRCS_CLIENT_MESSAGE_DELIM "\r\n"
 
@@ -50,7 +42,6 @@ class Client {
   std::string server_name_;
 
   // status info
-  uint mode_mask_;
   std::string away_msg_;
 
   // per socket IO buffer, saving unsufficient message
@@ -80,12 +71,7 @@ class Client {
   std::string GetHostName() const;
   std::string GetPortNum() const;
 
-  // mode control
-  std::string GetModeAsString() const;
-  void SetMode(uint const flags);
-  void UnsetMode(uint const flags);
-  bool CheckMode(uint const flags) const;
-
+  // buffered io
   ft::optional<std::vector<std::string> > GetReceivedMessages();
 
   void SetSendMessage(std::string const &message);
