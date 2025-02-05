@@ -73,7 +73,7 @@ private:
                 std::cout << "Disconnected from server." << std::endl;
                 break;
             }
-            std::cout << "[RECEIVED]: " << buffer;
+            std::cout << buffer;
 
             // PING 처리
             if (std::strncmp(buffer, "PING", 4) == 0) {

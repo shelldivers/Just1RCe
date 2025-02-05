@@ -66,7 +66,7 @@ private:
                 break;
             }
             std::string message(buffer);
-            std::cout << "[RECEIVED]: " << message;
+            std::cout << message;
 
             if (message.find("PING") == 0) {
                 std::string pong_response = message;
