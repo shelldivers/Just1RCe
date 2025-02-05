@@ -1,4 +1,12 @@
-// codespace, linux 용 클라이언트
+// g++ -o client_test -std=c++11 tests/test_client_for_commands_mac_realtime.cc
+// ./client_test
+// 입장시 NICK, USER 명령어를 알맞게 입력하면 접속이 된다
+// 일반적으로 이름의 크기는 9자 제한이 있으므로 
+// 추가적으로 클라이언트를 연결해 메시지를 확인하기 위해서는 8글자 + 1숫자 로 표기하는 것이 좋다
+// NICK nickname   
+// USER username 0 * :realname
+// 명령어를 양식에 맞게 올바르게 입력하면 서버에서 알맞은 동작을 하며 서버에서 클라이언트에게 보내는
+// 메시지 양식을 그대로 보여준다
 
 #include <iostream>
 #include <string>
@@ -40,6 +48,7 @@ public:
 
         std::cout << "Connected to " << ip_ << ":" << port_ << std::endl;
 
+        // 🔹 std::thread에서 멤버 함수를 실행할 수 있도록 람다 표현식 사용
         std::thread receive_thread([this]() { this->receiveMessages(); });
         receive_thread.detach();
 
@@ -56,7 +65,6 @@ private:
 
     void receiveMessages() {
         char buffer[4096];
-        std::string nickname;
 
         while (true) {
             std::memset(buffer, 0, sizeof(buffer));
@@ -65,27 +73,13 @@ private:
                 std::cout << "Disconnected from server." << std::endl;
                 break;
             }
-            std::string message(buffer);
-            std::cout << "[RECEIVED]: " << message;
+            std::cout << "[RECEIVED]: " << buffer;
 
-            if (message.find("PING") == 0) {
-                std::string pong_response = message;
-                pong_response.replace(0, 4, "PONG");
+            // PING 처리
+            if (std::strncmp(buffer, "PING", 4) == 0) {
+                std::string pong_response = std::string(buffer).replace(0, 4, "PONG");
                 std::cout << "[DEBUG] Responding to PING with: " << pong_response << std::endl;
                 sendCommand(pong_response);
-            }
-            else if (message.find("PRIVMSG ") != std::string::npos && message.find(" :VERSION") != std::string::npos) {
-                std::size_t start = message.find(":") + 1;
-                std::size_t end = message.find("!");
-                if (start != std::string::npos && end != std::string::npos) {
-                    nickname = message.substr(start, end - start);
-                }
-                sendCommand("NOTICE " + nickname + " :\001VERSION IRCClient 1.0\001");
-            }
-            else if (message.find("NOTICE * :*** No Ident response") != std::string::npos) {
-                if (!nickname.empty()) {
-                    sendCommand("USER " + nickname + " " + nickname + " irc.rizon.net :" + nickname);
-                }
             }
         }
     }
@@ -111,21 +105,8 @@ private:
 
 int main() {
     try {
-        int option;
-        std::cout << "Enter 1 to connect to the default server, or any other number to enter a custom server: ";
-        std::cin >> option;
-        std::cin.ignore();
-
-        std::string ip;
-        int port;
-
-        if (option == 1) {
-            ip = "52.193.79.145";
-            port = 6667;
-        } else {
-            ip = "127.0.0.1";
-            port = 6667;
-        }
+        std::string ip = "127.0.0.1";  // localhost (변경됨)
+        int port = 6667;       // 기본 포트
 
         IRCClient client(ip, port);
         client.connectToServer();

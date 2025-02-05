@@ -1,10 +1,10 @@
 // g++ -o server_test -std=c++11 tests/test_server_for_commands.cc
 // ./server_test 6667
 
-// 컴파일 후, 서버를 6667로 열고 irssi를 열어
+// 컴파일 후, 서버를 6667로 열고 클라이언트를 열어
 // /connect -nocap localhost 6667 
 // 위의 명령어를 입력하여 테스트 서버에 접속 
-// 후에 irssi에서 명령어를 입력하면 서버에 명령어가 어떤형식으로 들어오는지 알려준다   
+// 후에 클라이언트에서 명령어를 입력하면 서버에 명령어가 어떤형식으로 들어오는지 알려준다   
 
 #include <netdb.h>
 #include <stdio.h>
