@@ -29,6 +29,7 @@ class DbContext {
   virtual void DelClient(std::string const &nick_name) = 0;
 
   virtual Client *GetClient(std::string const &nick_name) = 0;
+  virtual std::string GetNickNameByFd(int const fd) = 0;
 
   // Channel index table
   virtual bool AddChannel(Channel *room) = 0;
