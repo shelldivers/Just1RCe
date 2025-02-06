@@ -1,9 +1,11 @@
-#include "../../includes/Parser.h"
+#include "../../includes/parser.h"
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "../../includes/numeric.h"
+
 
 namespace Just1RCe {
 
@@ -14,44 +16,31 @@ Parser::~Parser() {}
 
 std::vector<std::string> Parser::splitBySpace(const std::string &message) {
   std::vector<std::string> tokens;
-  int current_index = 0;
-  int before_index;
-
+  size_t start = 0, end;
+  
   if (message.empty()) return tokens;
 
-  while (message[current_index++] != JUST1RCE_SPACE);
-  tokens.push_back(message.substr(0, current_index - 1));
-  before_index = current_index - 1;
-
-  while (current_index++ < message.size() &&
-         tokens.size() < JUST1RCE_MAX_MIDDLE_SIZE) {
-    if (message[current_index] == JUST1RCE_SPACE) {
-      tokens.push_back(
-          message.substr(before_index + 1, current_index - before_index - 1));
-      before_index = current_index;
-    } else if (message[current_index] == JUST1RCE_COLON) {
-      tokens.push_back(message.substr(current_index + 1));
-      return tokens;
-    }
+  while ((end = message.find(JUST1RCE_SPACE, start)) != std::string::npos) {
+    std::string splited = message.substr(start, end - start);
+    if (splited.size())
+      tokens.push_back(splited);
+    start = end + 1;
   }
+  tokens.push_back(message.substr(start));
 
-  if (token_stream_.size() == JUST1RCE_MAX_MIDDLE_SIZE) {
-    size_t colon_pos = message.find(JUST1RCE_COLON);
-    if (colon_pos != std::string::npos)
-      token_stream_.push_back(message.substr(colon_pos + 1));
-  } else {
-    token_stream_.push_back(
-        message.substr(before_index + 1, current_index - before_index));
-  }
-  return token_stream_;
+  return tokens;
 }
 
 std::vector<std::string> Parser::splitByComma(const std::string &param) {
   std::vector<std::string> tokens;
   size_t start = 0, end;
 
+  if (param.empty()) return tokens;
+
   while ((end = param.find(JUST1RCE_COMMA, start)) != std::string::npos) {
-    tokens.push_back(param.substr(start, end - start));
+    std::string splited = param.substr(start, end - start);
+    if (splited.size())
+      tokens.push_back(splited);
     start = end + 1;
   }
   tokens.push_back(param.substr(start));
@@ -68,7 +57,7 @@ const int Parser::ParseCommandNick(std::string *nickname) {
 }
 
 const int Parser::ParseCommandUser(std::string *username,
-                                  std::string *realname) {
+                                   std::string *realname) {
   if (token_stream_.size() < 5) return ERR_NEEDMOREPARAMS;
 
   *username = token_stream_[1];
@@ -95,7 +84,7 @@ const int Parser::ParseCommandQuit(std::string *reason) {
 }
 
 const int Parser::ParseCommandJoin(std::vector<std::string> *channels,
-                                  std::vector<std::string> *passwords) {
+                                   std::vector<std::string> *passwords) {
   if (token_stream_.size() < 2) return ERR_NEEDMOREPARAMS;
 
   *channels = splitByComma(token_stream_[1]);
@@ -125,19 +114,19 @@ const int Parser::ParseCommandTopic(std::string *channel, std::string *topic) {
 }
 
 const int Parser::ParseCommandNames(std::string *channel) {
-  if (token_stream_.size() < 2) channel = "";
+  if (token_stream_.size() < 2) *channel = "";
 
   return CMD_SUCCESS;
 }
 
 const int Parser::ParseCommandList(std::string *channel) {
-  if (token_stream_.size() < 2) channel = "";
+  if (token_stream_.size() < 2) *channel = "";
 
   return CMD_SUCCESS;
 }
 
 const int Parser::ParseCommandInvite(std::string *nickname,
-                                    std::string *channel) {
+                                     std::string *channel) {
   if (token_stream_.size() < 3) return ERR_NEEDMOREPARAMS;
 
   *nickname = token_stream_[1];
@@ -147,7 +136,7 @@ const int Parser::ParseCommandInvite(std::string *nickname,
 }
 
 const int Parser::ParseCommandKick(std::string *channel, std::string *nickname,
-                                  std::string *comment) {
+                                   std::string *comment) {
   if (token_stream_.size() < 3) return ERR_NEEDMOREPARAMS;
 
   *channel = token_stream_[1];
@@ -160,8 +149,9 @@ const int Parser::ParseCommandKick(std::string *channel, std::string *nickname,
   return CMD_SUCCESS;
 }
 
-const int Parser::ParseCommandMode(std::string *target, std::string *mode_string,
-                                  std::string *mode_argument) {
+const int Parser::ParseCommandMode(std::string *target,
+                                   std::string *mode_string,
+                                   std::string *mode_argument) {
   if (token_stream_.size() < 2) return ERR_NEEDMOREPARAMS;
 
   *target = token_stream_[1];
@@ -178,7 +168,7 @@ const int Parser::ParseCommandMode(std::string *target, std::string *mode_string
 }
 
 const int Parser::ParseCommandPrivmsg(std::string *target,
-                                     std::string *text_to_send) {
+                                      std::string *text_to_send) {
   if (token_stream_.size() < 2) return ERR_NORECIPIENT;
   if (token_stream_.size() < 3) return ERR_NOTEXTTOSEND;
 
