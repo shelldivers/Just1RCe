@@ -2,10 +2,8 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "../../includes/numeric.h"
-
 
 namespace Just1RCe {
 
@@ -17,7 +15,7 @@ Parser::~Parser() {}
 std::vector<std::string> Parser::splitBySpace(const std::string &message) {
   std::vector<std::string> tokens;
   size_t start = 0, end;
-  
+
   if (message.empty()) return tokens;
 
   while ((end = message.find(JUST1RCE_SPACE, start)) != std::string::npos) {
