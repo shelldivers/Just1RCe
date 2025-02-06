@@ -22,24 +22,20 @@ class Client;
  */
 class DbContext {
  public:
-  virtual ~DbContext();
+  virtual ~DbContext(){};
 
   // Client index table
   virtual bool AddClient(Client *user) = 0;
-  virtual void DelClientByFd(int const fd) = 0;
-  virtual void DelClientByNickname(std::string const &nick_name) = 0;
-  virtual void DelClientByUsername(std::string const &user_name) = 0;
+  virtual void DelClient(std::string const &nick_name) = 0;
 
-  virtual Client *GetClientByFd(int const fd) = 0;
-  virtual Client *GetClientByNickname(std::string const &nick_name) = 0;
-  virtual Client *GetClientByUsername(std::string const &user_name) = 0;
+  virtual Client *GetClient(std::string const &nick_name) = 0;
 
   // Channel index table
   virtual bool AddChannel(Channel *room) = 0;
   virtual void DelChannel(std::string const &channel_name) = 0;
 
-  virtual Channel *GetChannelByName(std::string const &channel_name) = 0;
-  virtual size_t GetUserNumOfChannelByName(std::string const &channel_name) = 0;
+  virtual Channel *GetChannel(std::string const &channel_name) = 0;
+  virtual size_t GetNumOfClientInChannel(std::string const &channel_name) = 0;
 
   // client mode table
   virtual void SetClientMode(std::string const &channel_name,
@@ -51,19 +47,18 @@ class DbContext {
                                 std::string const &client_name) = 0;
   virtual void DeleteClientModesByClientName(
       std::string const &client_name) = 0;
-  virtual void DeleteClientModesByChannelName(
-      std::string const &channel_name) = 0;
 
   // mapping table between channel and client
-  virtual bool JoinClientToChannelByNames(std::string const &client_nick_name,
-                                          std::string const &channel_name) = 0;
-  virtual void PartClientFromChannelByNames(
-      std::string const &client_nick_name, std::string const &channel_name) = 0;
+  virtual bool JoinClientToChannel(std::string const &client_nick_name,
+                                   std::string const &channel_name) = 0;
+  virtual void PartClientFromChannel(std::string const &client_nick_name,
+                                     std::string const &channel_name) = 0;
   virtual std::vector<Channel *> GetChannelsByClientNickName(
       std::string const &client_nick_name) = 0;
   virtual std::vector<Client *> GetClientsByChannelName(
       std::string const &channel_name) = 0;
 };
+
 };  // namespace Just1RCe
 
 #endif
