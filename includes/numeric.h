@@ -1,7 +1,7 @@
 
 // It is recommended to use std::setw(3) to ensure a three-character-wide output format.
 // std::cout << std::setw(3) << std::setfill('0') << WELCOME << std::endl; 
-#define	CMD_SUCCESS 0
+#define	IRC_NOERROR 0
 #define	RPL_WELCOME 1
 #define	RPL_YOURHOST 2
 #define	RPL_CHANNELMODEIS 324
