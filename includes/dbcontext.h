@@ -57,6 +57,8 @@ class DbContext {
   // mapping table between channel and client
   virtual bool JoinClientToChannelByNames(std::string const &client_nick_name,
                                           std::string const &channel_name) = 0;
+  virtual void PartClientFromChannelByNames(
+      std::string const &client_nick_name, std::string const &channel_name) = 0;
   virtual std::vector<Channel *> GetChannelsByClientNickName(
       std::string const &client_nick_name) = 0;
   virtual std::vector<Client *> GetClientsByChannelName(
