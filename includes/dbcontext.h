@@ -22,7 +22,7 @@ class Client;
  */
 class DbContext {
  public:
-  virtual ~DbContext(){};
+  virtual ~DbContext() {}
 
   // Client index table
   virtual bool AddClient(Client *user) = 0;
