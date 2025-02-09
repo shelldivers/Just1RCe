@@ -1,5 +1,5 @@
-#ifndef JUST1RCE_INCLUDES_LEXER_H
-#define JUST1RCE_INCLUDES_LEXER_H
+#ifndef JUST1RCE_INCLUDES_PARSER_H
+#define JUST1RCE_INCLUDES_PARSER_H
 
 #include <string>
 #include <vector>
@@ -16,7 +16,7 @@ namespace Just1RCe {
 class Parser {
  private:
   std::vector<std::string> token_stream_;
-  std::vector<std::string> splitBySpace(const std::string &message);
+  void splitBySpace(const std::string &message);
   std::vector<std::string> splitByComma(const std::string &param);
   Parser(const Parser &rhs);
   Parser &operator=(const Parser &rhs);
