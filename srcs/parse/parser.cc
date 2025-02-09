@@ -7,26 +7,26 @@
 
 namespace Just1RCe {
 
-Parser::Parser(const std::string &message)
-    : token_stream_(splitBySpace(message)) {}
+Parser::Parser(const std::string &message) {
+  splitBySpace(message);
+}
 
 Parser::~Parser() {}
 
-std::vector<std::string> Parser::splitBySpace(const std::string &message) {
-  std::vector<std::string> tokens;
+void Parser::splitBySpace(const std::string &message) {
   size_t start = 0, end;
 
-  if (message.empty()) return tokens;
+  if (message.empty()) return;
 
   while ((end = message.find(JUST1RCE_SPACE, start)) != std::string::npos) {
     std::string splited = message.substr(start, end - start);
     if (splited.size())
-      tokens.push_back(splited);
+      token_stream_.push_back(splited);
     start = end + 1;
   }
-  tokens.push_back(message.substr(start));
-
-  return tokens;
+  std::string splited = message.substr(start);
+  if (splited.size())
+    token_stream_.push_back(splited);
 }
 
 std::vector<std::string> Parser::splitByComma(const std::string &param) {
@@ -41,7 +41,9 @@ std::vector<std::string> Parser::splitByComma(const std::string &param) {
       tokens.push_back(splited);
     start = end + 1;
   }
-  tokens.push_back(param.substr(start));
+  std::string splited = param.substr(start);
+  if (splited.size())
+    token_stream_.push_back(splited);
 
   return tokens;
 }
