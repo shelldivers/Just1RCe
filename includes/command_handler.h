@@ -17,7 +17,7 @@ class CommandHandler {
  public:
   ~CommandHandler() {}
 
-  virtual void operator()(std::string const &command,
+  virtual void operator()(std::string const &nick_name,
                           std::string const &meesage) = 0;
 };
 
