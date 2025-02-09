@@ -76,7 +76,7 @@ const int Parser::ParseCommandPing(std::string *token) {
 
 const int Parser::ParseCommandQuit(std::string *reason) {
   if (token_stream_.size() < 2)
-    *reason = DEFAULT_QUIT_COMMENT;
+    *reason = JUST1RCE_DEFAULT_QUIT_COMMENT;
   else
     *reason = token_stream_[1];
 
@@ -144,7 +144,7 @@ const int Parser::ParseCommandKick(std::string *channel, std::string *nickname,
   if (token_stream_.size() > 3)
     *comment = token_stream_[3];
   else
-    *comment = DEFAULT_KICK_COMMENT;
+    *comment = JUST1RCE_DEFAULT_KICK_COMMENT;
 
   return CMD_SUCCESS;
 }
