@@ -8,8 +8,8 @@
 #define JUST1RCE_SPACE ' '
 #define JUST1RCE_COLON ':'
 #define JUST1RCE_COMMA ','
-#define DEFAULT_QUIT_COMMENT "Leaving"
-#define DEFAULT_KICK_COMMENT "For some reason"
+#define JUST1RCE_DEFAULT_QUIT_COMMENT "Leaving"
+#define JUST1RCE_DEFAULT_KICK_COMMENT "For some reason"
 
 namespace Just1RCe {
 
