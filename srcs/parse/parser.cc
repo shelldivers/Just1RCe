@@ -53,7 +53,7 @@ const int Parser::ParseCommandNick(std::string *nickname) {
 
   *nickname = token_stream_[1];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandUser(std::string *username,
@@ -63,7 +63,7 @@ const int Parser::ParseCommandUser(std::string *username,
   *username = token_stream_[1];
   *realname = token_stream_[4];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandPing(std::string *token) {
@@ -71,7 +71,7 @@ const int Parser::ParseCommandPing(std::string *token) {
 
   *token = token_stream_[1];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandQuit(std::string *reason) {
@@ -80,7 +80,7 @@ const int Parser::ParseCommandQuit(std::string *reason) {
   else
     *reason = token_stream_[1];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandJoin(std::vector<std::string> *channels,
@@ -90,7 +90,7 @@ const int Parser::ParseCommandJoin(std::vector<std::string> *channels,
   *channels = splitByComma(token_stream_[1]);
   if (token_stream_.size() > 2) *passwords = splitByComma(token_stream_[2]);
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandPart(std::vector<std::string> *channels) {
@@ -98,7 +98,7 @@ const int Parser::ParseCommandPart(std::vector<std::string> *channels) {
 
   *channels = splitByComma(token_stream_[1]);
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandTopic(std::string *channel, std::string *topic) {
@@ -110,19 +110,19 @@ const int Parser::ParseCommandTopic(std::string *channel, std::string *topic) {
   else
     *topic = "";
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandNames(std::string *channel) {
   if (token_stream_.size() < 2) *channel = "";
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandList(std::string *channel) {
   if (token_stream_.size() < 2) *channel = "";
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandInvite(std::string *nickname,
@@ -132,7 +132,7 @@ const int Parser::ParseCommandInvite(std::string *nickname,
   *nickname = token_stream_[1];
   *channel = token_stream_[2];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandKick(std::string *channel, std::string *nickname,
@@ -146,7 +146,7 @@ const int Parser::ParseCommandKick(std::string *channel, std::string *nickname,
   else
     *comment = JUST1RCE_DEFAULT_KICK_COMMENT;
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandMode(std::string *target,
@@ -164,7 +164,7 @@ const int Parser::ParseCommandMode(std::string *target,
   else
     *mode_argument = "";
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 const int Parser::ParseCommandPrivmsg(std::string *target,
@@ -175,7 +175,7 @@ const int Parser::ParseCommandPrivmsg(std::string *target,
   *target = token_stream_[1];
   *text_to_send = token_stream_[2];
 
-  return CMD_SUCCESS;
+  return IRC_NOERROR;
 }
 
 }  // namespace Just1RCe
