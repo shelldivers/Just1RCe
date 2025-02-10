@@ -70,6 +70,7 @@ class Client {
   // network info
   std::string GetHostName() const;
   std::string GetPortNum() const;
+  int GetFd() const;
 
   // buffered io
   ft::optional<std::vector<std::string> > GetReceivedMessages();

@@ -41,4 +41,6 @@ std::string Client::GetPortNum() const {
   return oss.str();
 }
 
+int Client::GetFd() const { return socket_.socket_fd(); }
+
 }  // namespace Just1RCe
