@@ -26,9 +26,9 @@ class DbContext {
 
   // Client index table
   virtual bool AddClient(Client *user) = 0;
-  virtual void DelClient(std::string const &nick_name) = 0;
+  virtual void DelClient(std::string const &client_nick_name) = 0;
 
-  virtual Client *GetClient(std::string const &nick_name) = 0;
+  virtual Client *GetClient(std::string const &client_nick_name) = 0;
   virtual std::string GetNickNameByFd(int const fd) = 0;
 
   // Channel index table
@@ -39,15 +39,15 @@ class DbContext {
   virtual size_t GetNumOfClientInChannel(std::string const &channel_name) = 0;
 
   // client mode table
-  virtual void SetClientMode(std::string const &channel_name,
-                             std::string const &client_name,
+  virtual void SetClientMode(std::string const &client_nick_name,
+                             std::string const &channel_name,
                              ClientModeMask mask) = 0;
-  virtual ClientModeMask GetClientMode(std::string const &channel_name,
-                                       std::string const &client_name) = 0;
-  virtual void DeleteClientMode(std::string const &channel_name,
-                                std::string const &client_name) = 0;
+  virtual ClientModeMask GetClientMode(std::string const &client_nick_name,
+                                       std::string const &channel_name) = 0;
+  virtual void DeleteClientMode(std::string const &client_nick_name,
+                                std::string const &channel_name) = 0;
   virtual void DeleteClientModesByClientName(
-      std::string const &client_name) = 0;
+      std::string const &client_nick_name) = 0;
 
   // mapping table between channel and client
   virtual bool JoinClientToChannel(std::string const &client_nick_name,
