@@ -16,7 +16,7 @@ namespace Just1RCe {
  */
 class CommandHandler {
  public:
-  ~CommandHandler() {}
+  virtual ~CommandHandler() {}
 
   /**
    * @brief handle command
