@@ -26,10 +26,9 @@ class DbContext {
 
   // Client index table
   virtual bool AddClient(Client *user) = 0;
-  virtual void DelClient(std::string const &client_nick_name) = 0;
+  virtual void DelClient(int const client_fd) = 0;
 
-  virtual Client *GetClient(std::string const &client_nick_name) = 0;
-  virtual std::string GetNickNameByFd(int const fd) = 0;
+  virtual Client *GetClient(int const client_fd) = 0;
 
   // Channel index table
   virtual bool AddChannel(Channel *room) = 0;
@@ -39,23 +38,21 @@ class DbContext {
   virtual size_t GetNumOfClientInChannel(std::string const &channel_name) = 0;
 
   // client mode table
-  virtual void SetClientMode(std::string const &client_nick_name,
+  virtual void SetClientMode(int const client_fd,
                              std::string const &channel_name,
                              ClientModeMask mask) = 0;
-  virtual ClientModeMask GetClientMode(std::string const &client_nick_name,
+  virtual ClientModeMask GetClientMode(int const client_fd,
                                        std::string const &channel_name) = 0;
-  virtual void DeleteClientMode(std::string const &client_nick_name,
+  virtual void DeleteClientMode(int const client_fd,
                                 std::string const &channel_name) = 0;
-  virtual void DeleteClientModesByClientName(
-      std::string const &client_nick_name) = 0;
+  virtual void DeleteClientModesByClientFd(int const client_fd) = 0;
 
   // mapping table between channel and client
-  virtual bool JoinClientToChannel(std::string const &client_nick_name,
+  virtual bool JoinClientToChannel(int const client_fd,
                                    std::string const &channel_name) = 0;
-  virtual void PartClientFromChannel(std::string const &client_nick_name,
+  virtual void PartClientFromChannel(int const client_fd,
                                      std::string const &channel_name) = 0;
-  virtual std::vector<Channel *> GetChannelsByClientNickName(
-      std::string const &client_nick_name) = 0;
+  virtual std::vector<Channel *> GetChannelsByClientFd(int const client_fd) = 0;
   virtual std::vector<Client *> GetClientsByChannelName(
       std::string const &channel_name) = 0;
 };
