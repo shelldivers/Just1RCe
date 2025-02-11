@@ -15,15 +15,16 @@
 namespace Just1RCe {
 
 // type alias
-typedef std::string ClientNickName;
-typedef std::string ClientUserName;
-typedef std::string ChannelName;
-typedef std::pair<ClientNickName, ChannelName> ModeKey;
 typedef int Fd;
+typedef std::string ChannelName;
+typedef std::pair<Fd, ChannelName> ModeKey;
 
-typedef std::map<ClientNickName, Client *>::iterator ClientTableIter;
+typedef std::map<Fd, Client *>::iterator ClientTableIter;
 typedef std::map<ChannelName, Channel *>::iterator ChannelTableIter;
-typedef std::multimap<std::string, std::string>::iterator MappingTableIter;
+typedef std::multimap<Fd, std::string>::iterator
+    ClientToChannelMappingTableIter;
+typedef std::multimap<std::string, Fd>::iterator
+    ChannelToClientMappingTableIter;
 typedef std::map<ModeKey, ClientModeMask>::iterator ModeTableIter;
 
 class InMemoryDbContext : public DbContext {
@@ -32,16 +33,13 @@ class InMemoryDbContext : public DbContext {
   InMemoryDbContext &operator=(InMemoryDbContext const &);
 
   // index table, 1:1
-  std::map<ClientNickName, Client *> client_table_;
+  std::map<Fd, Client *> client_table_;
   std::map<ChannelName, Channel *> channel_table_;
   std::map<ModeKey, ClientModeMask> mode_table_;
 
-  // auxillary table, 1:1
-  std::map<Fd, ClientNickName> fd_to_client_mapping_table_;
-
   // mapping table, n:n
-  std::multimap<ClientNickName, ChannelName> client_to_channel_mapping_table_;
-  std::multimap<ChannelName, ClientNickName> channel_to_client_mapping_table_;
+  std::multimap<Fd, ChannelName> client_to_channel_mapping_table_;
+  std::multimap<ChannelName, Fd> channel_to_client_mapping_table_;
 
  public:
   InMemoryDbContext();
@@ -49,10 +47,9 @@ class InMemoryDbContext : public DbContext {
 
   // Client index table
   virtual bool AddClient(Client *user);
-  virtual void DelClient(std::string const &client_nick_name);
+  virtual void DelClient(int const client_fd);
 
-  virtual Client *GetClient(std::string const &client_nick_name);
-  virtual std::string GetNickNameByFd(int const fd);
+  virtual Client *GetClient(int const client_fd);
 
   // Channel index table
   virtual bool AddChannel(Channel *room);
@@ -62,23 +59,21 @@ class InMemoryDbContext : public DbContext {
   virtual size_t GetNumOfClientInChannel(std::string const &channel_name);
 
   // client mode table
-  virtual void SetClientMode(std::string const &client_nick_name,
+  virtual void SetClientMode(int const client_fd,
                              std::string const &channel_name,
                              ClientModeMask mask);
-  virtual ClientModeMask GetClientMode(std::string const &client_nick_name,
+  virtual ClientModeMask GetClientMode(int const client_fd,
                                        std::string const &channel_name);
-  virtual void DeleteClientMode(std::string const &client_nick_name,
+  virtual void DeleteClientMode(int const client_fd,
                                 std::string const &channel_name);
-  virtual void DeleteClientModesByClientName(
-      std::string const &client_nick_name);
+  virtual void DeleteClientModesByClientFd(int const client_fd);
 
   // mapping table between channel and client
-  virtual bool JoinClientToChannel(std::string const &client_nick_name,
+  virtual bool JoinClientToChannel(int const client_fd,
                                    std::string const &channel_name);
-  virtual void PartClientFromChannel(std::string const &client_nick_name,
+  virtual void PartClientFromChannel(int const client_fd,
                                      std::string const &channel_name);
-  virtual std::vector<Channel *> GetChannelsByClientNickName(
-      std::string const &client_nick_name);
+  virtual std::vector<Channel *> GetChannelsByClientFd(int const client_fd);
   virtual std::vector<Client *> GetClientsByChannelName(
       std::string const &channel_name);
 };
