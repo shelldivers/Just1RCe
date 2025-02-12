@@ -1,7 +1,7 @@
 #ifndef JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H
 #define JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H
 
-#include <string>
+#include <string.h>
 
 namespace Just1RCe {
 
@@ -12,13 +12,17 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
  private:
   NickCommandHandler(const NickCommandHandler& rhs);
   NickCommandHandler& operator=(const NickCommandHandler& rhs);
+  void isNicknameUse(const std::string& nickname);
+  void isNicknameErroneus(const std::string& nickname);
+  void is
+  std::string combineStringToMessage(std::string source, std::string Numeric,);
 
  public:
   NickCommandHandler();
   ~NickCommandHandler();
-  void operator()(const int fd, const std::string& meesage);
+  std::vector<int> operator()(const int fd, const std::string& message);
 };
 
-} // namespace Just1RCe
+}  // namespace Just1RCe
 
 #endif
