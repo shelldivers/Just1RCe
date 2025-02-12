@@ -1,4 +1,5 @@
 
+#include <string>
 #include <utility>
 
 #include "../../includes/client_mode.h"
@@ -35,12 +36,19 @@ void InMemoryDbContext::DeleteClientMode(int const client_fd,
  * @brief delete all modes with same nick name. using range erase query
  */
 void InMemoryDbContext::DeleteClientModesByClientFd(int const client_fd) {
-  // using lowerbound and upperbound, get range of iterator has 'nick_name'
-  ModeTableIter left = mode_table_.lower_bound(
-      std::make_pair(client_fd, std::string(1, static_cast<char>(0))));
-  ModeTableIter right = mode_table_.upper_bound(
-      std::make_pair(client_fd, std::string(1, static_cast<char>(255))));
-  for (ModeTableIter itr = left; itr != right; ++itr) mode_table_.erase(itr);
+  while (true) {
+    bool isFound = false;
+    for (ModeTableIter itr = mode_table_.begin(); itr != mode_table_.end();
+         ++itr) {
+      // erase one mode per loop
+      if (itr->first.first == client_fd) {
+        isFound = true;
+        mode_table_.erase(itr);
+        break;
+      }
+    }
+    if (!isFound) break;
+  }
 }
 
 }  // namespace Just1RCe

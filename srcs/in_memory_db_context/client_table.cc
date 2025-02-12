@@ -37,10 +37,19 @@ void InMemoryDbContext::DelClient(int const client_fd) {
   client_to_channel_mapping_table_.erase(client_fd);
 
   // erase all entry with value as client_fd
-  for (ChannelToClientMappingTableIter itr =
-           channel_to_client_mapping_table_.begin();
-       itr != channel_to_client_mapping_table_.end(); ++itr) {
-    if (itr->second == client_fd) channel_to_client_mapping_table_.erase(itr);
+  while (true) {
+    // erase one per loop
+    bool isFound = false;
+    for (ChannelToClientMappingTableIter itr =
+             channel_to_client_mapping_table_.begin();
+         itr != channel_to_client_mapping_table_.end(); ++itr) {
+      if (itr->second == client_fd) {
+        isFound = true;
+        channel_to_client_mapping_table_.erase(itr);
+        break;
+      }
+    }
+    if (!isFound) break;
   }
 
   // delete client
