@@ -22,6 +22,8 @@ bool InMemoryDbContext::JoinClientToChannel(int const client_fd,
 
   ModeKey key = std::make_pair(client_fd, channel_name);
   mode_table_.insert(std::make_pair(key, 0));
+
+  return true;
 }
 
 /**
