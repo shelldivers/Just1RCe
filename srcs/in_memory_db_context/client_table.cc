@@ -17,11 +17,7 @@ bool InMemoryDbContext::AddClient(Client *user) {
   if (user == NULL) return false;
 
   // add index table
-  client_table_.insert(std::make_pair(user->nick_name(), user));
-
-  // add fd to nick name
-  fd_to_client_mapping_table_.insert(
-      std::make_pair(user->GetFd(), user->nick_name()));
+  client_table_.insert(std::make_pair(user->GetFd(), user));
 
   return true;
 }
@@ -30,36 +26,31 @@ bool InMemoryDbContext::AddClient(Client *user) {
  *
  * @brief delete client and it's related data
  */
-void InMemoryDbContext::DelClient(std::string const &client_nick_name) {
+void InMemoryDbContext::DelClient(int const client_fd) {
   // sanity check
-  if (!client_table_.count(client_nick_name)) return;
+  if (!client_table_.count(client_fd)) return;
 
-  // get target
-  Client *erase_target = client_table_[client_nick_name];
+  // delete client's modes with 'client_fd'
+  DeleteClientModesByClientFd(client_fd);
 
-  // erase fd to nickname mapping table
-  fd_to_client_mapping_table_.erase(erase_target->GetFd());
+  // erase all entry with key as client_fd
+  client_to_channel_mapping_table_.erase(client_fd);
 
-  // delete client's modes with 'nick_name'
-  DeleteClientModesByClientName(client_nick_name);
+  // erase all entry with value as client_fd
+  for (ChannelToClientMappingTableIter itr =
+           channel_to_client_mapping_table_.begin();
+       itr != channel_to_client_mapping_table_.end(); ++itr) {
+    if (itr->second == client_fd) channel_to_client_mapping_table_.erase(itr);
+  }
 
   // delete client
-  delete erase_target;
-  client_table_.erase(client_nick_name);
+  delete client_table_[client_fd];
+  client_table_.erase(client_fd);
 }
 
-Client *InMemoryDbContext::GetClient(std::string const &client_nick_name) {
-  if (!client_table_.count(client_nick_name)) return NULL;
-  return client_table_[client_nick_name];
-}
-
-/**
- * @return if the fd is invalid, return ""
- */
-std::string InMemoryDbContext::GetNickNameByFd(int const fd) {
-  // sanity check
-  if (!fd_to_client_mapping_table_.count(fd)) return "";
-  return fd_to_client_mapping_table_[fd];
+Client *InMemoryDbContext::GetClient(int const client_fd) {
+  if (!client_table_.count(client_fd)) return NULL;
+  return client_table_[client_fd];
 }
 
 }  // namespace Just1RCe
