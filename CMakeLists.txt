@@ -47,6 +47,7 @@ set(CMAKE_SH "bash")
 
 # Set project configuration options
 set(AUTHOR_NAME "SHELLDIVERS")
+set(SERVER_NAME "irc.shelldivers.com")
 
 # GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
