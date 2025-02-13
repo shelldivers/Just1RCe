@@ -30,7 +30,7 @@ UserCommandHandler::~UserCommandHandler() {}
  * - ERR_NEEDMOREPARAMS : not enough parameters
  * - ERR_ALREADYREGISTRED : already registered
  */
-std::vector<int> operator()(const int client_fd, const std::string &message) {
+std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::string &message) {
   Parser parser(message);
   DbContext* db = ContextHolder::GetInstance()->db;
   Client* client = db->GetClient(client_fd);
