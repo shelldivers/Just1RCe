@@ -15,6 +15,19 @@ NickCommandHandler::NickCommandHandler() {}
 
 NickCommandHandler::~NickCommandHandler() {}
 
+/**
+ * @brief NICK command handler
+ * 
+ * @param fd: client fd
+ * @param message: message from client
+ * @return std::vector<int>: list of fds to send message
+ * 
+ * @details
+ * Get 3 types of numeric error code
+ * - ERR_NONICKNAMEGIVEN(431): No nickname given
+ * - ERR_ERRONEUSNICKNAME(432): Erroneous Nickname
+ * - ERR_NICKNAMEINUSE(433): Nickname is already in use
+ */
 std::vector<int> NickCommandHandler::operator()(const int fd,
                                                 const std::string& message) {
   Parser parser(message);
