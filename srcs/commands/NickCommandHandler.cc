@@ -44,7 +44,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
   int numeric = parser.ParseCommandNick(&new_nickname);
   if (numeric) {
-    client->SetSendMessage(":" + SERVER_NAME + " 431 " + old_nickname +
+    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 431 " + old_nickname +
                            " :No nickname given");
     fd_list.push_back(client_fd);
 
@@ -59,7 +59,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
   numeric = checkNicknameForbidden(new_nickname);
   if (numeric) {
-    client->SetSendMessage(":" + SERVER_NAME + " 432 " + new_nickname +
+    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 432 " + new_nickname +
                            " :Erroneous Nickname");
     fd_list.push_back(client_fd);
 
@@ -67,7 +67,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   }
 
   if (db->GetClientByNickname(new_nickname) != nullptr) {
-    client->SetSendMessage(":" + SERVER_NAME + " 433 " + old_nickname + " " +
+    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 433 " + old_nickname + " " +
                            new_nickname + " : Nickname is already in use.");
     fd_list.push_back(client_fd);
 
