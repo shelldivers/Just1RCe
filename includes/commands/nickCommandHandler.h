@@ -21,7 +21,7 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
  public:
   NickCommandHandler();
   ~NickCommandHandler();
-  std::vector<int> operator()(const int fd, const std::string& message);
+  std::vector<int> operator()(const int client_fd, const std::string& message);
 };
 
 }  // namespace Just1RCe

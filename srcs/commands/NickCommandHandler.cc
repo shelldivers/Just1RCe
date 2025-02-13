@@ -28,11 +28,11 @@ NickCommandHandler::~NickCommandHandler() {}
  * - ERR_ERRONEUSNICKNAME(432): Erroneous Nickname
  * - ERR_NICKNAMEINUSE(433): Nickname is already in use
  */
-std::vector<int> NickCommandHandler::operator()(const int fd,
+std::vector<int> NickCommandHandler::operator()(const int client_fd,
                                                 const std::string& message) {
   Parser parser(message);
   DbContext* db = ContextHolder::GetInstance()->db;
-  Client* client = db->GetClient(fd);
+  Client* client = db->GetClient(client_fd);
   std::vector<int> fd_list;
 
   if (!client) {
@@ -46,7 +46,7 @@ std::vector<int> NickCommandHandler::operator()(const int fd,
   if (numeric) {
     client->SetSendMessage(":" + SERVER_NAME + " 431 " + old_nickname +
                            " :No nickname given");
-    fd_list.push_back(fd);
+    fd_list.push_back(client_fd);
 
     return fd_list;
   }
@@ -61,7 +61,7 @@ std::vector<int> NickCommandHandler::operator()(const int fd,
   if (numeric) {
     client->SetSendMessage(":" + SERVER_NAME + " 432 " + new_nickname +
                            " :Erroneous Nickname");
-    fd_list.push_back(fd);
+    fd_list.push_back(client_fd);
 
     return fd_list;
   }
@@ -69,7 +69,7 @@ std::vector<int> NickCommandHandler::operator()(const int fd,
   if (db->GetClientByNickname(new_nickname) != nullptr) {
     client->SetSendMessage(":" + SERVER_NAME + " 433 " + old_nickname + " " +
                            new_nickname + " : Nickname is already in use.");
-    fd_list.push_back(fd);
+    fd_list.push_back(client_fd);
 
     return fd_list;
   }
