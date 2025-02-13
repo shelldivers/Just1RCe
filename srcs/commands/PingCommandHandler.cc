@@ -42,6 +42,7 @@ std::vector<int> PingCommandHandler::operator()(const int client_fd, const std::
 	if (client->nick_name().empty() || client->user_name().empty()) {
 		client->SetNumeric(":" + JUST1RCE_SERVER_NAME + " 451 " + client->nick_name() + " :You have not registered");
 		fd_list.push_back(client_fd);
+
 		return fd_list;
 	}
 
@@ -50,11 +51,13 @@ std::vector<int> PingCommandHandler::operator()(const int client_fd, const std::
 	if (numeric) {
 		client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 409 " + client->nick_name() + " :No origin specified");
 		fd_list.push_back(client_fd);
+
 		return fd_list;
 	}
 	
 	client->SetSendMessage("PONG :" + token);
 	fd_list.push_back(client_fd);
+	
 	return fd_list;
 }
 
