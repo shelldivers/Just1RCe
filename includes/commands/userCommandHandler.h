@@ -14,8 +14,8 @@ class UserCommandHandler : public CommandHandler {
   UserCommandHandler &operator=(const UserCommandHandler &);
 
  public:
-  UserCommandHandler() {}
-  ~UserCommandHandler() {}
+  UserCommandHandler();
+  ~UserCommandHandler();
   std::vector<int> operator()(const int client_fd, const std::string &message);
 };
 
