@@ -15,8 +15,8 @@ class PingCommandHandler : public CommandHandler {
   PingCommandHandler &operator=(PingCommandHandler const &);
 
  public:
-  PingCommandHandler() {}
-  ~PingCommandHandler() {} 
+  PingCommandHandler();
+  ~PingCommandHandler();
 
   std::vector<int> operator()(const int client_fd, const std::string &message);
 };
