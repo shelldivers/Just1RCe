@@ -1,15 +1,17 @@
+#include "../../includes/commands/joinCommandHandler.h"
+
 #include <string.h>
 
 #include <vector>
 
 #include "../../includes/channel.h"
 #include "../../includes/client.h"
-#include "../../includes/commands/pingCommandHandler.h"
 #include "../../includes/config.h"
 #include "../../includes/context_holder.h"
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
+
 
 namespace Just1RCe {
 
@@ -66,20 +68,20 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     Channel *channel = db->GetChannel(channel_name);
     std::vector<Client *> clients = db->GetClientsByChannelName(channel_name);
 
-	if (isAlreadyJoined(clients, client_fd)) {
-		continue;
-	}
+    if (isAlreadyJoined(clients, client_fd)) {
+      continue;
+    }
     if (keys.size() > index) {
       key = keys[index];
     }
-	if (checkChannelMask(channel_name) == ERR_BADCHANMASK) {
-		client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 476 " +
-							   client->nick_name() + " JOIN :" + channel_name +
-							   " :Bad Channel Mask");
-		fd_list.push_back(client_fd);
-  
-		return fd_list;
-	  }
+    if (checkChannelMask(channel_name) == ERR_BADCHANMASK) {
+      client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 476 " +
+                             client->nick_name() + " JOIN :" + channel_name +
+                             " :Bad Channel Mask");
+      fd_list.push_back(client_fd);
+
+      return fd_list;
+    }
     if (channel == nullptr) {
       channel = new Channel(channel_name);
       db->AddChannel(channel);
@@ -138,7 +140,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
 // - ERR_BADCHANMASK (476)
 // :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask (IRC 문서)
-const int checkChannelMask(Channel &channel) {
+const int JoinCommandHandler::checkChannelMask(Channel &channel) {
   std::string forbidden_chars = " \x07,:";
 
   for (size_t index = 0; index < forbidden_chars.size(); ++index) {
@@ -152,7 +154,8 @@ const int checkChannelMask(Channel &channel) {
 
 // - ERR_CHANNELISFULL (471)
 // :{SERVER_NAME} 471 nick_ken3 #limited_channel :Cannot join channel (+l)
-const int checkChannelFull(Channel &channel, const size_t client_num) {
+const int JoinCommandHandler::checkChannelFull(Channel &channel,
+                                               const size_t client_num) {
   if (channel.CheckMode('l') && channel.max_user_num() <= client_num) {
     return ERR_CHANNELISFULL;
   }
@@ -162,7 +165,8 @@ const int checkChannelFull(Channel &channel, const size_t client_num) {
 
 // - ERR_BADCHANNELKEY (475)
 // :{SERVER_NAME} 475 nick_ken3 #pass_channel :Cannot join channel (+k)
-const int checkChannelKey(Channel &channel, const std::string &key) {
+const int JoinCommandHandler::checkChannelKey(Channel &channel,
+                                              const std::string &key) {
   if (channel.CheckMode('k') && channel.key() != key) {
     return ERR_BADCHANNELKEY;
   }
@@ -172,7 +176,8 @@ const int checkChannelKey(Channel &channel, const std::string &key) {
 
 // - ERR_INVITEONLYCHAN (473)
 // :{SERVER_NAME} 473 nick_ken3 #invite_only :Cannot join channel (+i)
-const int checkInviteOnly(Channel &channel, const int client_fd) {
+const int JoinCommandHandler::checkInviteOnly(Channel &channel,
+                                              const int client_fd) {
   if (channel.CheckMode('i')) {
     std::vector<Client *> clients = channel.GetInviteList();
 
@@ -188,11 +193,12 @@ const int checkInviteOnly(Channel &channel, const int client_fd) {
   return IRC_NOERROR;
 }
 
-bool isAlreadyJoined(const std::vector<Client *> &clients, const int client_fd) {
+bool JoinCommandHandler::isAlreadyJoined(const std::vector<Client *> &clients,
+                                         const int client_fd) {
   for (size_t index = 0; index < clients.size(); ++index) {
-	if (clients[index]->GetFd() == client_fd) {
-	  return true;
-	}
+    if (clients[index]->GetFd() == client_fd) {
+      return true;
+    }
   }
 
   return false;
