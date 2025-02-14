@@ -2,12 +2,14 @@
 
 #include <string.h>
 
+#include "../../includes/channel.h"
 #include "../../includes/client.h"
 #include "../../includes/config.h"
 #include "../../includes/context_holder.h"
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
+
 
 namespace Just1RCe {
 
@@ -17,11 +19,11 @@ NickCommandHandler::~NickCommandHandler() {}
 
 /**
  * @brief NICK command handler
- * 
+ *
  * @param fd: client fd
  * @param message: message from client
  * @return std::vector<int>: list of fds to send message
- * 
+ *
  * @details
  * Get 3 types of numeric error code
  * - ERR_NONICKNAMEGIVEN(431): No nickname given
@@ -67,8 +69,9 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   }
 
   if (db->GetClientByNickname(new_nickname) != nullptr) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 433 " + old_nickname + " " +
-                           new_nickname + " : Nickname is already in use.");
+    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 433 " + old_nickname +
+                           " " + new_nickname +
+                           " : Nickname is already in use.");
     fd_list.push_back(client_fd);
 
     return fd_list;
@@ -111,7 +114,8 @@ const int NickCommandHandler::announceNicknameChanged(
     std::vector<Client*> clients =
         db->GetClientsByChannelName(channels[channel_index]->name());
 
-    for (size_t client_index = 0; client_index < clients.size(); client_index++) {
+    for (size_t client_index = 0; client_index < clients.size();
+         client_index++) {
       if (clients[client_index] == client) {
         continue;
       }
