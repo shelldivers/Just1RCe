@@ -1,15 +1,17 @@
+#include "../../includes/commands/quitCommandHandler.h"
+
 #include <string.h>
 
 #include <vector>
 
 #include "../../includes/channel.h"
 #include "../../includes/client.h"
-#include "../../includes/commands/pingCommandHandler.h"
 #include "../../includes/config.h"
 #include "../../includes/context_holder.h"
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
+
 
 namespace Just1RCe {
 
@@ -25,7 +27,8 @@ QuitCommandHandler::~QuitCommandHandler() {}
  *
  * @return vector of int(fd), to register write event
  */
-std::vector<int> QuitCommandHandler::operator()(const int client_fd, const std::string &message) {
+std::vector<int> QuitCommandHandler::operator()(const int client_fd,
+                                                const std::string &message) {
   Parser parser(message);
   DbContext *db = ContextHolder::GetInstance()->db;
   Client *client = db->GetClient(client_fd);
