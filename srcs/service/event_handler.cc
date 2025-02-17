@@ -85,8 +85,9 @@ void Service::HandleClientEvent(int const epoll_fd,
 
     if (do_write_again) {
       SetWriteEvent(epoll_fd, cur_event.data.fd);
-    } else
+    } else {
       SetReadEvent(epoll_fd, cur_event.data.fd);
+    }
   }
 }
 
