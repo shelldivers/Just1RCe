@@ -14,11 +14,6 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
  private:
   NickCommandHandler(const NickCommandHandler& rhs);
   NickCommandHandler& operator=(const NickCommandHandler& rhs);
-  const int checkNicknameForbidden(const std::string& nickname);
-  const int announceNicknameChanged(DbContext* db, const Client* client,
-                                    const std::string& old_nickname,
-                                    const std::string& new_nickname,
-                                    std::vector<int>* fd_list);
 
  public:
   NickCommandHandler();

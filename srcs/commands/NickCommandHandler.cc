@@ -10,6 +10,8 @@
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
 
+static const int checkNicknameForbidden(const std::string& nickname);
+static const int announceNicknameChanged();
 
 namespace Just1RCe {
 
@@ -44,8 +46,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   std::string new_nickname;
   std::string old_nickname = client->nick_name();
 
-  int numeric = parser.ParseCommandNick(&new_nickname);
-  if (numeric) {
+  if (parser.ParseCommandNick(&new_nickname) == ERR_NONICKNAMEGIVEN) {
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 431 " + old_nickname +
                            " :No nickname given");
     fd_list.push_back(client_fd);
@@ -53,14 +54,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
     return fd_list;
   }
 
-  if (old_nickname.empty()) {
-    client->set_nick_name(new_nickname);
-
-    return fd_list;
-  }
-
-  numeric = checkNicknameForbidden(new_nickname);
-  if (numeric) {
+  if (checkNicknameForbidden(new_nickname) == ERR_ERRONEUSNICKNAME) {
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 432 " + new_nickname +
                            " :Erroneous Nickname");
     fd_list.push_back(client_fd);
@@ -77,13 +71,19 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
     return fd_list;
   }
 
-  announceNicknameChanged(db, client, old_nickname, new_nickname, &fd_list);
+  if (old_nickname.empty()) {
+    client->set_nick_name(new_nickname);
+
+    return fd_list;
+  }
+
+  announceNicknameChanged(db->GetChannelsByClientFd(client->GetFd()),
+                          old_nickname, new_nickname, client, &fd_list);
 
   return fd_list;
 }
 
-const int NickCommandHandler::checkNicknameForbidden(
-    const std::string& nickname) {
+const int checkNicknameForbidden(const std::string& nickname) {
   const std::string forbidden_chars = "&#$: ,*?!@";
 
   for (size_t nickname_index = 0; nickname_index < nickname.size();
@@ -96,18 +96,14 @@ const int NickCommandHandler::checkNicknameForbidden(
   return IRC_NOERROR;
 }
 
-const int NickCommandHandler::announceNicknameChanged(
-    DbContext* db, Client* client, const std::string& old_nickname,
-    const std::string& new_nickname, std::vector<int>* fd_list) {
-  std::vector<Channel*> channels = db->GetChannelsByClientFd(client->GetFd());
+const int announceNicknameChanged(const std::vector<Channel*>& channels,
+                                  const std::string& old_nickname,
+                                  const std::string& new_nickname,
+                                  Client* client, std::vector<int>* fd_list) {
   const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
 
   client->SetSendMessage(nickname_changed);
   fd_list->push_back(client->GetFd());
-
-  if (channels.empty()) {
-    return IRC_NOERROR;
-  }
 
   for (size_t channel_index = 0; channel_index < channels.size();
        channel_index++) {
