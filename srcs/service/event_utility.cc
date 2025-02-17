@@ -28,11 +28,7 @@ void Service::RegisterClient(int const epoll_fd, int const client_fd) {
 }
 
 void Service::UnRegisterClient(int const epoll_fd, int const client_fd) {
-  struct epoll_event event;
-
-  event.events = 0;
-  event.data.fd = client_fd;
-  if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, &event) == -1)
+  if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, NULL) == -1)
     throw std::runtime_error("event register failed");
 }
 
