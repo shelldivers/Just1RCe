@@ -12,7 +12,6 @@
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
 
-
 namespace Just1RCe {
 
 JoinCommandHandler::JoinCommandHandler() {}
@@ -50,6 +49,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     return fd_list;
   }
 
+  // Get channel names and keys
   std::vector<std::string> channel_names;
   std::vector<std::string> keys;
   if (parser.ParseCommandJoin(&channel_names, &keys) == ERR_NEEDMOREPARAMS) {
@@ -61,6 +61,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     return fd_list;
   }
 
+  // Join channels
   for (size_t index = 0; index < channel_names.size(); ++index) {
     std::string channel_name = channel_names[index];
     std::string key = "";
@@ -68,12 +69,15 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     Channel *channel = db->GetChannel(channel_name);
     std::vector<Client *> clients = db->GetClientsByChannelName(channel_name);
 
+    // Check if the client is already joined
     if (isAlreadyJoined(clients, client_fd)) {
       continue;
     }
+    // Get key
     if (keys.size() > index) {
       key = keys[index];
     }
+    // Check channel mask
     if (checkChannelMask(channel_name) == ERR_BADCHANMASK) {
       client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 476 " +
                              client->nick_name() + " JOIN :" + channel_name +
@@ -82,10 +86,12 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
       return fd_list;
     }
+    // Create a new channel if it does not exist
     if (channel == nullptr) {
       channel = new Channel(channel_name);
       db->AddChannel(channel);
     }
+    // Check channel full
     if (checkChannelFull(*channel, clients.size()) == ERR_CHANNELISFULL) {
       client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 471 " +
                              client->nick_name() + " JOIN :" + channel_name +
@@ -94,6 +100,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
       return fd_list;
     }
+    // Check channel key
     if (checkChannelKey(*channel, key) == ERR_BADCHANNELKEY) {
       client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 475 " +
                              client->nick_name() + " JOIN :" + channel_name +
@@ -102,6 +109,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
       return fd_list;
     }
+    // Check invite only
     if (checkInviteOnly(*channel, client_fd) == ERR_INVITEONLYCHAN) {
       client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 473 " +
                              client->nick_name() + " JOIN :" + channel_name +
@@ -110,9 +118,9 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
       return fd_list;
     }
-
+    // Get channel client nicknames for RPL_NAMREPLY
+    // and set send join messages to all clients in the channel
     std::string channel_client_nicknames = "";
-
     for (size_t client_index = 0; client_index < clients.size();
          ++client_index) {
       if (client_index > 0) {
@@ -122,7 +130,11 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
       clients[client_index]->SetSendMessage(response);
       fd_list.push_back(clients[client_index]->GetFd());
     }
+
+    // Join the client to the channel
     db->JoinClientToChannel(client_fd, channel_name);
+
+    // Set send replies to joined client
     client->SetSendMessage(response);
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " MODE " +
                            channel_name + " " + channel->GetModeAsString());
@@ -139,7 +151,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 }
 
 // - ERR_BADCHANMASK (476)
-// :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask (IRC 문서)
+// :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask
 const int JoinCommandHandler::checkChannelMask(Channel &channel) {
   std::string forbidden_chars = " \x07,:";
 
@@ -156,7 +168,7 @@ const int JoinCommandHandler::checkChannelMask(Channel &channel) {
 // :{SERVER_NAME} 471 nick_ken3 #limited_channel :Cannot join channel (+l)
 const int JoinCommandHandler::checkChannelFull(Channel &channel,
                                                const size_t client_num) {
-  if (channel.CheckMode('l') && channel.max_user_num() <= client_num) {
+  if (channel.CheckMode('l') && /* channel max num */ <= client_num) {
     return ERR_CHANNELISFULL;
   }
 
