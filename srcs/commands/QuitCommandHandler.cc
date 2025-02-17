@@ -12,7 +12,6 @@
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
 
-
 namespace Just1RCe {
 
 QuitCommandHandler::QuitCommandHandler() {}
@@ -38,9 +37,12 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
     return fd_list;
   }
 
+  // Get token
   std::string token;
   parser.ParseCommandQuit(&token);
 
+  // Delete client from all channels and send QUIT message to all clients in the
+  // channels
   std::vector<Channel *> channels = db->GetChannelsByClientFd(client_fd);
   for (int channel_index = 0; channel_index < channels.size();
        ++channel_index) {
@@ -54,6 +56,7 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
       fd_list.push_back(channel_fd);
     }
   }
+  // Delete client from server
   db->DelClient(client_fd);
 
   return fd_list;
