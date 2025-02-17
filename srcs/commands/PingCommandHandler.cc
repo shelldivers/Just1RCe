@@ -47,8 +47,7 @@ std::vector<int> PingCommandHandler::operator()(const int client_fd, const std::
 	}
 
 	std::string token;
-	int numeric = parser.ParseCommandPing(&token);
-	if (numeric) {
+	if (parser.ParseCommandPing(&token) == ERR_NOORIGIN) {
 		client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 409 " + client->nick_name() + " :No origin specified");
 		fd_list.push_back(client_fd);
 
