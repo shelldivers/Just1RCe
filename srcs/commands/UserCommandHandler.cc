@@ -40,6 +40,7 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
     return fd_list;
   }
 
+  // Check if the client has registered by USER command before
   if (client->user_name().empty() == false) {
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 462 " +
                            client->nick_name() + " :You may not reregister");
@@ -48,8 +49,8 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
     return fd_list;
   }
 
+  // Get username and realname
   std::string username, realname;
-
   if (parser.ParseCommandUser(&username, &realname) == ERR_NEEDMOREPARAMS) {
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 461 " +
                            client->nick_name() + " :Not enough parameters");
@@ -58,9 +59,10 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
     return fd_list;
   }
 
+  // Set username and realname
+  // No message is sent to the client
   client->set_user_name(username);
   client->set_real_name(realname);
-  fd_list.push_back(client_fd);
 
   return fd_list;
 }
