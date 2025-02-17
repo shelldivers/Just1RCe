@@ -36,7 +36,7 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
   Client* client = db->GetClient(client_fd);
   std::vector<int> fd_list;
 
-  if (client == nullptr) {
+  if (!client) {
     return fd_list;
   }
 
@@ -49,9 +49,8 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
   }
 
   std::string username, realname;
-  int numeric = parser.ParseCommandUser(&username, &realname);
 
-  if (numeric) {
+  if (parser.ParseCommandUser(&username, &realname) == ERR_NEEDMOREPARAMS) {
     client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 461 " +
                            client->nick_name() + " :Not enough parameters");
     fd_list.push_back(client_fd);
