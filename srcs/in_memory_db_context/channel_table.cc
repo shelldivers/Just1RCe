@@ -1,7 +1,7 @@
 
 #include <iterator>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "../../includes/in_memory_db_context.h"
 
@@ -19,6 +19,10 @@ bool InMemoryDbContext::AddChannel(Channel *room) {
   return true;
 }
 
+/**
+ * @brief delete channel from DbContext
+ * @warning before calling this, must part all client from the channel
+ */
 void InMemoryDbContext::DelChannel(std::string const &channel_name) {
   // sanity check
   if (!channel_table_.count(channel_name)) return;
