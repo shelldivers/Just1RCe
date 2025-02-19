@@ -136,7 +136,6 @@ std::string ResponseGenerator::generate_response(
           response += JUST1RCE_SERVER_NAME;
           break;
       }
-      i++;
     } else {
       response += response_template[i];
     }
