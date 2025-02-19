@@ -74,9 +74,9 @@ ResponseArguments::ResponseArguments(const Client& client,
 }
 
 ResponseGenerator::ResponseGenerator() {
-  static bool initialized = false;
+  static bool response_templates_initialized = false;
 
-  if (initialized == false) {
+  if (response_templates_initialized == false) {
     response_templates_[RPL_WELCOME] =
         ":%s 001 %c :Welcome to the SHELLDIVERS Network, %c";
     response_templates_[RPL_YOURHOST] =
@@ -135,7 +135,7 @@ ResponseGenerator::ResponseGenerator() {
     response_templates_[ERR_CHANOPRIVSNEEDED] =
         ":%s 482 %c %h :You're not channel operator";
 
-    initialized = true;
+	response_templates_initialized = true;
   }
 }
 
