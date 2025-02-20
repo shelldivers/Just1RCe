@@ -20,7 +20,7 @@ struct ResponseArguments {
   std::vector<std::string> params;  // %p, 파라미터 목록
 
   ResponseArguments(const int numeric, const Client& client,
-                    const Channel* channel, std::vector<std::string> params);
+                    const Channel* channel, std::vector<std::string>& params);
 };
 
 class ResponseGenerator {

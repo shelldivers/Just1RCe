@@ -32,7 +32,7 @@ namespace Just1RCe {
  */
 ResponseArguments::ResponseArguments(const int numeric, const Client& client,
                                      const Channel* channel,
-                                     const std::vector<std::string>& params) {
+                                     std::vector<std::string>& params) {
   if (channel != NULL) {
     channel_name = channel.name();
     topic = channel.topic();
@@ -178,7 +178,7 @@ std::string ResponseGenerator::GenerateResponse(
 
 }  // namespace Just1RCe
 
-static void GenerateNicknames(const std::vector<Client*> &client_list,
+static void GenerateNicknames(const std::vector<Client*>& client_list,
                               std::string* nicknames) {
   *nicknames = "";
 
