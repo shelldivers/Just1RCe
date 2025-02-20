@@ -32,7 +32,7 @@ namespace Just1RCe {
  */
 ResponseArguments::ResponseArguments(const int numeric, const Client& client,
                                      const Channel* channel,
-                                     std::vector<std::string>& params) {
+                                     const std::vector<std::string>& params) {
   if (channel != NULL) {
     channel_name = channel.name();
     topic = channel.topic();
