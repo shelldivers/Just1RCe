@@ -10,7 +10,7 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 
-static void GenerateNicknames(std::vector<Client*> client_list,
+static void GenerateNicknames(std::vector<Client*>& client_list,
                               std::string* nicknames);
 
 namespace Just1RCe {
@@ -42,7 +42,7 @@ ResponseArguments::ResponseArguments(const int numeric, const Client& client,
   command_name = params[0];
 
   if (numeric == RPL_NAMREPLY && channel != NULL) {
-    generate_nicknames(
+    GenerateNicknames(
         ContextHolder().GetInstance()->db()->GetClientsByChannelName(
             channel->name()),
         &nicknames);
@@ -71,7 +71,7 @@ void ResponseGenerator::DestroyInstance() {
   }
 }
 
-ResponseGenerator::ResponseGenerator() { initialize_templates(); }
+ResponseGenerator::ResponseGenerator() { InitializeTemplates(); }
 
 ResponseGenerator::~ResponseGenerator() {}
 
