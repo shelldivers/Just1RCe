@@ -21,11 +21,13 @@ void Parser::splitBySpace(const std::string &message) {
   }
 
   while ((end = message.find(JUST1RCE_SPACE, start)) != std::string::npos) {
-    if (end > message.find(JUST1RCE_COLON, start)) {
-      std::string splited = message.substr(start + 1);
+    if (end < message.size() - 1 && message[end + 1] == JUST1RCE_COLON) {
+      std::string splited = message.substr(start, end - start);
       if (splited.empty() == false) {
         token_stream_.push_back(splited);
       }
+      start = end + 2;
+      token_stream_.push_back(message.substr(start));
       return;
     }
 
