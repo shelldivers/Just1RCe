@@ -41,6 +41,9 @@ class InMemoryDbContext : public DbContext {
   std::multimap<Fd, ChannelName> client_to_channel_mapping_table_;
   std::multimap<ChannelName, Fd> channel_to_client_mapping_table_;
 
+  // nickname to client mapping table
+  std::map<std::string, Fd> nick_name_to_fd_table_;
+
  public:
   InMemoryDbContext();
   ~InMemoryDbContext();
@@ -76,6 +79,12 @@ class InMemoryDbContext : public DbContext {
   virtual std::vector<Channel *> GetChannelsByClientFd(int const client_fd);
   virtual std::vector<Client *> GetClientsByChannelName(
       std::string const &channel_name);
+
+  // nick name to fd mapping table
+  virtual void SetNickNameToFd(std::string const &client_nick_name,
+                               int const fd);
+  virtual int GetFdByNickName(std::string const &client_nick_name);
+  virtual void DeleteNickNameToFd(std::string const &client_nick_name);
 };
 
 }  // namespace Just1RCe

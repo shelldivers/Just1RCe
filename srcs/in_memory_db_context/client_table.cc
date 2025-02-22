@@ -52,6 +52,9 @@ void InMemoryDbContext::DelClient(int const client_fd) {
     if (!isFound) break;
   }
 
+  // delete nick name to fd mapping
+  DeleteNickNameToFd(client_table_[client_fd]->nick_name());
+
   // delete client
   delete client_table_[client_fd];
   client_table_.erase(client_fd);
@@ -60,6 +63,21 @@ void InMemoryDbContext::DelClient(int const client_fd) {
 Client *InMemoryDbContext::GetClient(int const client_fd) {
   if (!client_table_.count(client_fd)) return NULL;
   return client_table_[client_fd];
+}
+
+void InMemoryDbContext::SetNickNameToFd(std::string const &client_nick_name,
+                                        int const fd) {
+  nick_name_to_fd_table_[client_nick_name] = fd;
+}
+
+int InMemoryDbContext::GetFdByNickName(std::string const &client_nick_name) {
+  if (!nick_name_to_fd_table_.count(client_nick_name)) return -1;
+  return nick_name_to_fd_table_[client_nick_name];
+}
+
+void InMemoryDbContext::DeleteNickNameToFd(
+    std::string const &client_nick_name) {
+  nick_name_to_fd_table_.erase(client_nick_name);
 }
 
 }  // namespace Just1RCe
