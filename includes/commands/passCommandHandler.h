@@ -12,12 +12,14 @@ namespace Just1RCe {
 
 class PassCommandHandler : public CommandHandler {
  private:
+  std::string password_;
+
   PassCommandHandler(const PassCommandHandler &);
   PassCommandHandler &operator=(const PassCommandHandler &);
-  const int GetUserErrorCode(const Client &client, std::string password);
+  const int GetPassErrorCode(const Client &client, std::string password);
 
  public:
-  PassCommandHandler();
+  explicit PassCommandHandler(const std::string &password);
   ~PassCommandHandler();
   std::vector<int> operator()(const int client_fd, const std::string &message);
 };
@@ -25,4 +27,3 @@ class PassCommandHandler : public CommandHandler {
 }  // namespace Just1RCe
 
 #endif  // JUST1RCE_INCLUDES_COMMANDS_PASSCOMMANDHANDLER_H_
-

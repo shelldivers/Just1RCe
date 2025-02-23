@@ -14,7 +14,8 @@
 
 namespace Just1RCe {
 
-PassCommandHandler::PassCommandHandler() {}
+PassCommandHandler::PassCommandHandler(const std::string& password)
+    : password_(password) {}
 
 PassCommandHandler::~PassCommandHandler() {}
 
@@ -56,16 +57,21 @@ std::vector<int> PassCommandHandler::operator()(const int client_fd,
     return std::vector<int>(1, client_fd);
   }
 
-  // Set Pass name and real name
-  client->set_Pass_name(Passname);
-  client->set_real_name(realname);
+  // Set client as passed
+  client->PassDone();
 
   return std::vector<int>();
 }
 
 const int PassCommandHandler::GetPassErrorCode(const Client& client,
                                                std::string password) {
-  if (ContextHolder::GetInstance()->db().)
+  if (client.IsPassed() == true) {
+    return ERR_ALREADYREGISTERED;
+  }
+
+  if (password_ != password) {
+    return ERR_PASSWDMISMATCH;
+  }
 
   return IRC_NOERROR;
 }
