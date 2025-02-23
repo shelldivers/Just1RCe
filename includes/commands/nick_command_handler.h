@@ -5,16 +5,17 @@
 #include <vector>
 
 #include "../command_handler.h"
-class DbContext;
-class Client;
 
 namespace Just1RCe {
+
+class DbContext;
+class Client;
 
 class NickCommandHandler : public Just1RCe::CommandHandler {
  private:
   NickCommandHandler(const NickCommandHandler& rhs);
   NickCommandHandler& operator=(const NickCommandHandler& rhs);
-  int CheckNick(const Client& client, const std::string& new_nickname);
+  int CheckNick(const std::string& new_nickname);
 
  public:
   NickCommandHandler();
