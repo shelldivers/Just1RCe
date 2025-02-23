@@ -1,6 +1,7 @@
-#include "../../includes/commands/nickCommandHandler.h"
+#include "nickCommandHandler.h"
 
-#include <string.h>
+#include <string>
+#include <vector>
 
 #include "../../includes/channel.h"
 #include "../../includes/client.h"

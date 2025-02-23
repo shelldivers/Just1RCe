@@ -1,12 +1,12 @@
-#ifndef JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H
-#define JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H
+#ifndef JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H_
+#define JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H_
 
-#include <string.h>
-
+#include <string>
 #include <vector>
 
 #include "../command_handler.h"
 class DbContext;
+class Client;
 
 namespace Just1RCe {
 
@@ -25,4 +25,4 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
 
 }  // namespace Just1RCe
 
-#endif
+#endif  // JUST1RCE_INCLUDES_COMMANDS_NICK_COMMAND_HANDLER_H_
