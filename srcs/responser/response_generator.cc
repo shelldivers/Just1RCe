@@ -10,7 +10,7 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 
-static void GenerateNicknames(std::vector<Client*>& client_list,
+static void GenerateNicknames(const std::vector<Client*>& client_list,
                               std::string* nicknames);
 
 namespace Just1RCe {
