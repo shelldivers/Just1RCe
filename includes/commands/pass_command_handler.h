@@ -6,9 +6,9 @@
 
 #include "../command_handler.h"
 
-class Client;
-
 namespace Just1RCe {
+
+class Client;
 
 class PassCommandHandler : public CommandHandler {
  private:
