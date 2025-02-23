@@ -36,7 +36,7 @@ std::vector<int> PassCommandHandler::operator()(const int client_fd,
                                                 const std::string& message) {
   Client* client = ContextHolder::GetInstance()->db()->GetClient(client_fd);
 
-  if (client == NULL || client->IsPassed() == true) {
+  if (client == NULL) {
     return std::vector<int>();
   }
 
