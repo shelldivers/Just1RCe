@@ -33,34 +33,28 @@ PingCommandHandler::~PingCommandHandler() {}
 std::vector<int> PingCommandHandler::operator()(const int client_fd, const std::string &message) {
 	Parser parser(message);
 	Client* client = ContextHolder::GetInstance()->db()->GetClient(client_fd);
-	std::vector<int> fd_list;
 
-	if (client == nullptr) {
-		return fd_list;
-	}
-
-	// Check if the client has registered by USER command before
-	if (client->nick_name().empty() || client->user_name().empty()) {
-		client->SetNumeric(":" + JUST1RCE_SERVER_NAME + " 451 " + client->nick_name() + " :You have not registered");
-		fd_list.push_back(client_fd);
-
-		return fd_list;
+	if (client == NULL) {
+		return std::vector<int>();
 	}
 
 	// Get token
 	std::string token;
-	if (parser.ParseCommandPing(&token) == ERR_NOORIGIN) {
-		client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 409 " + client->nick_name() + " :No origin specified");
-		fd_list.push_back(client_fd);
-
-		return fd_list;
-	}
+	parser.ParseCommandPing(&token);
 	
 	// Send PONG message
 	client->SetSendMessage("PONG :" + token);
 	fd_list.push_back(client_fd);
 	
 	return fd_list;
+}
+
+const int PingCommandHandler::CheckPing(const Client& client, const std::string& token) {
+	if (token.empty() == true) {
+		return ERR_NOORIGIN;
+	}
+
+	return IRC_NOERROR;
 }
 
 
