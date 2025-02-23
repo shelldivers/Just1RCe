@@ -46,7 +46,7 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd,
   parser.ParseCommandUser(&username, &realname);
 
   // Get numeric
-  int numeric = GetUserErrorCode(*client, username, realname);
+  int numeric = CheckUser(*client, username, realname);
   if (numeric != IRC_NOERROR) {
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
@@ -64,9 +64,9 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd,
   return std::vector<int>();
 }
 
-const int UserCommandHandler::GetUserErrorCode(const Client& client,
-                                               std::string username,
-                                               std::string realname) {
+const int UserCommandHandler::CheckUser(const Client& client,
+                                        std::string username,
+                                        std::string realname) {
   if (username.empty() == true || realname.empty() == true) {
     return ERR_NEEDMOREPARAMS;
   }
