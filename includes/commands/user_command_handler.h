@@ -14,7 +14,7 @@ class UserCommandHandler : public CommandHandler {
  private:
   UserCommandHandler(const UserCommandHandler &);
   UserCommandHandler &operator=(const UserCommandHandler &);
-  const int CheckUser(const Client &client, std::string username,
+  int CheckUser(const Client &client, std::string username,
                       std::string realname);
 
  public:

@@ -1,4 +1,4 @@
-#include "userCommandHandler.h"
+#include "../../includes/commands/user_command_handler.h"
 
 #include <string>
 #include <vector>
@@ -64,9 +64,8 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd,
   return std::vector<int>();
 }
 
-const int UserCommandHandler::CheckUser(const Client& client,
-                                        std::string username,
-                                        std::string realname) {
+int UserCommandHandler::CheckUser(const Client& client, std::string username,
+                                  std::string realname) {
   if (username.empty() == true || realname.empty() == true) {
     return ERR_NEEDMOREPARAMS;
   }

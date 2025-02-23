@@ -14,8 +14,7 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
  private:
   NickCommandHandler(const NickCommandHandler& rhs);
   NickCommandHandler& operator=(const NickCommandHandler& rhs);
-  const int GetNickErrorCode(const Client& client,
-                             const std::string& new_nickname);
+  int CheckNick(const Client& client, const std::string& new_nickname);
 
  public:
   NickCommandHandler();
