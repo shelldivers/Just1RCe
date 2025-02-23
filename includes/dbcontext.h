@@ -55,6 +55,12 @@ class DbContext {
   virtual std::vector<Channel *> GetChannelsByClientFd(int const client_fd) = 0;
   virtual std::vector<Client *> GetClientsByChannelName(
       std::string const &channel_name) = 0;
+
+  // nick name to fd mapping table
+  virtual void SetNickNameToFd(std::string const &client_nick_name,
+                               int const fd) = 0;
+  virtual int GetFdByNickName(std::string const &client_nick_name) = 0;
+  virtual void DeleteNickNameToFd(std::string const &client_nick_name) = 0;
 };
 
 };  // namespace Just1RCe
