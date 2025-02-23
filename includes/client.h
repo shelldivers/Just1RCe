@@ -49,6 +49,9 @@ class Client {
   std::string read_buffer_;
   std::string write_buffer_;
 
+  // authentication
+  bool is_pass_done_;
+
  public:
   explicit Client(const int listen_fd);
   ~Client();
@@ -77,6 +80,11 @@ class Client {
 
   void SetSendMessage(std::string const &message);
   bool SendMessage();
+
+  // authentication
+  void PassDone();
+  bool IsPassed() const;
+  bool IsAuthenticated() const;
 };
 
 }  // namespace Just1RCe

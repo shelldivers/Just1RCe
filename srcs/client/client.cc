@@ -5,7 +5,8 @@
 
 namespace Just1RCe {
 
-Client::Client(const int listen_fd) : socket_(listen_fd) {}
+Client::Client(const int listen_fd)
+    : socket_(listen_fd), is_pass_done_(false) {}
 
 Client::~Client() {}
 
