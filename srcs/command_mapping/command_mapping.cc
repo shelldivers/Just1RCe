@@ -1,4 +1,4 @@
-#include "command_mapping.h"
+#include "../../includes/command_mapping.h"
 
 #include <map>
 #include <string>
