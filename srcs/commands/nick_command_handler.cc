@@ -113,7 +113,7 @@ int NickCommandHandler::CheckNick(const Client& client,
     return ERR_NONICKNAMEGIVEN;
   }
 
-  if (isForbidden(new_nickname) == true) {
+  if (IsForbidden(new_nickname) == true) {
     return ERR_ERRONEUSNICKNAME;
   }
 

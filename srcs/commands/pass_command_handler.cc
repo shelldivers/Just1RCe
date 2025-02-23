@@ -46,12 +46,12 @@ std::vector<int> PassCommandHandler::operator()(const int client_fd,
   parser.ParseCommandPass(&password);
 
   // Get numeric
-  int numeric = GetPassErrorCode(*client, password);
+  int numeric = CheckPass(*client, password);
   if (numeric != IRC_NOERROR) {
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
         numeric,
-        ResponseArguments{numeric, *client, NULL, parser.GetTokenStream()});
+        ResponseArguments(numeric, *client, NULL, parser.GetTokenStream()));
 
     client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
