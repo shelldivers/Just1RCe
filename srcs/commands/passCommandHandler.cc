@@ -63,7 +63,7 @@ std::vector<int> PassCommandHandler::operator()(const int client_fd,
   return std::vector<int>();
 }
 
-const int PassCommandHandler::GetPassErrorCode(const Client& client,
+const int PassCommandHandler::CheckPass(const Client& client,
                                                std::string password) {
   if (client.IsPassed() == true) {
     return ERR_ALREADYREGISTERED;

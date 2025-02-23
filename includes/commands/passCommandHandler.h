@@ -16,7 +16,7 @@ class PassCommandHandler : public CommandHandler {
 
   PassCommandHandler(const PassCommandHandler &);
   PassCommandHandler &operator=(const PassCommandHandler &);
-  const int GetPassErrorCode(const Client &client, std::string password);
+  const int CheckPass(const Client &client, std::string password);
 
  public:
   explicit PassCommandHandler(const std::string &password);
