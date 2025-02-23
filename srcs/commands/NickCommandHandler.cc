@@ -9,9 +9,9 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
+#include "../../includes/response_generator.h"
 
-static const int checkNicknameForbidden(const std::string& nickname);
-static const int announceNicknameChanged();
+static bool IsForbidden(const std::string& nickname);
 
 namespace Just1RCe {
 
@@ -34,94 +34,107 @@ NickCommandHandler::~NickCommandHandler() {}
  */
 std::vector<int> NickCommandHandler::operator()(const int client_fd,
                                                 const std::string& message) {
-  Parser parser(message);
-  DbContext* db = ContextHolder::GetInstance()->db;
-  Client* client = db->GetClient(client_fd);
-  std::vector<int> fd_list;
+  Client* client = ContextHolder::GetInstance()->db()->GetClient(client_fd);
 
-  if (!client) {
-    return fd_list;
+  if (client == NULL || client->IsPassed() == false) {
+    return std::vector<int>();
   }
 
+  // Parse
   std::string new_nickname;
   std::string old_nickname = client->nick_name();
+  Parser parser(message);
+  parser.ParseCommandNick(&new_nickname);
 
-  if (parser.ParseCommandNick(&new_nickname) == ERR_NONICKNAMEGIVEN) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 431 " + old_nickname +
-                           " :No nickname given");
-    fd_list.push_back(client_fd);
+  // Check error
+  int numeric = GetNickErrorCode(*client, new_nickname);
+  if (numeric != IRC_NOERROR) {
+    std::vector<int> fd_list;
+    ResponseGenerator& generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        numeric,
+        ResponseArguments(numeric, *client, NULL, parser.GetTokenStream()));
 
-    return fd_list;
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
   }
 
-  if (checkNicknameForbidden(new_nickname) == ERR_ERRONEUSNICKNAME) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 432 " + new_nickname +
-                           " :Erroneous Nickname");
-    fd_list.push_back(client_fd);
+  client->set_nick_name(new_nickname);
 
-    return fd_list;
-  }
+  // announce nickname changed
+  if (old_nickname.empty() == false) {
+    std::vector<int> fd_list;
+    std::vector<Channel*> channels =
+        ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client_fd);
+    const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
 
-  if (db->GetClientByNickname(new_nickname) != nullptr) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 433 " + old_nickname +
-                           " " + new_nickname +
-                           " : Nickname is already in use.");
-    fd_list.push_back(client_fd);
+    for (size_t channel_index = 0; channel_index < channels.size();
+         channel_index++) {
+      std::vector<Client*> clients =
+          ContextHolder::GetInstance()->db()->GetClientsByChannelName(
+              channels[channel_index]->name());
 
-    return fd_list;
-  }
+      for (size_t client_index = 0; client_index < clients.size();
+           client_index++) {
+        if (clients[client_index] == client) {
+          continue;
+        }
 
-  if (old_nickname.empty()) {
-    client->set_nick_name(new_nickname);
-
-    return fd_list;
-  }
-
-  announceNicknameChanged(db->GetChannelsByClientFd(client->GetFd()),
-                          old_nickname, new_nickname, client, &fd_list);
-
-  return fd_list;
-}
-
-const int checkNicknameForbidden(const std::string& nickname) {
-  const std::string forbidden_chars = "&#$: ,*?!@";
-
-  for (size_t nickname_index = 0; nickname_index < nickname.size();
-       nickname_index++) {
-    if (forbidden_chars.find(nickname[nickname_index]) != std::string::npos) {
-      return ERR_ERRONEUSNICKNAME;
-    }
-  }
-
-  return IRC_NOERROR;
-}
-
-const int announceNicknameChanged(const std::vector<Channel*>& channels,
-                                  const std::string& old_nickname,
-                                  const std::string& new_nickname,
-                                  Client* client, std::vector<int>* fd_list) {
-  const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
-
-  client->SetSendMessage(nickname_changed);
-  fd_list->push_back(client->GetFd());
-
-  for (size_t channel_index = 0; channel_index < channels.size();
-       channel_index++) {
-    std::vector<Client*> clients =
-        db->GetClientsByChannelName(channels[channel_index]->name());
-
-    for (size_t client_index = 0; client_index < clients.size();
-         client_index++) {
-      if (clients[client_index] == client) {
-        continue;
+        clients[client_index]->SetSendMessage(nickname_changed);
+        fd_list.push_back(clients[client_index]->GetFd());
       }
-
-      clients[client_index]->SetSendMessage(nickname_changed);
-      fd_list->push_back(clients[client_index]->GetFd());
     }
+    client->SetSendMessage(nickname_changed);
+    fd_list.push_back(client_fd);
+
+    return fd_list;
+  }
+
+  return std::vector<int>();
+}
+
+/**
+ * @brief check error
+ *
+ * @param client: client
+ * @param new_nickname: new nickname
+ *
+ * @return int: error code
+ *
+ * @details
+ * Check if the new nickname is valid
+ * - ERR_NONICKNAMEGIVEN(431): No nickname given
+ * - ERR_ERRONEUSNICKNAME(432): Erroneous Nickname
+ * - ERR_NICKNAMEINUSE(433): Nickname is already in use
+ */
+const int NickCommandHandler::GetNickErrorCode(
+    const Client& client, const std::string& new_nickname) {
+  if (new_nickname.size() == 0) {
+    return ERR_NONICKNAMEGIVEN;
+  }
+
+  if (isForbidden(new_nickname) == true) {
+    return ERR_ERRONEUSNICKNAME;
+  }
+
+  if (ContextHolder::GetInstance()->db()->GetFdByNickName(new_nickname) != -1) {
+    return ERR_NICKNAMEINUSE;
   }
 
   return IRC_NOERROR;
 }
 
 }  // namespace Just1RCe
+
+bool IsForbidden(const std::string& nickname) {
+  const std::string forbidden_chars = "&#$: ,*?!@";
+
+  for (size_t nickname_index = 0; nickname_index < nickname.size();
+       nickname_index++) {
+    if (forbidden_chars.find(nickname[nickname_index]) != std::string::npos) {
+      return true;
+    }
+  }
+
+  return false;
+}
