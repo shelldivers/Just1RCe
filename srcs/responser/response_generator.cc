@@ -36,7 +36,7 @@ ResponseArguments::ResponseArguments(const int numeric, const Client& client,
   if (channel != NULL) {
     channel_name = channel.name();
     topic = channel.topic();
-    modestirng = channel.GetModeAsString();
+    modestring = channel.GetModeAsString();
   }
   client_name = client.nick_name();
   command_name = params[0];
@@ -53,22 +53,10 @@ ResponseArguments::ResponseArguments(const int numeric, const Client& client,
 
 /*----------------------ResponseGenerator--------------------------*/
 
-ResponseGenerator* ResponseGenerator::instance_ = NULL;
-const char* response_templates_[JUST1RCE_MAX_NUMERIC] = {};
-
-ResponseGenerator* ResponseGenerator::GetInstance() {
-  if (instance_ == NULL) {
-    instance_ = new ResponseGenerator();
-  }
+ResponseGenerator& ResponseGenerator::GetInstance() {
+  static ResponseGenerator instance_;
 
   return instance_;
-}
-
-void ResponseGenerator::DestroyInstance() {
-  if (instance_ != NULL) {
-    delete instance_;
-    instance_ = NULL;
-  }
 }
 
 ResponseGenerator::ResponseGenerator() { InitializeTemplates(); }
@@ -94,7 +82,7 @@ void ResponseGenerator::InitializeTemplates() {
   response_templates_[ERR_TOOMANYCHANNELS] =
       ":%s 405 %c %h :You have joined too many channels";
   response_templates_[ERR_NOORIGIN] = ":%s 409 %c :No origin specified";
-  response_templates_[ERR_NORECIPIENT] = ":%s 411 %c :No recipient given (%d)";
+  response_templates_[ERR_NORECIPIENT] = ":%s 411 %c :No recipient given (%C)";
   response_templates_[ERR_NOTEXTTOSEND] = ":%s 412 %c :No text to send";
   response_templates_[ERR_NONICKNAMEGIVEN] = ":%s 431 %c :No nickname given";
   response_templates_[ERR_ERRONEUSNICKNAME] =
@@ -110,7 +98,7 @@ void ResponseGenerator::InitializeTemplates() {
   response_templates_[ERR_NOTREGISTERED] =
       ":%s 451 %c :You have not registered";
   response_templates_[ERR_NEEDMOREPARAMS] =
-      ":%s 461 %c %d :Not enough parameters";
+      ":%s 461 %c %C :Not enough parameters";
   response_templates_[ERR_ALREADYREGISTERED] =
       ":%s 462 %c :You may not reregister";
   response_templates_[ERR_CHANNELISFULL] =
@@ -155,11 +143,11 @@ std::string ResponseGenerator::GenerateResponse(
         case 't':
           response += reg_args.topic;
           break;
-        case 'd':
+        case 'C':
           response += reg_args.command_name;
           break;
         case 'm':
-          response += reg_args.modstring;
+          response += reg_args.modestring;
           break;
         case 'v':
           response += JUST1RCE_VERSION;
