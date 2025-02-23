@@ -48,7 +48,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   parser.ParseCommandNick(&new_nickname);
 
   // Check error
-  int numeric = CheckNick(*client, new_nickname);
+  int numeric = CheckNick(new_nickname);
   if (numeric != IRC_NOERROR) {
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
@@ -107,8 +107,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
  * - ERR_ERRONEUSNICKNAME(432): Erroneous Nickname
  * - ERR_NICKNAMEINUSE(433): Nickname is already in use
  */
-int NickCommandHandler::CheckNick(const Client& client,
-                                  const std::string& new_nickname) {
+int NickCommandHandler::CheckNick(const std::string& new_nickname) {
   if (new_nickname.size() == 0) {
     return ERR_NONICKNAMEGIVEN;
   }
