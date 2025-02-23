@@ -50,7 +50,6 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   // Check error
   int numeric = GetNickErrorCode(*client, new_nickname);
   if (numeric != IRC_NOERROR) {
-    std::vector<int> fd_list;
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
         numeric,
