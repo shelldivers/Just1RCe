@@ -27,6 +27,7 @@ class Parser {
 
   std::vector<std::string> GetTokenStream() const;
 
+  const int Parser::ParseCommandPass(std::string *password);
   const int ParseCommandNick(std::string *nickname);
   const int ParseCommandUser(std::string *username, std::string *realname);
   const int ParseCommandPing(std::string *token);

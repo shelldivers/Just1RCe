@@ -80,6 +80,16 @@ const int Parser::ParseCommandNick(std::string *nickname) {
   return IRC_NOERROR;
 }
 
+const int Parser::ParseCommandPass(std::string *password) {
+  if (token_stream_.size() < 2) {
+    return ERR_NEEDMOREPARAMS;
+  }
+
+  *password = token_stream_[1];
+
+  return IRC_NOERROR;
+}
+
 const int Parser::ParseCommandUser(std::string *username,
                                    std::string *realname) {
   if (token_stream_.size() < 5) {
