@@ -18,8 +18,7 @@ extern "C" {
 
 namespace Just1RCe {
 
-void Service::HandleServerEvent(CommandMapping const &cmd_map,
-                                struct epoll_event const &cur_event) {
+void Service::HandleServerEvent(struct epoll_event const &cur_event) {
   // check sanity of server socket
   if (cur_event.events & (EPOLLHUP | EPOLLERR))
     throw std::runtime_error("server socket is broken");
