@@ -4,12 +4,12 @@
 #include <vector>
 
 #include "../../includes/client.h"
-#include "../../includes/commands/commandHandler.h"
+#include "../../includes/command_handler.h"
 #include "../../includes/config.h"
 #include "../../includes/context_holder.h"
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
-#include "../../includes/parse/parser.h"
+#include "../../includes/parser.h"
 #include "../../includes/response_generator.h"
 
 namespace Just1RCe {
@@ -21,7 +21,7 @@ UserCommandHandler::~UserCommandHandler() {}
 /**
  * @brief USER command handler
  *
- * @param client_fd fd to identify client that te message originate from
+ * @param client_fd fd to identify client that the message originate from
  * @param message raw text message from client
  *
  * @return vector of int(fd), to register write event
@@ -39,25 +39,43 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd,
     return std::vector<int>();
   }
 
+  // Parse
   std::string username;
   std::string realname;
-  Just1RCe::p parser(message);
+  Parser parser(message);
+  parser.ParseCommandUser(&username, &realname);
 
-  // Set username and realname
-  // No message is sent to the client
+  // Get numeric
+  int numeric = GetUserErrorCode(*client, username, realname);
+  if (numeric != IRC_NOERROR) {
+    ResponseGenerator& generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        numeric,
+        ResponseArguments{numeric, *client, NULL, parser.GetTokenStream()});
+
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  }
+
+  // Set user name and real name
   client->set_user_name(username);
   client->set_real_name(realname);
 
-  return fd_list;
+  return std::vector<int>();
 }
 
-const int GetUserErrorCode(const Client& client, std::string username,
+const int UserCommandHandler::GetUserErrorCode(const Client& client, std::string username,
                            std::string realname) {
   if (username.empty() == true || realname.empty() == true) {
     return ERR_NEEDMOREPARAMS;
   }
-  if (client.user_name().empty() == false || client.real_name().empty() == false) {
-    return ERR_ALREADYREGISTRED;
+
+  if (client.user_name().empty() == false ||
+      client.real_name().empty() == false) {
+    return ERR_ALREADYREGISTERED;
   }
+
+  return IRC_NOERROR;
+}
 
 }  // namespace Just1RCe
