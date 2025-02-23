@@ -66,6 +66,10 @@ std::vector<std::string> Parser::splitByComma(const std::string &param) {
   return tokens;
 }
 
+std::vector<std::string> Parser::GetTokenStream() const {
+  return token_stream_;
+}
+
 const int Parser::ParseCommandNick(std::string *nickname) {
   if (token_stream_.size() < 2) {
     return ERR_NONICKNAMEGIVEN;
