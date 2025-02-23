@@ -18,8 +18,7 @@ extern "C" {
 
 namespace Just1RCe {
 
-void Service::HandleServerEvent(int const epoll_fd,
-                                CommandMapping const &cmd_map,
+void Service::HandleServerEvent(CommandMapping const &cmd_map,
                                 struct epoll_event const &cur_event) {
   // check sanity of server socket
   if (cur_event.events & (EPOLLHUP | EPOLLERR))
