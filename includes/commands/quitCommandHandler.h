@@ -12,6 +12,7 @@ class QuitCommandHandler : public CommandHandler {
  private:
   QuitCommandHandler(const QuitCommandHandler &);
   QuitCommandHandler &operator=(const QuitCommandHandler &);
+  const int CheckQuit(const Client& client, const std::string& token);
 
  public:
   QuitCommandHandler();
