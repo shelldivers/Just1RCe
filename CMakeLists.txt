@@ -37,11 +37,10 @@ if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
 endif()
 
+file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/srcs/*.cc")
+
 # Add executable files
-add_executable(Just1RCe
-    #executable files
-    ${CMAKE_SOURCE_DIR}/srcs/main.cc
-)
+add_executable(Just1RCe ${SRC_FILES})
 
 set(CMAKE_SH "bash")
 
