@@ -6,6 +6,8 @@
 
 #include "../command_handler.h"
 
+class Client;
+
 namespace Just1RCe {
 
 class UserCommandHandler : public CommandHandler {
