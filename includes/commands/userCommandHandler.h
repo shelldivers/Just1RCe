@@ -12,6 +12,8 @@ class UserCommandHandler : public CommandHandler {
  private:
   UserCommandHandler(const UserCommandHandler &);
   UserCommandHandler &operator=(const UserCommandHandler &);
+  const int GetUserErrorCode(const Client &client, std::string username,
+                             std::string realname);
 
  public:
   UserCommandHandler();

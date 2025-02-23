@@ -10,6 +10,7 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parse/parser.h"
+#include "../../includes/response_generator.h"
 
 namespace Just1RCe {
 
@@ -19,45 +20,28 @@ UserCommandHandler::~UserCommandHandler() {}
 
 /**
  * @brief USER command handler
- * 
+ *
  * @param client_fd fd to identify client that te message originate from
  * @param message raw text message from client
- * 
+ *
  * @return vector of int(fd), to register write event
- * 
+ *
  * @details
  * Get 2 types of Numeric
  * - ERR_NEEDMOREPARAMS : not enough parameters
  * - ERR_ALREADYREGISTRED : already registered
  */
-std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::string &message) {
-  Parser parser(message);
-  DbContext* db = ContextHolder::GetInstance()->db;
-  Client* client = db->GetClient(client_fd);
-  std::vector<int> fd_list;
+std::vector<int> UserCommandHandler::operator()(const int client_fd,
+                                                const std::string& message) {
+  Client* client = ContextHolder::GetInstance()->db()->GetClient(client_fd);
 
-  if (!client) {
-    return fd_list;
+  if (client == NULL || client->IsPassed() == false) {
+    return std::vector<int>();
   }
 
-  // Check if the client has registered by USER command before
-  if (client->user_name().empty() == false) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 462 " +
-                           client->nick_name() + " :You may not reregister");
-    fd_list.push_back(client_fd);
-
-    return fd_list;
-  }
-
-  // Get username and realname
-  std::string username, realname;
-  if (parser.ParseCommandUser(&username, &realname) == ERR_NEEDMOREPARAMS) {
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 461 " +
-                           client->nick_name() + " :Not enough parameters");
-    fd_list.push_back(client_fd);
-
-    return fd_list;
-  }
+  std::string username;
+  std::string realname;
+  Just1RCe::p parser(message);
 
   // Set username and realname
   // No message is sent to the client
@@ -66,5 +50,14 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd, const std::
 
   return fd_list;
 }
+
+const int GetUserErrorCode(const Client& client, std::string username,
+                           std::string realname) {
+  if (username.empty() == true || realname.empty() == true) {
+    return ERR_NEEDMOREPARAMS;
+  }
+  if (client.user_name().empty() == false || client.real_name().empty() == false) {
+    return ERR_ALREADYREGISTRED;
+  }
 
 }  // namespace Just1RCe
