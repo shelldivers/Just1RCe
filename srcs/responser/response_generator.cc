@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "../../config.h"
-#include "../../includes/Client.h"
 #include "../../includes/channel.h"
+#include "../../includes/client.h"
+#include "../../includes/config.h"
 #include "../../includes/context_holder.h"
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
@@ -97,6 +97,7 @@ void ResponseGenerator::InitializeTemplates() {
       ":%s 443 %c %n %h :is already on channel";
   response_templates_[ERR_NOTREGISTERED] =
       ":%s 451 %c :You have not registered";
+  response_templates_[ERR_PASSWDMISMATCH] = ":%s 464 %c :Password incorrect";
   response_templates_[ERR_NEEDMOREPARAMS] =
       ":%s 461 %c %C :Not enough parameters";
   response_templates_[ERR_ALREADYREGISTERED] =
