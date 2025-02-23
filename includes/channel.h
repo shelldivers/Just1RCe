@@ -52,7 +52,8 @@ class Channel {
   inline bool is_channel_local() const;
 
   // TODO(eldeshue) : time information
-  /// TODO(eldeshue) : invite_list_, ban_list_
+  /// TODO(eldeshue) : ban_list_
+  std::set<std::string> invite_list_;
 
   // Meta Information : unique data to identify someone in the network
 
@@ -80,6 +81,11 @@ class Channel {
   void SetMode(ChannelModeMask const flags);
   void UnsetMode(ChannelModeMask const flags);
   bool CheckMode(ChannelModeMask const flags) const;
+
+  // invite list
+  bool Invite(std::string const &user_host_mask);
+  bool UnInvite(std::string const &user_host_mask);
+  bool IsInvited(std::string const &user_host_mask);
 };
 }  // namespace Just1RCe
 

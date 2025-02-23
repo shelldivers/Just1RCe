@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "../includes/channel.h"
+#include "../../includes/channel.h"
 
 namespace Just1RCe {
 

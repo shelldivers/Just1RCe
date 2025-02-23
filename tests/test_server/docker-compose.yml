@@ -1,0 +1,14 @@
+version: "3"
+services:
+  irc:
+    image: lscr.io/linuxserver/ngircd
+    container_name: ngircd
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Seoul
+    volumes:
+      - ./config:/config
+    ports:
+      - "127.0.0.1:6667:6667"
