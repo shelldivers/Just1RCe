@@ -10,7 +10,7 @@
 namespace Just1RCe {
 
 class CommandHandler;
-typedef std::map<std::string, CommandHandler *> CommandMapping;
+typedef std::map<std::string, Just1RCe::CommandHandler *> CommandMapping;
 
 class Service {
  private:
