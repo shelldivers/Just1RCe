@@ -1,5 +1,5 @@
-#ifndef JUST1RCE_INCLUDES_COMMANDS_PING_COMMAND_HANDLER_H
-#define JUST1RCE_INCLUDES_COMMANDS_PING_COMMAND_HANDLER_H
+#ifndef JUST1RCE_COMMANDS_PING_COMMAND_HANDLER_H_
+#define JUST1RCE_COMMANDS_PING_COMMAND_HANDLER_H_
 
 #include <string.h>
 
@@ -7,13 +7,15 @@
 
 #include "../command_handler.h"
 
+class Client;
+
 namespace Just1RCe {
 
 class PingCommandHandler : public CommandHandler {
  private:
   PingCommandHandler(PingCommandHandler const &);
   PingCommandHandler &operator=(PingCommandHandler const &);
-  const int CheckPing(const Client& client, const std::string& token);
+  const int CheckPing(const Client &client, const std::string &token);
 
  public:
   PingCommandHandler();
