@@ -62,8 +62,7 @@ std::vector<int> PingCommandHandler::operator()(const int client_fd,
   return std::vector<int>(1, client_fd);
 }
 
-const int PingCommandHandler::CheckPing(const Client& client,
-                                        const std::string& token) {
+const int PingCommandHandler::CheckPing(const std::string& token) {
   if (token.empty() == true) {
     return ERR_NOORIGIN;
   }

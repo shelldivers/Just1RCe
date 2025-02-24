@@ -7,15 +7,15 @@
 
 #include "../command_handler.h"
 
-class Client;
-
 namespace Just1RCe {
+
+class Client;
 
 class PingCommandHandler : public CommandHandler {
  private:
   PingCommandHandler(PingCommandHandler const &);
   PingCommandHandler &operator=(PingCommandHandler const &);
-  const int CheckPing(const Client &client, const std::string &token);
+  const int CheckPing(const std::string &token);
 
  public:
   PingCommandHandler();
