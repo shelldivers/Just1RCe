@@ -13,21 +13,17 @@ class Client;
 
 class JoinCommandHandler : public CommandHandler {
  private:
-  JoinCommandHandler(const JoinCommandHandler &);
-  JoinCommandHandler &operator=(const JoinCommandHandler &);
-  int CheckChannel(const Client &client, const std::string &channel_name);
-  int CheckChannelMode()
+  JoinCommandHandler(const JoinCommandHandler&);
+  JoinCommandHandler& operator=(const JoinCommandHandler&);
+  void JoinChannelWithSetResponse(Client* client, Channel* channel,
+                                  std::vector<std::string>& token_stream,
+                                  std::vector<int>* fd_list);
+  int CheckChannelMode(Channel* channel);
 
  public:
   JoinCommandHandler();
   ~JoinCommandHandler();
-  std::vector<int> operator()(const int client_fd, const std::string &message);
-  int checkChannelMask(Channel &channel);
-  int checkChannelFull(Channel &channel, const size_t client_num);
-  int checkChannelKey(Channel &channel, const std::string &key);
-  int checkInviteOnly(Channel &channel, const int client_fd);
-  bool isAlreadyJoined(const std::vector<Client *> &clients,
-                       const int client_fd);
+  std::vector<int> operator()(const int client_fd, const std::string& message);
 };
 
 }  // namespace Just1RCe

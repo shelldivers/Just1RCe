@@ -61,40 +61,19 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   // 채널을 순회하면서 채널을 확인
   // 채널이 존재하면 JOIN 여부 확인
   // 채널이 존재하지 않으면 채널 생성
-  //
 
   // Join channels
   for (size_t index = 0; index < channel_names.size(); ++index) {
-    // Check if the client is already joined
+    std::vector<int> fd_list;
+    // 채널이 없으면 채널을 새로 생성하고 JOIN
     Channel* channel = db->GetChannel(channel_names[index]);
     if (channel == NULL) {
       channel = new Channel(channel_names[index]);
-      db->AddChannel(channel);
-      db->JoinClientToChannel(client_fd, channel_names[index]);
+      JoinChannelWithResponse(client, channel, parser.GetTokenStream(),
+                              &fd_list);
+      continue;
+    }
 
-      ResponseGenerator& generator = ResponseGenerator::GetInstance();
-      std::string response = generator.GenerateResponse(
-          RPL_NAMREPLY, ResponseArguments(RPL_NAMREPLY, *client, channel,
-                                          parser.GetTokenStream()));
-    }
-    // Get key
-    if (keys.size() > index) {
-      key = keys[index];
-    }
-    // Check channel mask
-    if (checkChannelMask(channel_name) == ERR_BADCHANMASK) {
-      client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 476 " +
-                             client->nick_name() + " JOIN :" + channel_name +
-                             " :Bad Channel Mask");
-      fd_list.push_back(client_fd);
-
-      return fd_list;
-    }
-    // Create a new channel if it does not exist
-    if (channel == nullptr) {
-      channel = new Channel(channel_name);
-      db->AddChannel(channel);
-    }
     // Check channel full
     if (checkChannelFull(*channel, clients.size()) == ERR_CHANNELISFULL) {
       client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 471 " +
@@ -153,6 +132,27 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 
   return fd_list;
 }
+
+void JoinCommandHandler::JoinChannelWithSetResponse(
+    Client* client, Channel* channel, std::vector<std::string>& token_stream,
+    std::vector<int>* fd_list) {
+  DbContext* db = ContextHolder::GetInstance()->db();
+
+  db->AddChannel(channel);
+  db->JoinClientToChannel(client->GetFd(), channel->name());
+
+  ResponseGenerator& generator = ResponseGenerator::GetInstance();
+  std::string response = generator.GenerateResponse(
+      RPL_NAMREPLY,
+      ResponseArguments(RPL_NAMREPLY, *client, channel, token_stream));
+  client->SetSendMessage(response);
+  fd_list->push_back(client->GetFd());
+}
+
+int JoinCommandHandler::CheckChannelMode(Channel* channel) {
+  std::string mode = channel->GetModeAsString();
+
+  if (mode) }
 
 // - ERR_BADCHANMASK (476)
 // :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask
