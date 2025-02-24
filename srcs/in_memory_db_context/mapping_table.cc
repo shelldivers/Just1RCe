@@ -41,7 +41,8 @@ void InMemoryDbContext::PartClientFromChannel(int const client_fd,
         client_to_channel_mapping_table_.upper_bound(client_fd);
     // find target iter to erase
     ClientToChannelMappingTableIter erase_target_itr =
-        std::find(left, right, std::make_pair(client_fd, channel_name));
+        std::find(left, right,
+                  std::pair<const int, std::string>(client_fd, channel_name));
     // if target iterator found, erase
     if (erase_target_itr != right)
       client_to_channel_mapping_table_.erase(erase_target_itr);
@@ -56,7 +57,8 @@ void InMemoryDbContext::PartClientFromChannel(int const client_fd,
         channel_to_client_mapping_table_.upper_bound(channel_name);
     // find target iterator to erase
     ChannelToClientMappingTableIter erase_target_itr =
-        std::find(left, right, std::make_pair(channel_name, client_fd));
+        std::find(left, right,
+                  std::pair<const std::string, int>(channel_name, client_fd));
     // if target iterator found, erase
     if (erase_target_itr != right)
       channel_to_client_mapping_table_.erase(erase_target_itr);

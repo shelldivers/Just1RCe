@@ -18,9 +18,7 @@ extern "C" {
 
 namespace Just1RCe {
 
-void Service::HandleServerEvent(int const epoll_fd,
-                                CommandMapping const &cmd_map,
-                                struct epoll_event const &cur_event) {
+void Service::HandleServerEvent(struct epoll_event const &cur_event) {
   // check sanity of server socket
   if (cur_event.events & (EPOLLHUP | EPOLLERR))
     throw std::runtime_error("server socket is broken");
@@ -46,7 +44,7 @@ void Service::RunCommand(int const epoll_fd, CommandMapping const &cmd_map,
       (*(cmd_map.find(command)->second))(cur_event.data.fd, msg);
 
   // set all messages
-  for (int i = 0; i < fd_to_write.size(); ++i)
+  for (size_t i = 0; i < fd_to_write.size(); ++i)
     SetWriteEvent(epoll_fd, fd_to_write[i]);
 }
 
@@ -73,7 +71,7 @@ void Service::HandleClientEvent(int const epoll_fd,
 
     // run commands
     if (messages.has_value()) {
-      for (int i = 0; i < (*messages).size(); ++i) {
+      for (size_t i = 0; i < (*messages).size(); ++i) {
         RunCommand(epoll_fd, cmd_map, cur_event, (*messages)[i]);
       }
     }

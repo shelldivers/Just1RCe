@@ -4,11 +4,10 @@
 #include <map>
 #include <string>
 
-class CommandHandler;
-
-typedef std::map<std::string, Just1RCe::CommandHandler *> CommandMapping;
-
 namespace Just1RCe {
+
+class CommandHandler;
+typedef std::map<std::string, CommandHandler *> CommandMapping;
 
 void RegistCommandHandlers(CommandMapping *cmd_map,
                            const std::string &password);

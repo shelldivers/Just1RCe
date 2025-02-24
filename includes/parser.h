@@ -27,23 +27,23 @@ class Parser {
 
   std::vector<std::string> GetTokenStream() const;
 
-  const int Parser::ParseCommandPass(std::string *password);
-  const int ParseCommandNick(std::string *nickname);
-  const int ParseCommandUser(std::string *username, std::string *realname);
-  const int ParseCommandPing(std::string *token);
-  const int ParseCommandQuit(std::string *reason);
-  const int ParseCommandJoin(std::vector<std::string> *channels,
-                         std::vector<std::string> *passwords);
-  const int ParseCommandPart(std::vector<std::string> *channels);
-  const int ParseCommandTopic(std::string *channel, std::string *topic);
-  const int ParseCommandNames(std::string *channel);
-  const int ParseCommandList(std::string *channel);
-  const int ParseCommandInvite(std::string *nickname, std::string *channel);
-  const int ParseCommandKick(std::string *channel, std::string *nick_name,
-                         std::string *comment);
-  const int ParseCommandMode(std::string *target, std::string *mode_string,
-                         std::string *mode_argument);
-  const int ParseCommandPrivmsg(std::string *target, std::string *text_to_send);
+  int ParseCommandPass(std::string *password);
+  int ParseCommandNick(std::string *nickname);
+  int ParseCommandUser(std::string *username, std::string *realname);
+  int ParseCommandPing(std::string *token);
+  int ParseCommandQuit(std::string *reason);
+  int ParseCommandJoin(std::vector<std::string> *channels,
+                       std::vector<std::string> *passwords);
+  int ParseCommandPart(std::vector<std::string> *channels);
+  int ParseCommandTopic(std::string *channel, std::string *topic);
+  int ParseCommandNames(std::string *channel);
+  int ParseCommandList(std::string *channel);
+  int ParseCommandInvite(std::string *nickname, std::string *channel);
+  int ParseCommandKick(std::string *channel, std::string *nick_name,
+                       std::string *comment);
+  int ParseCommandMode(std::string *target, std::string *mode_string,
+                       std::string *mode_argument);
+  int ParseCommandPrivmsg(std::string *target, std::string *text_to_send);
 };
 
 }  // namespace Just1RCe
