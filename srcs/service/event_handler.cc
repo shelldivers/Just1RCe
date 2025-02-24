@@ -57,7 +57,7 @@ void Service::RunCommand(int const epoll_fd, CommandMapping const &cmd_map,
       SetWriteEvent(epoll_fd, fd_to_write[i]);
   } else {
     // unknown(unimplemented) command
-    // TODO : reply ERROR_UNKNOWNCOMMAND(421)
+    // TODO(eldeshue) : reply ERROR_UNKNOWNCOMMAND(421)
   }
 }
 
