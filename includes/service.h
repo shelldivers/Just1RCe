@@ -10,7 +10,7 @@
 namespace Just1RCe {
 
 class CommandHandler;
-typedef std::map<std::string, CommandHandler *> CommandMapping;
+typedef std::map<std::string, Just1RCe::CommandHandler *> CommandMapping;
 
 class Service {
  private:
@@ -20,9 +20,7 @@ class Service {
   Service &operator=(Service const &);
 
   // event handler
-  static void HandleServerEvent(int const epoll_fd,
-                                CommandMapping const &cmd_map,
-                                struct epoll_event const &cur_event);
+  static void HandleServerEvent(struct epoll_event const &cur_event);
   static void HandleClientEvent(int const epoll_fd,
                                 CommandMapping const &cmd_map,
                                 struct epoll_event const &cur_event);

@@ -1,4 +1,4 @@
-#include "../../response_generator.h"
+#include "../../includes/response_generator.h"
 
 #include <string>
 #include <vector>
@@ -10,10 +10,10 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 
+namespace Just1RCe {
+
 static void GenerateNicknames(const std::vector<Client*>& client_list,
                               std::string* nicknames);
-
-namespace Just1RCe {
 
 /*----------------------ResponseArguments--------------------------*/
 
@@ -34,16 +34,16 @@ ResponseArguments::ResponseArguments(const int numeric, const Client& client,
                                      const Channel* channel,
                                      const std::vector<std::string>& params) {
   if (channel != NULL) {
-    channel_name = channel.name();
-    topic = channel.topic();
-    modestring = channel.GetModeAsString();
+    channel_name = channel->name();
+    topic = channel->topic();
+    modestring = channel->GetModeAsString();
   }
   client_name = client.nick_name();
   command_name = params[0];
 
   if (numeric == RPL_NAMREPLY && channel != NULL) {
     GenerateNicknames(
-        ContextHolder().GetInstance()->db()->GetClientsByChannelName(
+        ContextHolder::GetInstance()->db()->GetClientsByChannelName(
             channel->name()),
         &nicknames);
   } else {
@@ -151,7 +151,7 @@ std::string ResponseGenerator::GenerateResponse(
           response += reg_args.modestring;
           break;
         case 'v':
-          response += JUST1RCE_VERSION;
+          response += JUST1RCE_PROJECT_VERSION;
           break;
         case 's':
           response += JUST1RCE_SERVER_NAME;
@@ -165,8 +165,6 @@ std::string ResponseGenerator::GenerateResponse(
   return response;
 }
 
-}  // namespace Just1RCe
-
 static void GenerateNicknames(const std::vector<Client*>& client_list,
                               std::string* nicknames) {
   *nicknames = "";
@@ -178,3 +176,4 @@ static void GenerateNicknames(const std::vector<Client*>& client_list,
     *nicknames += client_list[i]->nick_name();
   }
 }
+}  // namespace Just1RCe

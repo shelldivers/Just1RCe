@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 
-class Client;
-class Channel;
-
 #define JUST1RCE_MAX_NUMERIC 1000
 
 namespace Just1RCe {
+
+class Client;
+class Channel;
 
 struct ResponseArguments {
   std::string client_name;          // %c, 클라이언트 이름

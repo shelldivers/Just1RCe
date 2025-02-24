@@ -6,16 +6,16 @@
 
 #include "../command_handler.h"
 
-class Client;
-
 namespace Just1RCe {
+
+class Client;
 
 class UserCommandHandler : public CommandHandler {
  private:
   UserCommandHandler(const UserCommandHandler &);
   UserCommandHandler &operator=(const UserCommandHandler &);
-  const int CheckUser(const Client &client, std::string username,
-                      std::string realname);
+  int CheckUser(const Client &client, std::string username,
+                std::string realname);
 
  public:
   UserCommandHandler();

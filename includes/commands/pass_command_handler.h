@@ -6,9 +6,9 @@
 
 #include "../command_handler.h"
 
-class Client;
-
 namespace Just1RCe {
+
+class Client;
 
 class PassCommandHandler : public CommandHandler {
  private:
@@ -16,7 +16,7 @@ class PassCommandHandler : public CommandHandler {
 
   PassCommandHandler(const PassCommandHandler &);
   PassCommandHandler &operator=(const PassCommandHandler &);
-  const int CheckPass(const Client &client, std::string password);
+  int CheckPass(const Client &client, std::string password);
 
  public:
   explicit PassCommandHandler(const std::string &password);

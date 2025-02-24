@@ -40,7 +40,7 @@ void Service::RunIrcServer(std::string const &port_number,
     // handling events
     for (int i = 0; i < recv_event_cnt; ++i) {
       if (event_buffer[i].data.fd == server.socket_fd()) {
-        HandleServerEvent(epoll_fd, cmd_map, event_buffer[i]);
+        HandleServerEvent(event_buffer[i]);
       } else {
         HandleClientEvent(epoll_fd, cmd_map, event_buffer[i]);
       }
