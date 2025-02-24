@@ -201,18 +201,4 @@ int CheckChannel(const Client &client, Channel *channel,
   return IRC_NOERROR;
 }
 
-// - ERR_BADCHANMASK (476)
-// :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask
-
-// - ERR_CHANNELISFULL (471)
-// :{SERVER_NAME} 471 nick_ken3 #limited_channel :Cannot join channel (+l)
-
-// - ERR_BADCHANNELKEY (475)
-// :{SERVER_NAME} 475 nick_ken3 #pass_channel :Cannot join channel (+k)
-
-// - ERR_INVITEONLYCHAN (473)
-// :{SERVER_NAME} 473 nick_ken3 #invite_only :Cannot join channel (+i)
-
-// 이미 채널에 참가 중인지지
-
 }  // namespace Just1RCe
