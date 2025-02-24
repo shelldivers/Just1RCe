@@ -20,7 +20,8 @@ class Service {
   Service &operator=(Service const &);
 
   // event handler
-  static void HandleServerEvent(struct epoll_event const &cur_event);
+  static void HandleServerEvent(int const epoll_fd,
+                                struct epoll_event const &cur_event);
   static void HandleClientEvent(int const epoll_fd,
                                 CommandMapping const &cmd_map,
                                 struct epoll_event const &cur_event);
