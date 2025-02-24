@@ -21,7 +21,8 @@ Channel::Channel(std::string const &name, std::string const &key)
       topic_(""),
       key_(key),
       mod_(JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT),
-      max_user_num_(std::numeric_limits<size_t>::max()) {
+      max_user_num_(std::numeric_limits<size_t>::max()),
+      cur_user_count_(0) {
   // wrong channel name format error
   if (!is_channel_global() && !is_channel_local())
     throw std::runtime_error(JUST1RCE_SRCS_CHANNEL_WRONG_NAME_ERROR);
@@ -59,4 +60,10 @@ inline bool Channel::is_channel_global() const {
 inline bool Channel::is_channel_local() const {
   return (this->name_[0] == '&');
 }
+
+size_t Channel::cur_user_count() const { return cur_user_count_; }
+
+void Channel::IncreaseUserCount() { ++cur_user_count_; }
+void Channel::DecreaseUserCount() { --cur_user_count_; }
+
 }  // namespace Just1RCe
