@@ -20,8 +20,9 @@ void JoinChannelWithResponse(Client *client, Channel *channel,
 void PartFromAllChannelsWithResponse(
     Client *client, const std::vector<std::string> &channel_names,
     std::vector<int> *fd_list);
-int CheckChannel(const Client &client, Channel *channel,
-                 const std::string &key);
+int CheckChannelMode(const Client &client, Channel *channel,
+                     const std::string &key);
+int CheckChannelName(const Channel &channel);
 void AnnounceJoined(Client *client, const Channel &channel,
                     std::vector<int> *fd_list);
 
@@ -88,7 +89,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     if (index < keys.size()) {
       key = keys[index];
     }
-    int numeric = CheckChannel(*client, channel, key);
+    int numeric = CheckChannelMode(*client, channel, key);
     if (numeric != IRC_NOERROR) {
       ResponseGenerator &generator = ResponseGenerator::GetInstance();
       std::string response = generator.GenerateResponse(
@@ -169,19 +170,8 @@ void PartFromAllChannelsWithResponse(
   }
 }
 
-int CheckChannel(const Client &client, Channel *channel,
-                 const std::string &key) {
-  // Channel name valid
-  std::string channel_name = channel->name();
-  if (channel_name[0] != '@' && channel_name[0] != '&') {
-    return ERR_BADCHANMASK;
-  }
-  for (size_t index = 1; index < channel_name.size(); ++index) {
-    if (channel_name[index] == ' ' || channel_name[index] == '\a' ||
-        channel_name[index] == ',') {
-      return ERR_BADCHANMASK;
-    }
-  }
+int CheckChannelMode(const Client &client, Channel *channel,
+                     const std::string &key) {
   // Invite only
   if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY &&
                          channel->IsInvited(client.GetHostName()) == false)) {
@@ -196,6 +186,21 @@ int CheckChannel(const Client &client, Channel *channel,
   if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_USER_LIMIT) &&
       channel->cur_user_count() >= channel->max_user_num()) {
     return ERR_CHANNELISFULL;
+  }
+
+  return IRC_NOERROR;
+}
+
+int CheckChannelName(const Channel &channel) {
+  std::string channel_name = channel.name();
+  if (channel_name[0] != '@' && channel_name[0] != '&') {
+    return ERR_BADCHANMASK;
+  }
+  for (size_t index = 1; index < channel_name.size(); ++index) {
+    if (channel_name[index] == ' ' || channel_name[index] == '\a' ||
+        channel_name[index] == ',') {
+      return ERR_BADCHANMASK;
+    }
   }
 
   return IRC_NOERROR;
