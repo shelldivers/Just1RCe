@@ -23,7 +23,7 @@ void PartFromAllChannelsWithResponse(
 int CheckChannelMode(const Client &client, Channel *channel,
                      const std::string &key);
 int CheckChannelName(const Channel &channel);
-void AnnounceJoined(Client *client, const Channel &channel,
+void BroadcastJoined(Client *client, const Channel &channel,
                     std::vector<int> *fd_list);
 
 JoinCommandHandler::JoinCommandHandler() {}
@@ -102,14 +102,14 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     }
 
     // Announce JOIN
-    AnnounceJoined(client, *channel, &fd_list);
+    BroadcastJoined(client, *channel, &fd_list);
     JoinChannelWithResponse(client, channel, parser.GetTokenStream(), &fd_list);
   }
 
   return fd_list;
 }
 
-void AnnounceJoined(Client *client, const Channel &channel,
+void BroadcastJoined(Client *client, const Channel &channel,
                     std::vector<int> *fd_list) {
   DbContext *db = ContextHolder::GetInstance()->db();
 
