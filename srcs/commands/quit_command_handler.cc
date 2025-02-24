@@ -38,12 +38,15 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
   std::string token;
   parser.ParseCommandQuit(&token);
 
-  // send QUIT message to all clients in the channels
   std::vector<int> fd_list;
   std::vector<Channel *> channels =
       ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client_fd);
   for (int channel_index = 0; channel_index < channels.size();
        ++channel_index) {
+    // Part from channel
+    ContextHolder::GetInstance()->db()->PartClientFromChannel(client_fd, channels[channel_index]->name());
+
+    // Send QUIT message to all clients in the channel
     std::string response = ":" + client->GetNickname() + " QUIT :" + token;
     std::vector<Client *> clients =
         ContextHolder::GetInstance()->db()->GetClientsByChannelName(
@@ -51,9 +54,6 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
 
     for (int client_index = 0; client_index < channel_fd_list.size();
          ++client_index) {
-      if (clients[client_index]->GetFd() == client_fd) {
-        continue;
-      }
       clients[client_index]->SetSendMessage(response);
       fd_list.push_back(channel_fd);
     }
