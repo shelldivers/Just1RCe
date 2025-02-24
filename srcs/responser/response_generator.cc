@@ -65,15 +65,14 @@ ResponseGenerator::~ResponseGenerator() {}
 
 void ResponseGenerator::InitializeTemplates() {
   response_templates_[RPL_WELCOME] =
-      ":%s 001 %c :Welcome to the SHELLDIVERS Network, %c";
-  response_templates_[RPL_YOURHOST] =
-      ":%s 002 %c :Your host is %s, running version %v";
+      ":%s 001 %c :Welcome to the SHELLDIVERS Network, %c\r\n:%s 002 %c :Your "
+      "host is %s, running version %v";
   response_templates_[RPL_CHANNELMODEIS] = ":%s 324 %c %h %m";
   response_templates_[RPL_NOTOPIC] = ":%s 331 %c %h :No topic is set";
   response_templates_[RPL_TOPIC] = ":%s 332 %c %h :%t";
   response_templates_[RPL_INVITING] = ":%s 341 %c %n %h";
-  response_templates_[RPL_NAMREPLY] = ":%s 353 %c = %h :%n";
-  response_templates_[RPL_ENDOFNAMES] = ":%s 366 %c %h :End of /NAMES list";
+  response_templates_[RPL_NAMREPLY] =
+      ":%s 353 %c = %h :%n\r\n:%s 366 %c %h :End of /NAMES list";
   response_templates_[ERR_NOSUCHNICK] =
       ":%s 401 %c <nickname> :No such nick/channel";
   response_templates_[ERR_NOSUCHCHANNEL] = ":%s 403 %c %h :No such channel";
