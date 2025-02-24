@@ -1,11 +1,11 @@
 #ifndef JUST1RCE_COMMANDS_PING_COMMAND_HANDLER_H_
 #define JUST1RCE_COMMANDS_PING_COMMAND_HANDLER_H_
 
-#include <string.h>
-
+#include <string>
 #include <vector>
 
 #include "../command_handler.h"
+
 
 namespace Just1RCe {
 

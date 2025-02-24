@@ -1,7 +1,6 @@
 #include "../../includes/commands/ping_command_handler.h"
 
-#include <string.h>
-
+#include <string>
 #include <vector>
 
 #include "../../includes/client.h"
@@ -11,6 +10,7 @@
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
 #include "../../includes/response_generator.h"
+
 
 namespace Just1RCe {
 
