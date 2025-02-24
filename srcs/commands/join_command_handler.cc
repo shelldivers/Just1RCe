@@ -24,7 +24,7 @@ int CheckChannelMode(const Client &client, Channel *channel,
                      const std::string &key);
 int CheckChannelName(const Channel &channel);
 void BroadcastJoined(Client *client, const Channel &channel,
-                    std::vector<int> *fd_list);
+                     std::vector<int> *fd_list);
 
 JoinCommandHandler::JoinCommandHandler() {}
 
@@ -41,7 +41,6 @@ JoinCommandHandler::~JoinCommandHandler() {}
  * @details
  * Get 8 types of Numeric Reply
  * - RPL_TOPIC (332)
- * - RPL_NOTOPIC (331)
  * - RPL_NAMREPLY (353)
  * - RPL_ENDOFNAMES (366)
  * - ERR_BADCHANMASK (476)
@@ -65,6 +64,18 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   Parser parser(message);
   parser.ParseCommandJoin(&channel_names, &keys);
 
+  // No channel recieved
+  if (channel_names.size() == 0) {
+    ResponseGenerator &generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        ERR_NEEDMOREPARAMS, ResponseArguments(ERR_NEEDMOREPARAMS, *client, NULL,
+                                              parser.GetTokenStream()));
+
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  }
+
+  // Is alt parameter
   if (channel_names.size() == 1 && channel_names[0] == "0") {
     std::vector<int> fd_list;
     PartFromAllChannelsWithResponse(client, channel_names, &fd_list);
@@ -76,7 +87,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   for (size_t index = 0; index < channel_names.size(); ++index) {
     Channel *channel = db->GetChannel(channel_names[index]);
 
-    // 채널이 없으면 채널을 새로 생성하고 JOIN
+    // If channel not exist, create channel
     if (channel == NULL) {
       channel = new Channel(channel_names[index]);
       db->AddChannel(channel);
@@ -110,7 +121,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 }
 
 void BroadcastJoined(Client *client, const Channel &channel,
-                    std::vector<int> *fd_list) {
+                     std::vector<int> *fd_list) {
   DbContext *db = ContextHolder::GetInstance()->db();
 
   std::vector<Client *> client_list =
