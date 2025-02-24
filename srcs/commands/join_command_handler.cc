@@ -14,6 +14,17 @@
 
 namespace Just1RCe {
 
+void JoinChannelWithResponse(Client *client, Channel *channel,
+                             const std::vector<std::string> &token_stream,
+                             std::vector<int> *fd_list);
+void PartFromAllChannelsWithResponse(
+    Client *client, const std::vector<std::string> &channel_names,
+    std::vector<int> *fd_list);
+int CheckChannelMode(const Client &client, Channel *channel,
+                     const std::string &key);
+void AnnounceJoined(Client *client, const Channel &channel,
+                    std::vector<int> *fd_list);
+
 JoinCommandHandler::JoinCommandHandler() {}
 
 JoinCommandHandler::~JoinCommandHandler() {}
@@ -39,11 +50,11 @@ JoinCommandHandler::~JoinCommandHandler() {}
  * - ERR_NEEDMOREPARAMS (461)
  */
 std::vector<int> JoinCommandHandler::operator()(const int client_fd,
-                                                const std::string& message) {
-  DbContext* db = ContextHolder::GetInstance()->db();
-  Client* client = db->GetClient(client_fd);
+                                                const std::string &message) {
+  DbContext *db = ContextHolder::GetInstance()->db();
+  Client *client = db->GetClient(client_fd);
 
-  if (client == nullptr || client->IsAuthenticated() == false) {
+  if (client == NULL || client->IsAuthenticated() == false) {
     return std::vector<int>();
   }
 
@@ -53,106 +64,131 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   Parser parser(message);
   parser.ParseCommandJoin(&channel_names, &keys);
 
-  // 채널을 순회하면서 해당 채널에 참가할 수 있는지 확인
-  // 채널 모드 확인
-  // 채널이 가득 찼는지 확인
-  // 채널이 없으면 생성
-  // 분리를 어떻게할까
-  // 채널을 순회하면서 채널을 확인
-  // 채널이 존재하면 JOIN 여부 확인
-  // 채널이 존재하지 않으면 채널 생성
-
-  // Join channels
-  for (size_t index = 0; index < channel_names.size(); ++index) {
+  if (channel_names.size() == 1 && channel_names[0] == "0") {
     std::vector<int> fd_list;
+    PartFromAllChannelsWithResponse(client, channel_names, &fd_list);
+
+    return fd_list;
+  }
+
+  std::vector<int> fd_list;
+  for (size_t index = 0; index < channel_names.size(); ++index) {
+    Channel *channel = db->GetChannel(channel_names[index]);
+
     // 채널이 없으면 채널을 새로 생성하고 JOIN
-    Channel* channel = db->GetChannel(channel_names[index]);
     if (channel == NULL) {
       channel = new Channel(channel_names[index]);
+      db->AddChannel(channel);
       JoinChannelWithResponse(client, channel, parser.GetTokenStream(),
                               &fd_list);
       continue;
     }
 
-    // Check channel full
-    if (checkChannelFull(*channel, clients.size()) == ERR_CHANNELISFULL) {
-      client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 471 " +
-                             client->nick_name() + " JOIN :" + channel_name +
-                             " :Cannot join channel (+l)");
+    std::string key = "";
+    if (index < keys.size()) {
+      key = keys[index];
+    }
+    int numeric = CheckChannelMode(*client, channel, key);
+    if (numeric != IRC_NOERROR) {
+      ResponseGenerator &generator = ResponseGenerator::GetInstance();
+      std::string response = generator.GenerateResponse(
+          numeric, ResponseArguments(numeric, *client, channel,
+                                     parser.GetTokenStream()));
+
+      client->SetSendMessage(response);
       fd_list.push_back(client_fd);
-
-      return fd_list;
-    }
-    // Check channel key
-    if (checkChannelKey(*channel, key) == ERR_BADCHANNELKEY) {
-      client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 475 " +
-                             client->nick_name() + " JOIN :" + channel_name +
-                             " :Cannot join channel (+k)");
-      fd_list.push_back(client_fd);
-
-      return fd_list;
-    }
-    // Check invite only
-    if (checkInviteOnly(*channel, client_fd) == ERR_INVITEONLYCHAN) {
-      client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 473 " +
-                             client->nick_name() + " JOIN :" + channel_name +
-                             " :Cannot join channel (+i)");
-      fd_list.push_back(client_fd);
-
-      return fd_list;
-    }
-    // Get channel client nicknames for RPL_NAMREPLY
-    // and set send join messages to all clients in the channel
-    std::string channel_client_nicknames = "";
-    for (size_t client_index = 0; client_index < clients.size();
-         ++client_index) {
-      if (client_index > 0) {
-        channel_client_nicknames += " ";
-      }
-      channel_client_nicknames += clients[client_index]->nick_name();
-      clients[client_index]->SetSendMessage(response);
-      fd_list.push_back(clients[client_index]->GetFd());
+      continue;
     }
 
-    // Join the client to the channel
-    db->JoinClientToChannel(client_fd, channel_name);
-
-    // Set send replies to joined client
-    client->SetSendMessage(response);
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " MODE " +
-                           channel_name + " " + channel->GetModeAsString());
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 353 " +
-                           client->nick_name() + "= " + channel_name + " :" +
-                           channel_client_nicknames);
-    client->SetSendMessage(":" + JUST1RCE_SERVER_NAME + " 366 " +
-                           client->nick_name() + " " + channel_name +
-                           " :End of /NAMES list.");
-    fd_list.push_back(client_fd);
+    // Announce JOIN
+    AnnounceJoined(client, *channel, &fd_list);
+    JoinChannelWithResponse(client, channel, parser.GetTokenStream(), &fd_list);
   }
 
   return fd_list;
 }
 
-void JoinCommandHandler::JoinChannelWithSetResponse(
-    Client* client, Channel* channel, std::vector<std::string>& token_stream,
-    std::vector<int>* fd_list) {
-  DbContext* db = ContextHolder::GetInstance()->db();
+void AnnounceJoined(Client *client, const Channel &channel,
+                    std::vector<int> *fd_list) {
+  DbContext *db = ContextHolder::GetInstance()->db();
+  
+  std::vector<Client *> client_list =
+  db->GetClientsByChannelName(channel.name());
+  std::string response = client->nick_name() + " JOIN :" + channel.name();
+  for (size_t index = 0; index < client_list.size(); ++index) {
+    client_list[index]->SetSendMessage(response);
+    fd_list->push_back(client_list[index]->GetFd());
+  }
+}
 
-  db->AddChannel(channel);
+void JoinChannelWithResponse(Client *client, Channel *channel,
+                             const std::vector<std::string> &token_stream,
+                             std::vector<int> *fd_list) {
+  DbContext *db = ContextHolder::GetInstance()->db();
+
   db->JoinClientToChannel(client->GetFd(), channel->name());
 
-  ResponseGenerator& generator = ResponseGenerator::GetInstance();
-  std::string response = generator.GenerateResponse(
+  ResponseGenerator &generator = ResponseGenerator::GetInstance();
+  std::string response;
+  // Topic message
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY)) {
+    response = generator.GenerateResponse(
+        RPL_TOPIC,
+        ResponseArguments(RPL_TOPIC, *client, channel, token_stream));
+    client->SetSendMessage(response);
+    fd_list->push_back(client->GetFd());
+  }
+  // NameReply
+  response = generator.GenerateResponse(
       RPL_NAMREPLY,
       ResponseArguments(RPL_NAMREPLY, *client, channel, token_stream));
   client->SetSendMessage(response);
   fd_list->push_back(client->GetFd());
 }
 
-int JoinCommandHandler::CheckChannelMode(Channel* channel) {
-  std::string mode = channel->GetModeAsString();
+void PartFromAllChannelsWithResponse(
+    Client *client, const std::vector<std::string> &channel_names,
+    std::vector<int> *fd_list) {
+  DbContext *db = ContextHolder::GetInstance()->db();
 
-  if (mode) }
+  // Loop channel list
+  for (size_t index = 0; index < channel_names.size(); ++index) {
+    std::vector<Client *> client_list =
+        db->GetClientsByChannelName(channel_names[index]);
+    std::string response = client->nick_name() + " PART";
+
+    // Part channel
+    db->PartClientFromChannel(client->GetFd(), channel_names[index]);
+
+    // Send message
+    for (size_t client_index = 0; client_index < client_list.size();
+         ++client_index) {
+      client_list[client_index]->SetSendMessage(response);
+      fd_list->push_back(client_list[client_index]->GetFd());
+    }
+  }
+}
+
+int CheckChannelMode(const Client &client, Channel *channel,
+                     const std::string &key) {
+  // Invite only
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY &&
+                         channel->IsInvited(client.GetHostName()) == false)) {
+    return ERR_INVITEONLYCHAN;
+  }
+  // Private channel
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_KEY_SET) &&
+      channel->key() != key) {
+    return ERR_BADCHANNELKEY;
+  }
+  // Maximun client number
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_USER_LIMIT) &&
+      channel->cur_user_count() >= channel->max_user_num()) {
+    return ERR_CHANNELISFULL;
+  }
+
+  return IRC_NOERROR;
+}
 
 // - ERR_BADCHANMASK (476)
 // :{SERVER_NAME} 476 nick_kenn3 !#$%! :Bad Channel Mask
