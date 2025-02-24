@@ -75,7 +75,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
     return std::vector<int>(1, client_fd);
   } else {
     std::vector<int> fd_list;
-    AnnounceNickChanged(old_nickname, new_nickname, &fd_list);
+    AnnounceNickChanged(client, old_nickname, new_nickname, &fd_list);
 
     return fd_list;
   }
@@ -83,11 +83,12 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   return std::vector<int>();
 }
 
-void NickCommandHandler::AnnounceNickChanged(const std::string& old_nickname,
+void NickCommandHandler::AnnounceNickChanged(Client* client,
+                                             const std::string& old_nickname,
                                              const std::string& new_nickname,
                                              std::vector<int>* fd_list) {
   std::vector<Channel*> channels =
-      ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client_fd);
+      ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client->GetFd());
   const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
 
   for (size_t channel_index = 0; channel_index < channels.size();
@@ -107,7 +108,7 @@ void NickCommandHandler::AnnounceNickChanged(const std::string& old_nickname,
     }
   }
   client->SetSendMessage(nickname_changed);
-  fd_list->push_back(client_fd);
+  fd_list->push_back(client->GetFd());
 }
 
 /**
