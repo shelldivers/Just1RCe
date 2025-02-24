@@ -20,8 +20,8 @@ void JoinChannelWithResponse(Client *client, Channel *channel,
 void PartFromAllChannelsWithResponse(
     Client *client, const std::vector<std::string> &channel_names,
     std::vector<int> *fd_list);
-int CheckChannelMode(const Client &client, Channel *channel,
-                     const std::string &key);
+int CheckChannel(const Client &client, Channel *channel,
+                 const std::string &key);
 void AnnounceJoined(Client *client, const Channel &channel,
                     std::vector<int> *fd_list);
 
@@ -88,7 +88,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     if (index < keys.size()) {
       key = keys[index];
     }
-    int numeric = CheckChannelMode(*client, channel, key);
+    int numeric = CheckChannel(*client, channel, key);
     if (numeric != IRC_NOERROR) {
       ResponseGenerator &generator = ResponseGenerator::GetInstance();
       std::string response = generator.GenerateResponse(
@@ -111,9 +111,9 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
 void AnnounceJoined(Client *client, const Channel &channel,
                     std::vector<int> *fd_list) {
   DbContext *db = ContextHolder::GetInstance()->db();
-  
+
   std::vector<Client *> client_list =
-  db->GetClientsByChannelName(channel.name());
+      db->GetClientsByChannelName(channel.name());
   std::string response = client->nick_name() + " JOIN :" + channel.name();
   for (size_t index = 0; index < client_list.size(); ++index) {
     client_list[index]->SetSendMessage(response);
@@ -169,8 +169,19 @@ void PartFromAllChannelsWithResponse(
   }
 }
 
-int CheckChannelMode(const Client &client, Channel *channel,
-                     const std::string &key) {
+int CheckChannel(const Client &client, Channel *channel,
+                 const std::string &key) {
+  // Channel name valid
+  std::string channel_name = channel->name();
+  if (channel_name[0] != '@' && channel_name[0] != '&') {
+    return ERR_BADCHANMASK;
+  }
+  for (size_t index = 1; index < channel_name.size(); ++index) {
+    if (channel_name[index] == ' ' || channel_name[index] == '\a' ||
+        channel_name[index] == ',') {
+      return ERR_BADCHANMASK;
+    }
+  }
   // Invite only
   if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY &&
                          channel->IsInvited(client.GetHostName()) == false)) {
