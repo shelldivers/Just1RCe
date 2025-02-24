@@ -1,7 +1,6 @@
 #include "../../includes/commands/quit_command_handler.h"
 
-#include <string.h>
-
+#include <string>
 #include <vector>
 
 #include "../../includes/channel.h"
@@ -11,6 +10,7 @@
 #include "../../includes/dbcontext.h"
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
+
 
 namespace Just1RCe {
 
@@ -44,7 +44,8 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
   for (int channel_index = 0; channel_index < channels.size();
        ++channel_index) {
     // Part from channel
-    ContextHolder::GetInstance()->db()->PartClientFromChannel(client_fd, channels[channel_index]->name());
+    ContextHolder::GetInstance()->db()->PartClientFromChannel(
+        client_fd, channels[channel_index]->name());
 
     // Send QUIT message to all clients in the channel
     std::string response = ":" + client->GetNickname() + " QUIT :" + token;
