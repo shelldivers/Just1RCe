@@ -16,7 +16,8 @@ class NickCommandHandler : public Just1RCe::CommandHandler {
   NickCommandHandler(const NickCommandHandler& rhs);
   NickCommandHandler& operator=(const NickCommandHandler& rhs);
   int CheckNick(const std::string& new_nickname);
-  void AnnounceNickChanged(const std::string& old_nickname,
+  void AnnounceNickChanged(Client* client,
+                           const std::string& old_nickname,
                            const std::string& new_nickname,
                            std::vector<int>* fd_list);
 

@@ -44,7 +44,7 @@ std::vector<int> PingCommandHandler::operator()(const int client_fd,
   std::string token;
   parser.ParseCommandPing(&token);
 
-  int numeric = CheckPing(*client, token);
+  int numeric = CheckPing(token);
   if (numeric != IRC_NOERROR) {
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
