@@ -61,6 +61,17 @@ std::vector<int> UserCommandHandler::operator()(const int client_fd,
   client->set_user_name(username);
   client->set_real_name(realname);
 
+  // If the client is authenticated, send welcome message
+  if (client->IsAuthenticated() == true) {
+    ResponseGenerator& generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        RPL_WELCOME,
+        ResponseArguments(RPL_WELCOME, *client, NULL, parser.GetTokenStream()));
+
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  }
+
   return std::vector<int>();
 }
 

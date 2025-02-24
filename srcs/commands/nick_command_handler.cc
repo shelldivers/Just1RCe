@@ -61,36 +61,54 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
   client->set_nick_name(new_nickname);
 
-  // announce nickname changed
-  if (old_nickname.empty() == false) {
+  // Send response
+  // 1. If the client is not authenticated, send welcome message
+  // 2. If the client is in channels, send NICK message to all clients in the
+  // channels
+  if (old_nickname.empty() == true || client->IsAuthenticated() == true) {
+    ResponseGenerator& generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        RPL_WELCOME,
+        ResponseArguments(RPL_WELCOME, *client, NULL, parser.GetTokenStream()));
+
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  } else {
     std::vector<int> fd_list;
-    std::vector<Channel*> channels =
-        ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client_fd);
-    const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
-
-    for (size_t channel_index = 0; channel_index < channels.size();
-         channel_index++) {
-      std::vector<Client*> clients =
-          ContextHolder::GetInstance()->db()->GetClientsByChannelName(
-              channels[channel_index]->name());
-
-      for (size_t client_index = 0; client_index < clients.size();
-           client_index++) {
-        if (clients[client_index] == client) {
-          continue;
-        }
-
-        clients[client_index]->SetSendMessage(nickname_changed);
-        fd_list.push_back(clients[client_index]->GetFd());
-      }
-    }
-    client->SetSendMessage(nickname_changed);
-    fd_list.push_back(client_fd);
+    AnnounceNickChanged(client, old_nickname, new_nickname, &fd_list);
 
     return fd_list;
   }
 
   return std::vector<int>();
+}
+
+void NickCommandHandler::AnnounceNickChanged(Client* client,
+                                             const std::string& old_nickname,
+                                             const std::string& new_nickname,
+                                             std::vector<int>* fd_list) {
+  std::vector<Channel*> channels =
+      ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client->GetFd());
+  const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
+
+  for (size_t channel_index = 0; channel_index < channels.size();
+       channel_index++) {
+    std::vector<Client*> clients =
+        ContextHolder::GetInstance()->db()->GetClientsByChannelName(
+            channels[channel_index]->name());
+
+    for (size_t client_index = 0; client_index < clients.size();
+         client_index++) {
+      if (clients[client_index] == client) {
+        continue;
+      }
+
+      clients[client_index]->SetSendMessage(nickname_changed);
+      fd_list->push_back(clients[client_index]->GetFd());
+    }
+  }
+  client->SetSendMessage(nickname_changed);
+  fd_list->push_back(client->GetFd());
 }
 
 /**

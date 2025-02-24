@@ -46,6 +46,7 @@ class Channel {
 
   // user info
   size_t max_user_num_;
+  size_t cur_user_count_;
 
   // channel type information
   inline bool is_channel_global() const;
@@ -68,12 +69,16 @@ class Channel {
   std::string key() const;
 
   size_t max_user_num() const;
+  size_t cur_user_count() const;
 
   // setter
   // auth check needed
   void set_topic(std::string const &new_topic);
   void set_key(std::string const &new_key);
   size_t set_max_user_num(size_t const new_max_user_num);
+
+  void IncreaseUserCount();
+  void DecreaseUserCount();
 
   // mod handler, authority check needed
   ChannelModeMask GetMode() const;

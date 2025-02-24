@@ -11,9 +11,16 @@ namespace Just1RCe {
 /**
  *
  * @brief add entry in both mapping table and mode table
+ * @return if the user count is full, return fail
  */
 bool InMemoryDbContext::JoinClientToChannel(int const client_fd,
                                             std::string const &channel_name) {
+  // user number check join availability
+  Channel *target_channel = GetChannel(channel_name);
+  if (target_channel->cur_user_count() == target_channel->max_user_num()) {
+    return false;
+  }
+
   // add entry in the mapping table
   client_to_channel_mapping_table_.insert(
       std::make_pair(client_fd, channel_name));
@@ -22,6 +29,9 @@ bool InMemoryDbContext::JoinClientToChannel(int const client_fd,
 
   ModeKey key = std::make_pair(client_fd, channel_name);
   mode_table_.insert(std::make_pair(key, 0));
+
+  // get channel and increase count
+  target_channel->IncreaseUserCount();
 
   return true;
 }
@@ -66,6 +76,15 @@ void InMemoryDbContext::PartClientFromChannel(int const client_fd,
 
   // erase client mode
   DeleteClientMode(client_fd, channel_name);
+
+  // user count
+  Channel *target_channel = GetChannel(channel_name);
+  target_channel->DecreaseUserCount();
+
+  // if client count == 0, delete channel
+  if (target_channel->cur_user_count() == 0) {
+    DelChannel(channel_name);
+  }
 }
 
 std::vector<Channel *> InMemoryDbContext::GetChannelsByClientFd(
