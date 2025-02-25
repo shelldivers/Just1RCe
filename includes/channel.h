@@ -43,6 +43,7 @@ class Channel {
   std::string topic_;
   std::string key_;
   ChannelModeMask mod_;
+  int operator_fd_;
 
   // user info
   size_t max_user_num_;
@@ -79,6 +80,10 @@ class Channel {
 
   void IncreaseUserCount();
   void DecreaseUserCount();
+
+  // operator
+  int GetOperatorFd() const;
+  void operator_fd(int const new_operator_fd);
 
   // mod handler, authority check needed
   ChannelModeMask GetMode() const;
