@@ -21,6 +21,7 @@ Channel::Channel(std::string const &name, std::string const &key)
       topic_(""),
       key_(key),
       mod_(JUST1RCE_SRCS_CHANNEL_MOD_DEFAULT),
+      operator_fd_(-1),
       max_user_num_(std::numeric_limits<size_t>::max()),
       cur_user_count_(0) {
   // wrong channel name format error
@@ -65,5 +66,10 @@ size_t Channel::cur_user_count() const { return cur_user_count_; }
 
 void Channel::IncreaseUserCount() { ++cur_user_count_; }
 void Channel::DecreaseUserCount() { --cur_user_count_; }
+
+int Channel::GetOperatorFd() const { return operator_fd_; }
+void Channel::operator_fd(int const new_operator_fd) {
+  operator_fd_ = new_operator_fd;
+}
 
 }  // namespace Just1RCe
