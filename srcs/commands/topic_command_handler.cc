@@ -15,8 +15,8 @@
 
 namespace Just1RCe {
 
-int CheckNumericError(const Client& client, const Channel* channel);
-void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list);
+static int CheckNumericError(const Client& client, const Channel* channel);
+static void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list);
 
 TopicCommandHandler::TopicCommandHandler() {}
 
@@ -88,7 +88,7 @@ std::vector<int> TopicCommandHandler::operator()(const int client_fd,
   return std::vector<int>();
 }
 
-int CheckNumericError(const Client& client, const Channel* channel) {
+static int CheckNumericError(const Client& client, const Channel* channel) {
   DbContext* db = ContextHolder::GetInstance()->db();
 
   // ERR_NOSUCHCHANNEL (403): No such channel
@@ -110,9 +110,7 @@ int CheckNumericError(const Client& client, const Channel* channel) {
   return IRC_NOERROR;
 }
 
-
-
-void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list) {
+static void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list) {
   DbContext* db = ContextHolder::GetInstance()->db();
   std::string response = "TOPIC " + channel->name() + " :" + channel->topic();
 
