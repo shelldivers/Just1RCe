@@ -11,8 +11,10 @@
 #include "../../includes/numeric.h"
 #include "../../includes/parser.h"
 
-
 namespace Just1RCe {
+
+void BroadcastQuit(Client *client, Channel *channel, const std::string &token,
+                   std::vector<int> *fd_list);
 
 QuitCommandHandler::QuitCommandHandler() {}
 
@@ -28,41 +30,50 @@ QuitCommandHandler::~QuitCommandHandler() {}
  */
 std::vector<int> QuitCommandHandler::operator()(const int client_fd,
                                                 const std::string &message) {
-  Client *client = ContextHolder::GetInstance()->db()->GetClient(client_fd);
+  DbContext *db = ContextHolder::GetInstance()->db();
+  Client *client = db->GetClient(client_fd);
 
-  if (client == nullptr || client->IsAuthenticated() == false) {
+  if (client == NULL || client->IsAuthenticated() == false) {
     return std::vector<int>();
   }
 
   // Get token
   std::string token;
+  Parser parser(message);
   parser.ParseCommandQuit(&token);
 
   std::vector<int> fd_list;
   std::vector<Channel *> channels =
       ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client_fd);
-  for (int channel_index = 0; channel_index < channels.size();
+  for (size_t channel_index = 0; channel_index < channels.size();
        ++channel_index) {
+    // Send QUIT message to all clients in the channel
+    BroadcastQuit(client, channels[channel_index], token, &fd_list);
+
     // Part from channel
     ContextHolder::GetInstance()->db()->PartClientFromChannel(
         client_fd, channels[channel_index]->name());
-
-    // Send QUIT message to all clients in the channel
-    std::string response = ":" + client->GetNickname() + " QUIT :" + token;
-    std::vector<Client *> clients =
-        ContextHolder::GetInstance()->db()->GetClientsByChannelName(
-            channels[channel_index]->name());
-
-    for (int client_index = 0; client_index < channel_fd_list.size();
-         ++client_index) {
-      clients[client_index]->SetSendMessage(response);
-      fd_list.push_back(channel_fd);
-    }
   }
   // Delete client from server
   db->DelClient(client_fd);
 
   return fd_list;
+}
+
+void BroadcastQuit(Client *client, Channel *channel, const std::string &token,
+                   std::vector<int> *fd_list) {
+  std::string response = ":" + client->nick_name() + " QUIT :" + token;
+  std::vector<Client *> clients =
+      ContextHolder::GetInstance()->db()->GetClientsByChannelName(
+          channel->name());
+
+  for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
+    if (clients[client_index]->nick_name() == client->nick_name()) {
+      continue;
+    }
+    clients[client_index]->SetSendMessage(response);
+    fd_list->push_back(clients[client_index]->GetFd());
+  }
 }
 
 }  // namespace Just1RCe
