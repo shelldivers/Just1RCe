@@ -18,7 +18,8 @@ extern "C" {
 
 namespace Just1RCe {
 
-void Service::HandleServerEvent(struct epoll_event const &cur_event) {
+void Service::HandleServerEvent(int const epoll_fd,
+                                struct epoll_event const &cur_event) {
   // check sanity of server socket
   if (cur_event.events & (EPOLLHUP | EPOLLERR))
     throw std::runtime_error("server socket is broken");
@@ -26,6 +27,9 @@ void Service::HandleServerEvent(struct epoll_event const &cur_event) {
   // add new user
   Client *new_user = new Client(cur_event.data.fd);
   ContextHolder::GetInstance()->db()->AddClient(new_user);
+
+  // add new user to the event handler
+  RegisterClient(epoll_fd, new_user->GetFd());
 }
 
 static std::string GetCommandFromMessage(std::string const &msg) {
@@ -39,13 +43,22 @@ void Service::RunCommand(int const epoll_fd, CommandMapping const &cmd_map,
                          struct epoll_event const &cur_event,
                          std::string const &msg) {
   // call command handler
+  // get command identifier
   std::string const command = GetCommandFromMessage(msg);
-  std::vector<int> const fd_to_write =
-      (*(cmd_map.find(command)->second))(cur_event.data.fd, msg);
 
-  // set all messages
-  for (size_t i = 0; i < fd_to_write.size(); ++i)
-    SetWriteEvent(epoll_fd, fd_to_write[i]);
+  // command check
+  if (cmd_map.count(command)) {
+    // known command, call handler
+    std::vector<int> const fd_to_write =
+        (*(cmd_map.find(command)->second))(cur_event.data.fd, msg);
+
+    // set all messages
+    for (size_t i = 0; i < fd_to_write.size(); ++i)
+      SetWriteEvent(epoll_fd, fd_to_write[i]);
+  } else {
+    // unknown(unimplemented) command
+    // TODO(eldeshue) : reply ERROR_UNKNOWNCOMMAND(421)
+  }
 }
 
 void Service::HandleClientEvent(int const epoll_fd,
