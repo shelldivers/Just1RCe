@@ -65,7 +65,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   // 1. If the client is not authenticated, send welcome message
   // 2. If the client is in channels, send NICK message to all clients in the
   // channels
-  if (old_nickname.empty() == true || client->IsAuthenticated() == true) {
+  if (old_nickname.empty() == true && client->IsAuthenticated() == true) {
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
         RPL_WELCOME,
@@ -88,7 +88,8 @@ void NickCommandHandler::AnnounceNickChanged(Client* client,
                                              const std::string& new_nickname,
                                              std::vector<int>* fd_list) {
   std::vector<Channel*> channels =
-      ContextHolder::GetInstance()->db()->GetChannelsByClientFd(client->GetFd());
+      ContextHolder::GetInstance()->db()->GetChannelsByClientFd(
+          client->GetFd());
   const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
 
   for (size_t channel_index = 0; channel_index < channels.size();
