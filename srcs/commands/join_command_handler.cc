@@ -1,5 +1,7 @@
 #include "../../includes/commands/join_command_handler.h"
 
+#include <algorithm>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -14,17 +16,20 @@
 
 namespace Just1RCe {
 
-void JoinChannelWithResponse(Client *client, Channel *channel,
-                             const std::vector<std::string> &token_stream,
-                             std::vector<int> *fd_list);
-void PartFromAllChannelsWithResponse(
-    Client *client, const std::vector<std::string> &channel_names,
-    std::vector<int> *fd_list);
-int CheckChannelMode(const Client &client, Channel *channel,
-                     const std::string &key);
-int CheckChannelName(const Channel &channel);
-void BroadcastJoined(Client *client, const Channel &channel,
-                     std::vector<int> *fd_list);
+static void BroadcastJoined(Client *client, const Channel &channel,
+                            std::vector<int> *fd_list);
+static void JoinChannelWithResponse(
+    Client *client, Channel *channel,
+    const std::vector<std::string> &token_stream, std::vector<int> *fd_list);
+static int CheckChannelMode(const Client &client, Channel *channel,
+                            const std::string &key);
+static bool IsChannelNameValid(const std::string &channel_name);
+static void AddChannelAndJoinWithResponse(
+    Client *client, const std::string &channel_name,
+    const std::vector<std::string> &token_stream, std::vector<int> *fd_list);
+static void ResponseAsNumeric(Client *client, Channel *channel,
+                              const std::vector<std::string> &token_stream,
+                              std::vector<int> *fd_list, int numeric);
 
 JoinCommandHandler::JoinCommandHandler() {}
 
@@ -55,6 +60,7 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   Client *client = db->GetClient(client_fd);
 
   if (client == NULL || client->IsAuthenticated() == false) {
+    std::cerr << "client is not authenticated" << std::endl;
     return std::vector<int>();
   }
 
@@ -63,36 +69,31 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   std::vector<std::string> keys;
   Parser parser(message);
   parser.ParseCommandJoin(&channel_names, &keys);
+  std::vector<std::string> token_stream = parser.GetTokenStream();
 
   // No channel recieved
-  if (channel_names.size() == 0) {
-    ResponseGenerator &generator = ResponseGenerator::GetInstance();
-    std::string response = generator.GenerateResponse(
-        ERR_NEEDMOREPARAMS, ResponseArguments(ERR_NEEDMOREPARAMS, *client, NULL,
-                                              parser.GetTokenStream()));
-
-    client->SetSendMessage(response);
+  if (token_stream.size() < 2) {
+    ResponseAsNumeric(client, NULL, token_stream, NULL, ERR_NEEDMOREPARAMS);
+    std::cerr << "no channel recieved" << std::endl;
     return std::vector<int>(1, client_fd);
-  }
-
-  // Is alt parameter
-  if (channel_names.size() == 1 && channel_names[0] == "0") {
-    std::vector<int> fd_list;
-    PartFromAllChannelsWithResponse(client, channel_names, &fd_list);
-
-    return fd_list;
   }
 
   std::vector<int> fd_list;
   for (size_t index = 0; index < channel_names.size(); ++index) {
     Channel *channel = db->GetChannel(channel_names[index]);
 
+    if (IsChannelNameValid(channel_names[index]) == false) {
+      ResponseAsNumeric(client, channel, token_stream, &fd_list,
+                        ERR_BADCHANMASK);
+      std::cerr << "channel name is invalid" << std::endl;
+      continue;
+    }
+
     // If channel not exist, create channel
     if (channel == NULL) {
-      channel = new Channel(channel_names[index]);
-      db->AddChannel(channel);
-      JoinChannelWithResponse(client, channel, parser.GetTokenStream(),
-                              &fd_list);
+      AddChannelAndJoinWithResponse(client, channel_names[index], token_stream,
+                                    &fd_list);
+      std::cerr << "channel not exist, create channel" << std::endl;
       continue;
     }
 
@@ -102,90 +103,55 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     }
     int numeric = CheckChannelMode(*client, channel, key);
     if (numeric != IRC_NOERROR) {
-      ResponseGenerator &generator = ResponseGenerator::GetInstance();
-      std::string response = generator.GenerateResponse(
-          numeric, ResponseArguments(numeric, *client, channel,
-                                     parser.GetTokenStream()));
-
-      client->SetSendMessage(response);
-      fd_list.push_back(client_fd);
+      std::cerr << "channel mode check failed" << std::endl;
+      ResponseAsNumeric(client, channel, token_stream, &fd_list, numeric);
       continue;
     }
-
-    // Announce JOIN
+    std::cerr << "channel mode check success" << std::endl;
     BroadcastJoined(client, *channel, &fd_list);
-    JoinChannelWithResponse(client, channel, parser.GetTokenStream(), &fd_list);
+    std::cerr << "broadcast joined" << std::endl;
+    JoinChannelWithResponse(client, channel, token_stream, &fd_list);
   }
 
   return fd_list;
 }
 
-void BroadcastJoined(Client *client, const Channel &channel,
-                     std::vector<int> *fd_list) {
+static void BroadcastJoined(Client *client, const Channel &channel,
+                            std::vector<int> *fd_list) {
   DbContext *db = ContextHolder::GetInstance()->db();
 
   std::vector<Client *> client_list =
       db->GetClientsByChannelName(channel.name());
-  std::string response = client->nick_name() + " JOIN :" + channel.name();
+  std::string response = ":" + client->nick_name() + '!' + client->user_name() +
+                         '@' + client->GetHostName() + " JOIN " +
+                         channel.name();
   for (size_t index = 0; index < client_list.size(); ++index) {
     client_list[index]->SetSendMessage(response);
     fd_list->push_back(client_list[index]->GetFd());
   }
 }
 
-void JoinChannelWithResponse(Client *client, Channel *channel,
-                             const std::vector<std::string> &token_stream,
-                             std::vector<int> *fd_list) {
+static void JoinChannelWithResponse(
+    Client *client, Channel *channel,
+    const std::vector<std::string> &token_stream, std::vector<int> *fd_list) {
   DbContext *db = ContextHolder::GetInstance()->db();
 
   db->JoinClientToChannel(client->GetFd(), channel->name());
 
-  ResponseGenerator &generator = ResponseGenerator::GetInstance();
-  std::string response;
   // Topic message
-  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY)) {
-    response = generator.GenerateResponse(
-        RPL_TOPIC,
-        ResponseArguments(RPL_TOPIC, *client, channel, token_stream));
-    client->SetSendMessage(response);
-    fd_list->push_back(client->GetFd());
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY) &&
+      channel->topic().empty() == false) {
+    ResponseAsNumeric(client, channel, token_stream, fd_list, RPL_TOPIC);
   }
   // NameReply
-  response = generator.GenerateResponse(
-      RPL_NAMREPLY,
-      ResponseArguments(RPL_NAMREPLY, *client, channel, token_stream));
-  client->SetSendMessage(response);
-  fd_list->push_back(client->GetFd());
+  ResponseAsNumeric(client, channel, token_stream, fd_list, RPL_NAMREPLY);
 }
 
-void PartFromAllChannelsWithResponse(
-    Client *client, const std::vector<std::string> &channel_names,
-    std::vector<int> *fd_list) {
-  DbContext *db = ContextHolder::GetInstance()->db();
-
-  // Loop channel list
-  for (size_t index = 0; index < channel_names.size(); ++index) {
-    std::vector<Client *> client_list =
-        db->GetClientsByChannelName(channel_names[index]);
-    std::string response = client->nick_name() + " PART";
-
-    // Part channel
-    db->PartClientFromChannel(client->GetFd(), channel_names[index]);
-
-    // Send message
-    for (size_t client_index = 0; client_index < client_list.size();
-         ++client_index) {
-      client_list[client_index]->SetSendMessage(response);
-      fd_list->push_back(client_list[client_index]->GetFd());
-    }
-  }
-}
-
-int CheckChannelMode(const Client &client, Channel *channel,
-                     const std::string &key) {
+static int CheckChannelMode(const Client &client, Channel *channel,
+                            const std::string &key) {
   // Invite only
-  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY &&
-                         channel->IsInvited(client.GetHostName()) == false)) {
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY) &&
+      channel->IsInvited(client.GetHostName()) == false) {
     return ERR_INVITEONLYCHAN;
   }
   // Private channel
@@ -202,19 +168,43 @@ int CheckChannelMode(const Client &client, Channel *channel,
   return IRC_NOERROR;
 }
 
-int CheckChannelName(const Channel &channel) {
-  std::string channel_name = channel.name();
-  if (channel_name[0] != '@' && channel_name[0] != '&') {
-    return ERR_BADCHANMASK;
+static bool IsChannelNameValid(const std::string &channel_name) {
+  if (channel_name.size() <= 1) {
+    return false;
+  }
+  if (channel_name[0] != '#' && channel_name[0] != '&') {
+    return false;
   }
   for (size_t index = 1; index < channel_name.size(); ++index) {
     if (channel_name[index] == ' ' || channel_name[index] == '\a' ||
         channel_name[index] == ',') {
-      return ERR_BADCHANMASK;
+      return false;
     }
   }
 
-  return IRC_NOERROR;
+  return true;
+}
+
+static void AddChannelAndJoinWithResponse(
+    Client *client, const std::string &channel_name,
+    const std::vector<std::string> &token_stream, std::vector<int> *fd_list) {
+  DbContext *db = ContextHolder::GetInstance()->db();
+
+  Channel *channel = new Channel(channel_name);
+  db->AddChannel(channel);
+  JoinChannelWithResponse(client, channel, token_stream, fd_list);
+}
+
+static void ResponseAsNumeric(Client *client, Channel *channel,
+                              const std::vector<std::string> &token_stream,
+                              std::vector<int> *fd_list, int numeric) {
+  ResponseGenerator &generator = ResponseGenerator::GetInstance();
+  std::string response = generator.GenerateResponse(
+      numeric, ResponseArguments(numeric, *client, channel, token_stream));
+  client->SetSendMessage(response);
+  if (fd_list != NULL) {
+    fd_list->push_back(client->GetFd());
+  }
 }
 
 }  // namespace Just1RCe
