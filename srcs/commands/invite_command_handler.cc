@@ -109,7 +109,9 @@ std::vector<int> InviteCommandHandler::operator()(const int client_fd,
   target_client->SetSendMessage(response);
   fd_list.push_back(target_client_fd);
 
-  channel->Invite(target_client->GetHostName());
+  std::string target_hostmask = target_client->user_name() + "@" +
+                                target_client->GetHostName();
+  channel->Invite(target_hostmask);
 
   return fd_list;
 }
