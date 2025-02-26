@@ -29,8 +29,8 @@ void Client::SetSendMessage(std::string const &message) {
  * @return if true, write_buffer_ has content to send, re-register write event
  */
 bool Client::SendMessage() {
-  ssize_t send_size =
-      send(socket_.socket_fd(), write_buffer_.c_str(), write_buffer_.size(), 0);
+  ssize_t send_size = send(socket_.socket_fd(), write_buffer_.c_str(),
+                           write_buffer_.size(), MSG_NOSIGNAL);
   if (send_size == -1) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
       return true;  // re-register the write event
