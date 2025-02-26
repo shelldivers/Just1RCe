@@ -29,7 +29,7 @@ std::string ConvertModeToString(ClientModeMask const target) {
  * @return none
  * @throws none
  */
-inline void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags) {
+void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags) {
   *target |= flags;
 }
 
@@ -40,8 +40,7 @@ inline void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags) {
  * @return none
  * @throws none
  */
-inline void SubFlagsFromMode(ClientModeMask *target,
-                             ClientModeMask const flags) {
+void SubFlagsFromMode(ClientModeMask *target, ClientModeMask const flags) {
   *target &= ~flags;
 }
 
@@ -52,7 +51,7 @@ inline void SubFlagsFromMode(ClientModeMask *target,
  * @return true if all the mask in the flags are setted.
  * @throws none
  */
-inline bool CheckMode(ClientModeMask const target, ClientModeMask const flags) {
+bool CheckMode(ClientModeMask const target, ClientModeMask const flags) {
   return (flags & target) == flags;
 }
 

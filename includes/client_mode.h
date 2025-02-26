@@ -17,11 +17,9 @@ typedef unsigned int ClientModeMask;
 #define JUST1RCE_SRCS_CLIENT_MOD_RECEIVE_SERVER 0b010000
 
 std::string ConvertModeToString(ClientModeMask const target);
-inline void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags);
-inline void SubFlagsFromMode(ClientModeMask *target,
-                             ClientModeMask const flags);
-inline bool CheckMode(ClientModeMask const target,
-                      ClientModeMask const to_find);
+void AddFlagsToMode(ClientModeMask *target, ClientModeMask const flags);
+void SubFlagsFromMode(ClientModeMask *target, ClientModeMask const flags);
+bool CheckMode(ClientModeMask const target, ClientModeMask const to_find);
 
 }  // namespace Just1RCe
 

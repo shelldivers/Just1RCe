@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "../channel.h"
+#include "../client.h"
 #include "../command_handler.h"
 
 namespace Just1RCe {
