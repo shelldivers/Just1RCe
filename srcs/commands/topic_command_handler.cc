@@ -103,7 +103,8 @@ static int CheckNumericError(const Client& client, const Channel* channel) {
   }
 
   // ERR_CHANOPRIVSNEEDED (482): Client not channel operator
-  if (channel->GetOperatorFd() != client.GetFd()) {
+  if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_TOPIC_OPRT_ONLY) &&
+      channel->GetOperatorFd() != client.GetFd()) {
     return ERR_CHANOPRIVSNEEDED;
   }
 
