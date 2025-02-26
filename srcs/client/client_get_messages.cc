@@ -28,7 +28,8 @@ static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
 
   memset(recv_buffer, '\0', JUST1RCE_SRCS_CLIENT_MSG_MAX + 1);
   while (true) {
-    recv_size = recv(fd, recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, 0);
+    recv_size =
+        recv(fd, recv_buffer, JUST1RCE_SRCS_CLIENT_MSG_MAX, MSG_NOSIGNAL);
     // connection destructed, EPOLLHUP
     if (recv_size == 0) {
       return false;
