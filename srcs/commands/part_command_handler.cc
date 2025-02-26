@@ -127,8 +127,9 @@ static void BroadcastPart(const std::string& channel_name,
     if (clients[index]->nick_name() == client_name) {
       continue;
     }
-    std::string client_fullname = client_name + "!" + clients[index]->user_name() +
-                                  "@" + clients[index]->GetHostName();
+    std::string client_fullname = clients[index]->nick_name() + "!" +
+                                  clients[index]->user_name() + "@" +
+                                  clients[index]->GetHostName();
     std::string response = ":" + client_fullname + " PART " + channel_name;
 
     clients[index]->SetSendMessage(response);
