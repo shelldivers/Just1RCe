@@ -31,8 +31,8 @@ void ModeCommandHandler::BroadCastMode(std::vector<int> *fd_list,
 
   std::stringstream message;
   message << ':' << target_client->nick_name() << '!'
-          << target_client->user_name() << "@{" << target_client->GetHostName()
-          << "}.IP MODE " << target_channel->name() << ' ' << mode_oprt
+          << target_client->user_name() << "@" << target_client->GetHostName()
+          << ".IP MODE " << target_channel->name() << ' ' << mode_oprt
           << mode_identifier << ' ' << mode_arg;
 
   for (size_t i = 0; i < clients.size(); ++i) {
