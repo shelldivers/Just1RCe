@@ -42,7 +42,12 @@ void Service::RunIrcServer(std::string const &port_number,
       if (event_buffer[i].data.fd == server.socket_fd()) {
         HandleServerEvent(epoll_fd, event_buffer[i]);
       } else {
-        HandleClientEvent(epoll_fd, cmd_map, event_buffer[i]);
+        try {
+          HandleClientEvent(epoll_fd, cmd_map, event_buffer[i]);
+        } catch (const std::exception &e) {
+          RunCommand(epoll_fd, cmd_map, event_buffer[i],
+                     "QUIT :unexpected connection destroyed");
+        }
       }
     }
   }
