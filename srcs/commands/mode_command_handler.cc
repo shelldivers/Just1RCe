@@ -55,6 +55,9 @@ std::vector<int> ModeCommandHandler::operator()(const int client_fd,
   Channel *const target_channel =
       ContextHolder::GetInstance()->db()->GetChannel(target_channel_name);
 
+  // client auth check
+  if (!target_client->IsAuthenticated()) return std::vector<int>();
+
   // target channel not found
   if (target_channel == NULL) {
     std::string response = ResponseGenerator::GetInstance().GenerateResponse(
