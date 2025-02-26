@@ -104,8 +104,12 @@ std::vector<int> InviteCommandHandler::operator()(const int client_fd,
                                  client->GetHostName();
   std::string response =
       ":" + client_full_name + " INVITE " + target_nick + " :" + channel_name;
-  db->GetClient(target_client_fd)->SetSendMessage(response);
+  Client *target_client = db->GetClient(target_client_fd);
+  
+  target_client->SetSendMessage(response);
   fd_list.push_back(target_client_fd);
+
+  channel->Invite(target_client->GetHostName());
 
   return fd_list;
 }
