@@ -16,18 +16,13 @@ class ModeCommandHandler : public CommandHandler {
   ModeCommandHandler &operator=(ModeCommandHandler const &);
 
   // common utility
-  void ModeCommandHandler::BroadCastMode(std::vector<int> *fd_list,
-                                         Channel *const target_channel,
-                                         Client *const target_client,
-                                         char const mode_oprt,
-                                         char const mode_identifier,
-                                         std::string const &mode_arg);
+  void BroadCastMode(std::vector<int> *fd_list, Channel *const target_channel,
+                     Client *const target_client, char const mode_oprt,
+                     char const mode_identifier, std::string const &mode_arg);
 
-  void ModeCommandHandler::ModifyModes(Client *const target_client,
-                                       Channel *const target_channel,
-                                       std::string const &mode_string,
-                                       std::string const &mode_args,
-                                       std::vector<int> *fd_list);
+  void ModifyModes(Client *const target_client, Channel *const target_channel,
+                   std::string const &mode_string, std::string const &mode_args,
+                   std::vector<int> *fd_list);
   // mode to handle
   void ProcessModeI(Client *const target_client, Channel *const target_channel,
                     std::vector<int> *fd_list, char const oprt);
