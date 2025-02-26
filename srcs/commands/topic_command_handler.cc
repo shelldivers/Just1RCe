@@ -16,7 +16,8 @@
 namespace Just1RCe {
 
 static int CheckNumericError(const Client& client, const Channel* channel);
-static void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list);
+static void BroadcastTopic(const Client& client, const Channel* channel,
+                           std::vector<int>* fd_list);
 
 TopicCommandHandler::TopicCommandHandler() {}
 
@@ -83,7 +84,7 @@ std::vector<int> TopicCommandHandler::operator()(const int client_fd,
   std::vector<int> fd_list;
   std::string topic = token_stream[2];
   channel->set_topic(topic);
-  BroadcastTopic(channel, &fd_list);
+  BroadcastTopic(*client, channel, &fd_list);
 
   return std::vector<int>();
 }
@@ -111,9 +112,13 @@ static int CheckNumericError(const Client& client, const Channel* channel) {
   return IRC_NOERROR;
 }
 
-static void BroadcastTopic(const Channel* channel, std::vector<int>* fd_list) {
+static void BroadcastTopic(const Client& client, const Channel* channel,
+                           std::vector<int>* fd_list) {
   DbContext* db = ContextHolder::GetInstance()->db();
-  std::string response = "TOPIC " + channel->name() + " :" + channel->topic();
+  std::string client_fullname = client.nick_name() + "!" + client.user_name() +
+                                "@" + client.GetHostName();
+  std::string response = ":" + client_fullname + " TOPIC " + channel->name() +
+                         " :" + channel->topic();
 
   std::vector<Client*> clients = db->GetClientsByChannelName(channel->name());
   for (size_t index = 0; index < clients.size(); ++index) {
