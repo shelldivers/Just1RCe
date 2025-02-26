@@ -122,7 +122,7 @@ void ModeCommandHandler::ModifyModes(Client *const target_client,
   std::stringstream ss(mode_args);
   char oprt = '\0';
 
-  for (int i = 0; i < mode_string.size(); ++i) {
+  for (size_t i = 0; i < mode_string.size(); ++i) {
     if (CheckModeOperator(mode_string[i])) {
       // change method
       oprt = mode_string[i];
