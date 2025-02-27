@@ -76,7 +76,7 @@ std::vector<int> PrivmsgCommandHandler::operator()(const int client_fd,
   // ERR_CANNOTSENDTOCHAN (404): Cannot send to channel
   if (target_name[0] == '#' || target_name[0] == '&') {
     Channel *channel = db->GetChannel(target_name);
-    if (channel == NULL || IsUserOnChannel(client_fd, *channel)) {
+    if (channel == NULL || IsUserOnChannel(client_fd, *channel) == false) {
       ResponseAsNumeric(client, token_stream, ERR_CANNOTSENDTOCHAN);
       return std::vector<int>(1, client_fd);
     }
@@ -119,6 +119,9 @@ static void SendPrivmsgToChannel(const Client &client, const Channel &channel,
       ":" + client_fullname + " PRIVMSG " + channel.name() + " :" + message;
 
   for (size_t index = 0; index < clients.size(); ++index) {
+    if (client.GetFd() == clients[index]->GetFd()) {
+      continue;
+    }
     Client *client = clients[index];
     client->SetSendMessage(response);
     fd_list->push_back(client->GetFd());
