@@ -191,6 +191,7 @@ static void AddChannelAndJoinWithResponse(
   DbContext *db = ContextHolder::GetInstance()->db();
 
   Channel *channel = new Channel(channel_name);
+  channel->operator_fd(client->GetFd());
   db->AddChannel(channel);
   JoinChannelWithResponse(client, channel, token_stream, fd_list);
 }
