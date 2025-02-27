@@ -151,7 +151,8 @@ static int CheckChannelMode(const Client &client, Channel *channel,
                             const std::string &key) {
   // Invite only
   if (channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_INVITE_ONLY) &&
-      channel->IsInvited(client.GetHostName()) == false) {
+      channel->IsInvited(client.user_name() + "@" + client.GetHostName()) ==
+          false) {
     return ERR_INVITEONLYCHAN;
   }
   // Private channel
