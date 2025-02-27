@@ -69,7 +69,7 @@ std::vector<int> ModeCommandHandler::operator()(const int client_fd,
   }
 
   // check input parameter
-  if (CheckModeStringFormat(mode_string)) {
+  if (!CheckModeStringFormat(mode_string)) {
     std::string response = ResponseGenerator::GetInstance().GenerateResponse(
         RPL_CHANNELMODEIS,
         ResponseArguments(RPL_CHANNELMODEIS, *target_client, target_channel,
