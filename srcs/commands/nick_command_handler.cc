@@ -73,7 +73,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
     client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
-  } else {
+  } else if (old_nickname.empty() == false) {
     std::vector<int> fd_list;
     AnnounceNickChanged(client, old_nickname, new_nickname, &fd_list);
 
@@ -127,7 +127,7 @@ void NickCommandHandler::AnnounceNickChanged(Client* client,
  * - ERR_NICKNAMEINUSE(433): Nickname is already in use
  */
 int NickCommandHandler::CheckNick(const std::string& new_nickname) {
-  if (new_nickname.size() == 0) {
+  if (new_nickname.empty() == true) {
     return ERR_NONICKNAMEGIVEN;
   }
 
