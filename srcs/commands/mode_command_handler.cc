@@ -43,6 +43,8 @@ void ModeCommandHandler::BroadCastMode(std::vector<int> *fd_list,
 
 static bool CheckModeStringFormat(std::string const &mode_string);
 
+static bool CheckChannelNameFormat(std::string const &channel_name);
+
 std::vector<int> ModeCommandHandler::operator()(const int client_fd,
                                                 const std::string &message) {
   // parse message and get resources
@@ -58,6 +60,21 @@ std::vector<int> ModeCommandHandler::operator()(const int client_fd,
   // client auth check
   if (!target_client->IsAuthenticated()) return std::vector<int>();
 
+  // no user mode, no reply
+  if (!CheckChannelNameFormat(target_channel_name)) {
+    return std::vector<int>();
+  }
+
+  // check input parameter
+  if (!CheckModeStringFormat(mode_string)) {
+    std::string response = ResponseGenerator::GetInstance().GenerateResponse(
+        RPL_CHANNELMODEIS,
+        ResponseArguments(RPL_CHANNELMODEIS, *target_client, target_channel,
+                          parser.GetTokenStream()));
+    target_client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  }
+
   // target channel not found
   if (target_channel == NULL) {
     std::string response = ResponseGenerator::GetInstance().GenerateResponse(
@@ -67,17 +84,6 @@ std::vector<int> ModeCommandHandler::operator()(const int client_fd,
     target_client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
   }
-
-  // check input parameter
-  if (CheckModeStringFormat(mode_string)) {
-    std::string response = ResponseGenerator::GetInstance().GenerateResponse(
-        RPL_CHANNELMODEIS,
-        ResponseArguments(RPL_CHANNELMODEIS, *target_client, target_channel,
-                          parser.GetTokenStream()));
-    target_client->SetSendMessage(response);
-    return std::vector<int>(1, client_fd);
-  }
-
   // check client authority
   if (target_channel->GetOperatorFd() != client_fd) {
     std::string response = ResponseGenerator::GetInstance().GenerateResponse(
@@ -112,6 +118,11 @@ static bool CheckModeStringFormat(std::string const &mode_string) {
     if (!CheckModeIdentifier(mode_string[i])) return false;
   }
   return true;
+}
+
+static bool CheckChannelNameFormat(std::string const &channel_name) {
+  return ((!channel_name.empty()) &&
+          ((channel_name[0] == '#') || (channel_name[0] == '&')));
 }
 
 void ModeCommandHandler::ModifyModes(Client *const target_client,
