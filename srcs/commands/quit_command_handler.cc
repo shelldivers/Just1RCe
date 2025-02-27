@@ -62,7 +62,10 @@ std::vector<int> QuitCommandHandler::operator()(const int client_fd,
 
 void BroadcastQuit(Client *client, Channel *channel, const std::string &token,
                    std::vector<int> *fd_list) {
-  std::string response = ":" + client->nick_name() + " QUIT :" + token;
+  const std::string client_fullname = client->nick_name() + "!" +
+                                      client->user_name() + "@" +
+                                      client->GetHostName();
+  const std::string response = ":" + client->nick_name() + " QUIT :" + token;
   std::vector<Client *> clients =
       ContextHolder::GetInstance()->db()->GetClientsByChannelName(
           channel->name());
