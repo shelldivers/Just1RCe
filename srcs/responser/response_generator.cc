@@ -46,7 +46,7 @@ ResponseArguments::ResponseArguments(const int numeric, const Client& client,
         ContextHolder::GetInstance()->db()->GetClientsByChannelName(
             channel->name()),
         &nicknames);
-  } else {
+  } else if (params.size() > 1) {
     nicknames = params[1];
   }
 }

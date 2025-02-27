@@ -44,6 +44,17 @@ std::vector<int> PassCommandHandler::operator()(const int client_fd,
   std::string password;
   Parser parser(message);
   parser.ParseCommandPass(&password);
+  std::vector<std::string> token_stream = parser.GetTokenStream();
+
+  if (token_stream.size() < 2) {
+    ResponseGenerator& generator = ResponseGenerator::GetInstance();
+    std::string response = generator.GenerateResponse(
+        ERR_NEEDMOREPARAMS,
+        ResponseArguments(ERR_NEEDMOREPARAMS, *client, NULL, token_stream));
+
+    client->SetSendMessage(response);
+    return std::vector<int>(1, client_fd);
+  }
 
   // Get numeric
   int numeric = CheckPass(*client, password);
