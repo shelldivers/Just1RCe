@@ -109,7 +109,7 @@ void ResponseGenerator::InitializeTemplates() {
       ":%s 475 %c %h :Cannot join channel (+k)";
   response_templates_[ERR_BADCHANMASK] = ":%s 476 %h :Bad Channel Mask";
   response_templates_[ERR_CHANOPRIVSNEEDED] =
-      ":%s 482 %c %h :You're not channel operator";
+      ":%s 482 %h :You're not channel operator";
 }
 
 /**
