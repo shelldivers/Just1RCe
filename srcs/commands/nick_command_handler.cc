@@ -47,9 +47,12 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   Parser parser(message);
   parser.ParseCommandNick(&new_nickname);
 
-  // Check error
+    // Check error
   int numeric = CheckNick(new_nickname);
   if (numeric != IRC_NOERROR) {
+    if (client->IsAuthenticated() == false) {
+      return std::vector<int>();
+    }
     ResponseGenerator& generator = ResponseGenerator::GetInstance();
     std::string response = generator.GenerateResponse(
         numeric,
@@ -57,9 +60,10 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
     client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
-  }
+  }  
 
   client->set_nick_name(new_nickname);
+  ContextHolder::GetInstance()->db()->SetNickNameToFd(new_nickname, client_fd);
 
   // Send response
   // 1. If the client is not authenticated, send welcome message
@@ -73,7 +77,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
     client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
-  } else if (old_nickname.empty() == false) {
+  } else {
     std::vector<int> fd_list;
     AnnounceNickChanged(client, old_nickname, new_nickname, &fd_list);
 
@@ -127,7 +131,7 @@ void NickCommandHandler::AnnounceNickChanged(Client* client,
  * - ERR_NICKNAMEINUSE(433): Nickname is already in use
  */
 int NickCommandHandler::CheckNick(const std::string& new_nickname) {
-  if (new_nickname.empty() == true) {
+  if (new_nickname.size() == 0) {
     return ERR_NONICKNAMEGIVEN;
   }
 
