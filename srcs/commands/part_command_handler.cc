@@ -15,7 +15,7 @@
 namespace Just1RCe {
 
 static void BroadcastPart(const std::string& channel_name,
-                          const std::string& client_name,
+                          const Client* target_client,
                           std::vector<int>* fd_list);
 static bool IsClientExistOnChannel(const int client_fd,
                                    const std::string& channel_name);
@@ -85,7 +85,7 @@ std::vector<int> PartCommandHandler::operator()(const int client_fd,
       return std::vector<int>(1, client_fd);
     }
 
-    BroadcastPart(channel_names[index], client->nick_name(), &fd_list);
+    BroadcastPart(channel_names[index], client, &fd_list);
     db->PartClientFromChannel(client_fd, channel_names[index]);
   }
 
@@ -118,19 +118,20 @@ static bool IsClientExistOnChannel(const int client_fd,
 }
 
 static void BroadcastPart(const std::string& channel_name,
-                          const std::string& client_name,
+                          const Client* target_client,
                           std::vector<int>* fd_list) {
   DbContext* db = ContextHolder::GetInstance()->db();
   std::vector<Client*> clients = db->GetClientsByChannelName(channel_name);
 
+  std::string client_fullname = target_client->nick_name() + "!" +
+                                target_client->user_name() + "@" +
+                                target_client->GetHostName();
+  std::string response = ":" + client_fullname + " PART " + channel_name;
+
   for (size_t index = 0; index < clients.size(); ++index) {
-    if (clients[index]->nick_name() == client_name) {
+    if (clients[index] == target_client) {
       continue;
     }
-    std::string client_fullname = clients[index]->nick_name() + "!" +
-                                  clients[index]->user_name() + "@" +
-                                  clients[index]->GetHostName();
-    std::string response = ":" + client_fullname + " PART " + channel_name;
 
     clients[index]->SetSendMessage(response);
     fd_list->push_back(clients[index]->GetFd());
