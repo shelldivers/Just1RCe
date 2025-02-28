@@ -86,7 +86,7 @@ std::vector<int> TopicCommandHandler::operator()(const int client_fd,
   channel->set_topic(topic);
   BroadcastTopic(*client, channel, &fd_list);
 
-  return std::vector<int>();
+  return fd_list;
 }
 
 static int CheckNumericError(const Client& client, const Channel* channel) {
