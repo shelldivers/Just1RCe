@@ -27,10 +27,10 @@ void ModeCommandHandler::ProcessModeL(Client *const target_client,
                                       std::stringstream *arguments) {
   if (oprt == '+') {
     std::string arg;
-    *arguments >> arg;
+    std::getline(*arguments, arg, ',');
     int const new_limit = std::atoi(arg.c_str());
 
-    if (arg.empty() || !CheckAllDigit(arg) || new_limit < 1) {
+    if (!*arguments || arg.empty() || !CheckAllDigit(arg) || new_limit < 1) {
       // no argument or already key set, skip
       return;
     }
