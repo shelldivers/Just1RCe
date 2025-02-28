@@ -1,4 +1,6 @@
 
+#include <algorithm>
+#include <map>
 #include <string>
 #include <utility>
 
@@ -52,11 +54,18 @@ void InMemoryDbContext::DelClient(int const client_fd) {
     if (!isFound) break;
   }
 
+  Client *target_client = client_table_[client_fd];
+
   // delete nick name to fd mapping
-  DeleteNickNameToFd(client_table_[client_fd]->nick_name());
+  DeleteNickNameToFd(target_client->nick_name());
+
+  // delete all user-host mask in invite list among all channels
+  DeleteAllInvitation(
+      target_client->user_name() + "@" + target_client->GetHostName(),
+      &channel_table_);
 
   // delete client
-  delete client_table_[client_fd];
+  delete target_client;
   client_table_.erase(client_fd);
 }
 
@@ -78,6 +87,16 @@ int InMemoryDbContext::GetFdByNickName(std::string const &client_nick_name) {
 void InMemoryDbContext::DeleteNickNameToFd(
     std::string const &client_nick_name) {
   nick_name_to_fd_table_.erase(client_nick_name);
+}
+
+static void DeleteAllInvitation(
+    std::string const &user_host_mask,
+    std::map<ChannelName, Channel *> *channel_table) {
+  // for every channel, erase client's user-host mask
+  for (ChannelTableIter itr = channel_table->begin();
+       itr != channel_table->end(); ++itr) {
+    itr->second->UnInvite(user_host_mask);
+  }
 }
 
 }  // namespace Just1RCe

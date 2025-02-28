@@ -60,7 +60,6 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   Client *client = db->GetClient(client_fd);
 
   if (client == NULL || client->IsAuthenticated() == false) {
-    std::cerr << "client is not authenticated" << std::endl;
     return std::vector<int>();
   }
 
@@ -74,7 +73,6 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
   // No channel recieved
   if (token_stream.size() < 2) {
     ResponseAsNumeric(client, NULL, token_stream, NULL, ERR_NEEDMOREPARAMS);
-    std::cerr << "no channel recieved" << std::endl;
     return std::vector<int>(1, client_fd);
   }
 
@@ -85,7 +83,6 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     if (IsChannelNameValid(channel_names[index]) == false) {
       ResponseAsNumeric(client, channel, token_stream, &fd_list,
                         ERR_BADCHANMASK);
-      std::cerr << "channel name is invalid" << std::endl;
       continue;
     }
 
@@ -93,7 +90,6 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     if (channel == NULL) {
       AddChannelAndJoinWithResponse(client, channel_names[index], token_stream,
                                     &fd_list);
-      std::cerr << "channel not exist, create channel" << std::endl;
       continue;
     }
 
@@ -103,13 +99,10 @@ std::vector<int> JoinCommandHandler::operator()(const int client_fd,
     }
     int numeric = CheckChannelMode(*client, channel, key);
     if (numeric != IRC_NOERROR) {
-      std::cerr << "channel mode check failed" << std::endl;
       ResponseAsNumeric(client, channel, token_stream, &fd_list, numeric);
       continue;
     }
-    std::cerr << "channel mode check success" << std::endl;
     BroadcastJoined(client, *channel, &fd_list);
-    std::cerr << "broadcast joined" << std::endl;
     JoinChannelWithResponse(client, channel, token_stream, &fd_list);
   }
 
