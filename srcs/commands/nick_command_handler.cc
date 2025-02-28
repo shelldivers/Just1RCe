@@ -47,7 +47,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   Parser parser(message);
   parser.ParseCommandNick(&new_nickname);
 
-    // Check error
+  // Check error
   int numeric = CheckNick(new_nickname);
   if (numeric != IRC_NOERROR) {
     if (client->IsAuthenticated() == false) {
@@ -60,7 +60,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
 
     client->SetSendMessage(response);
     return std::vector<int>(1, client_fd);
-  }  
+  }
 
   client->set_nick_name(new_nickname);
   ContextHolder::GetInstance()->db()->SetNickNameToFd(new_nickname, client_fd);
@@ -94,7 +94,10 @@ void NickCommandHandler::AnnounceNickChanged(Client* client,
   std::vector<Channel*> channels =
       ContextHolder::GetInstance()->db()->GetChannelsByClientFd(
           client->GetFd());
-  const std::string nickname_changed = old_nickname + " NICK " + new_nickname;
+  const std::string old_nickname_full =
+      old_nickname + "!" + client->user_name() + "@" + client->GetHostName();
+  const std::string nickname_changed =
+      ":" + old_nickname_full + " NICK " + new_nickname;
 
   for (size_t channel_index = 0; channel_index < channels.size();
        channel_index++) {
