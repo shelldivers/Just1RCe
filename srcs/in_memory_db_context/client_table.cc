@@ -8,6 +8,10 @@
 
 namespace Just1RCe {
 
+static void DeleteAllInvitation(
+    std::string const &user_host_mask,
+    std::map<ChannelName, Channel *> *channel_table);
+
 /**
  *
  * @brief add client to the table
