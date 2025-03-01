@@ -32,12 +32,8 @@ bool Client::SendMessage() {
   ssize_t send_size = send(socket_.socket_fd(), write_buffer_.c_str(),
                            write_buffer_.size(), MSG_NOSIGNAL);
   if (send_size == -1) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK) {
-      return true;  // re-register the write event
-    } else {
       // throw error
       throw std::runtime_error(JUST1RCE_SRCS_CLIENT_SEND_ERROR);
-    }
   }
 
   // save partial message, push back to the read_buffer_

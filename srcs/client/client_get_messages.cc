@@ -34,10 +34,7 @@ static bool recv_and_append_buffer(int const fd, std::string *pbuffer) {
     if (recv_size == 0) {
       return false;
     }
-    // no more data to receive
-    if (recv_size == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-      break;
-    }
+  
     // recv error
     if (recv_size == -1) {
       throw std::runtime_error(JUST1RCE_SRCS_CLIENT_RECV_ERROR);
