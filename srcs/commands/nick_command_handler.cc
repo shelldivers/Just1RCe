@@ -63,6 +63,7 @@ std::vector<int> NickCommandHandler::operator()(const int client_fd,
   }
 
   client->set_nick_name(new_nickname);
+  ContextHolder::GetInstance()->db()->DeleteNickNameToFd(old_nickname);
   ContextHolder::GetInstance()->db()->SetNickNameToFd(new_nickname, client_fd);
 
   // Send response
