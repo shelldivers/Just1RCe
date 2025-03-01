@@ -1,0 +1,78 @@
+name: CMake Build, Analyze, and Test
+
+on:
+  push: 
+    branches:
+      - main
+      - dev
+  pull_request:
+
+jobs:
+  Run_Cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '3.30.0' 
+
+      - name: cmake build
+        run: cmake --preset=default -S . -B build
+
+      - name: CMake build and run cppcheck
+        run: cmake --build build --target RunCppcheck
+
+  Run_Cpplint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '3.30.0' 
+
+      - name: cmake build
+        run: cmake --preset=default -S . -B build
+
+      - name: CMake build and run cpplint
+        run: cmake --build build --target RunCpplint
+
+  Run_Google_Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '3.30.0' 
+
+      - name: cmake build
+        run: cmake --preset=default -S . -B build
+
+      - name: CMake build and run google test
+        run: cmake --build build --target RunGoogleTest
+
+
+
