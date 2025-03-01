@@ -20,9 +20,8 @@ void ModeCommandHandler::ProcessModeO(Client *const target_client,
                                       std::stringstream *arguments) {
   DbContext *db = ContextHolder::GetInstance()->db();
   std::string arg;
-  *arguments >> arg;
 
-  if (arg.empty()) {
+  if (!std::getline(*arguments, arg, ',') || arg.empty()) {
     return;
   }
   if (oprt == '+') {

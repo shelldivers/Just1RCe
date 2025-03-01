@@ -17,9 +17,6 @@ bool InMemoryDbContext::JoinClientToChannel(int const client_fd,
                                             std::string const &channel_name) {
   // user number check join availability
   Channel *target_channel = GetChannel(channel_name);
-  if (target_channel->cur_user_count() == target_channel->max_user_num()) {
-    return false;
-  }
 
   // add entry in the mapping table
   client_to_channel_mapping_table_.insert(

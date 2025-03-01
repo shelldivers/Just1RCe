@@ -19,9 +19,8 @@ void ModeCommandHandler::ProcessModeK(Client *const target_client,
                                       std::stringstream *arguments) {
   if (oprt == '+') {
     std::string new_key;
-    *arguments >> new_key;
 
-    if (new_key.empty() ||
+    if (!std::getline(*arguments, new_key, ',') || new_key.empty() ||
         target_channel->CheckMode(JUST1RCE_SRCS_CHANNEL_MOD_KEY_SET)) {
       // no argument or already key set, skip
       return;
